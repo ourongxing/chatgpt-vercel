@@ -4,6 +4,7 @@ import MarkdownIt from "markdown-it"
 // @ts-ignore
 import mdKatex from "markdown-it-katex"
 import mdHighlight from "markdown-it-highlightjs"
+import Clipboard from "./Clipboard"
 
 interface Props {
   role: ChatMessage["role"]
@@ -24,9 +25,9 @@ export default ({ role, message }: Props) => {
       .use(mdHighlight)
 
     if (typeof message === "function") {
-      return md.render(message())
+      return md.render(message().trim())
     } else if (typeof message === "string") {
-      return md.render(message)
+      return md.render(message.trim())
     }
     return ""
   }
@@ -37,7 +38,7 @@ export default ({ role, message }: Props) => {
 
   return (
     <div
-      class="flex py-2 gap-3 -mx-4 px-4 rounded-lg transition-colors md:hover:bg-slate/3"
+      class="flex py-2 gap-3 -mx-4 px-4 rounded-lg transition-colors md:hover:bg-slate/3 relative message-item"
       class:op-75={role === "user"}
     >
       <div
@@ -46,6 +47,16 @@ export default ({ role, message }: Props) => {
       <div
         class="message prose text-slate break-words overflow-hidden"
         innerHTML={htmlString()}
+      />
+      <Clipboard
+        message={(() => {
+          if (typeof message === "function") {
+            return message().trim()
+          } else if (typeof message === "string") {
+            return message.trim()
+          }
+          return ""
+        })()}
       />
     </div>
   )
