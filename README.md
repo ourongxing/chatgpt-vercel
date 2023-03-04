@@ -34,7 +34,7 @@ Demo: [https://chatgpt.busiyi.world](https://chatgpt.busiyi.world)
 ### POST /api
 
 ```ts
-await fetch("https://chat.busiyi.world/api", {
+await fetch("https://chatgpt.busiyi.world/api", {
     method: "POST",
     body: JSON.stringify({
         message: "xxx",
