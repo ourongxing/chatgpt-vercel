@@ -1,7 +1,9 @@
 {
-  "name": "novel-gpt",
+  "name": "vercel-chatgpt",
+  "version": "1.0.0",
+  "description": "powered by chatgpt-api",
   "type": "module",
-  "version": "0.0.1",
+  "license": "MIT",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -23,10 +25,11 @@
     "solid-js": "^1.6.11"
   },
   "devDependencies": {
+    "@iconify-json/carbon": "^1.1.16",
     "@types/markdown-it": "^12.2.3",
-    "@unocss/preset-attributify": "^0.50.1",
-    "@unocss/preset-typography": "^0.50.3",
+    "@vercel/node": "^2.8.0",
     "punycode": "^2.3.0",
+    "typescript": "^4.8.3",
     "unocss": "^0.50.1"
   }
 }

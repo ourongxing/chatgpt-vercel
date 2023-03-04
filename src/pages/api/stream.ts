@@ -1,38 +1,45 @@
-import type { APIRoute } from 'astro'
-import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser'
+import type { APIRoute } from "astro"
+import {
+  createParser,
+  ParsedEvent,
+  ReconnectInterval
+} from "eventsource-parser"
 
-const apiKey = import.meta.env.OPENAI_API_KEY
+const apiKeys = import.meta.env.OPENAI_API_KEY.split(/\s*\|\s*/)
 
-export const post: APIRoute = async (context) => {
+export const post: APIRoute = async context => {
   const body = await context.request.json()
-  const messages = body.messages
+  const apiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)]
+  let { messages, key = apiKey, temperature = 0.6 } = body
+
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
 
+  if (!key.startsWith("sk-")) key = apiKey
   if (!messages) {
-    return new Response('No input text')
+    return new Response("No input text")
   }
 
-  const completion = await fetch('https://api.openai.com/v1/chat/completions', {
+  const completion = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`
     },
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: "gpt-3.5-turbo",
       messages,
-      temperature: 0.6,
-      stream: true,
-    }),
+      temperature,
+      stream: true
+    })
   })
 
   const stream = new ReadableStream({
     async start(controller) {
       const streamParser = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === 'event') {
+        if (event.type === "event") {
           const data = event.data
-          if (data === '[DONE]') {
+          if (data === "[DONE]") {
             controller.close()
             return
           }
@@ -47,7 +54,7 @@ export const post: APIRoute = async (context) => {
             //   ],
             // }
             const json = JSON.parse(data)
-            const text = json.choices[0].delta?.content            
+            const text = json.choices[0].delta?.content
             const queue = encoder.encode(text)
             controller.enqueue(queue)
           } catch (e) {
@@ -60,7 +67,7 @@ export const post: APIRoute = async (context) => {
       for await (const chunk of completion.body as any) {
         parser.feed(decoder.decode(chunk))
       }
-    },
+    }
   })
 
   return new Response(stream)
