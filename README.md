@@ -2,6 +2,8 @@
 
 A demo repo based on [OpenAI GPT-3.5 Turbo API](https://platform.openai.com/docs/guides/chat).
 
+More powerful than [diu8081/chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo)
+
 Demo: [https://chatgpt.busiyi.world](https://chatgpt.busiyi.world)
 ## How to build
 
@@ -17,12 +19,12 @@ Demo: [https://chatgpt.busiyi.world](https://chatgpt.busiyi.world)
 3. Add your [OpenAI API key](https://platform.openai.com/account/api-keys) to `.env`
     ```
     OPENAI_API_KEY=sk-xxx...
-    // Also you can
+    // also you can set muiltiple keys
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
 4. Run the app
     ```shell
-    npm run dev
+    pnpm dev
     ```
 5. Deploy to Vercel
     ```shell
