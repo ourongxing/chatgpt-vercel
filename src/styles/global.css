@@ -1,5 +1,15 @@
-.text-ellipsis {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  /**/
+}
+::-webkit-scrollbar-track {
+  background: #404552;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2d37;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
 }

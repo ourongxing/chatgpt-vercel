@@ -1,10 +1,12 @@
 # ChatGPT-API Vercel
 
-![](https://testmnbbs.oss-cn-zhangjiakou.aliyuncs.com/pic/5abbf20f-8f62-4c67-91ef-9055625f83e0.jpeg?x-oss-process=base_webp)
+![](https://testmnbbs.oss-cn-zhangjiakou.aliyuncs.com/pic/20230306030720.png?x-oss-process=base_webp)
 
 A demo repo based on [OpenAI GPT-3.5 Turbo API](https://platform.openai.com/docs/guides/chat).
 
 More powerful than [diu8081/chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo)
+
+Demo: [https://vercel-chatgpt-github.vercel.app](https://vercel-chatgpt-github.vercel.app)
 ## How to build
 
 1. Setup & Install dependencies

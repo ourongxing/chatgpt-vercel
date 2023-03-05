@@ -1,14 +1,22 @@
 import { createEffect, createSignal, For, onMount, Show } from "solid-js"
 import MessageItem from "./MessageItem"
-import type { ChatMessage } from "../types"
+import type { ChatMessage } from "~/types"
 import Setting from "./Setting"
+import PromptList from "./PromptList"
+import prompts from "../../assets/awesome-chatgpt-prompts-zh.json"
+import { Fzf } from "fzf"
 
 const defaultSetting = {
   continuousDialogue: false,
   archiveSession: false,
-  openaiAPIKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  openaiAPIKey: "",
   openaiAPITemperature: 60,
   systemRule: "回答要尽可能的客观，不知道就说不知道，不要乱答。"
+}
+
+export interface PromptItem {
+  key: string
+  value: string
 }
 
 export type Setting = typeof defaultSetting
@@ -27,6 +35,8 @@ export default () => {
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
   const [setting, setSetting] = createSignal(defaultSetting)
+  const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
+  const fzf = new Fzf(prompts, { selector: k => `${k.key} (${k.value})` })
 
   onMount(() => {
     const storage = localStorage.getItem("setting")
@@ -80,6 +90,7 @@ export default () => {
     // @ts-ignore
     if (window?.umami) umami.trackEvent("chat_generate")
     inputRef.value = ""
+    setCompatiblePrompt([])
     setHeight("3em")
     if (
       !value ||
@@ -159,6 +170,7 @@ export default () => {
     inputRef.value = ""
     setMessageList([])
     setCurrentAssistantMessage("")
+    setCompatiblePrompt([])
   }
 
   function stopStreamFetch() {
@@ -166,6 +178,21 @@ export default () => {
       controller()?.abort()
       archiveCurrentMessage()
     }
+  }
+
+  function reAnswer() {
+    handleButtonClick(
+      messageList()
+        .filter(k => k.role === "user")
+        .at(-1)?.content
+    )
+  }
+
+  function selectPrompt(prompt: string) {
+    inputRef.value = prompt
+    // setHeight("3em")
+    setHeight(inputRef.scrollHeight + "px")
+    setCompatiblePrompt([])
   }
 
   const [height, setHeight] = createSignal("3em")
@@ -184,7 +211,7 @@ export default () => {
         <Show
           when={!loading()}
           fallback={() => (
-            <div class="h-12 my-4 flex items-center justify-center bg-slate bg-op-15 text-slate rounded-sm">
+            <div class="h-12 my-4 flex items-center justify-center bg-slate bg-op-15 text-slate rounded">
               <span>AI 正在思考...</span>
               <div
                 class="ml-1em px-2 py-0.5 border border-slate text-slate rounded-md text-sm op-70 cursor-pointer hover:bg-slate/10"
@@ -195,16 +222,23 @@ export default () => {
             </div>
           )}
         >
-          <div class="my-4 flex items-end">
+          <div class="mt-4 flex items-end">
             <textarea
               ref={inputRef!}
               id="input"
               placeholder="与 ta 对话吧"
               autocomplete="off"
               autofocus
-              disabled={loading()}
               onKeyDown={e => {
-                if (e.key === "Enter") {
+                if (compatiblePrompt().length) {
+                  if (
+                    e.key === "ArrowUp" ||
+                    e.key === "ArrowDown" ||
+                    e.key === "Enter"
+                  ) {
+                    e.preventDefault()
+                  }
+                } else if (e.key === "Enter") {
                   if (!e.shiftKey && !e.isComposing) {
                     handleButtonClick()
                   }
@@ -212,58 +246,53 @@ export default () => {
               }}
               onInput={e => {
                 setHeight("3em")
-                setHeight((e.target as HTMLTextAreaElement).scrollHeight + "px")
+                setHeight(
+                  (e.currentTarget as HTMLTextAreaElement).scrollHeight + "px"
+                )
+                let { value } = e.currentTarget
+                const promptKey = value.replace(/^\/(.*)/, "$1")
+                if (value === "") setCompatiblePrompt([])
+                else if (promptKey !== value) {
+                  if (promptKey === "") setCompatiblePrompt(prompts)
+                  else {
+                    setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
+                  }
+                }
               }}
               style={{
-                height: height()
+                height: height(),
+                "border-bottom-left-radius":
+                  compatiblePrompt().length === 0 ? "0.25rem" : 0
               }}
               class="self-end py-3 resize-none w-full px-3 text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
               rounded-l
             />
-            <button
-              onClick={() => handleButtonClick()}
-              disabled={loading()}
-              h-12
-              px-2
-              bg-slate
-              bg-op-15
-              text-slate
+            <div
+              class="flex text-slate bg-slate bg-op-15 h-3em items-center rounded-r"
+              style={{
+                "border-bottom-right-radius":
+                  compatiblePrompt().length === 0 ? "0.25rem" : 0
+              }}
             >
-              <span class="i-carbon:send-filled">123</span>
-            </button>
-            <button
-              onClick={() =>
-                handleButtonClick(
-                  messageList()
-                    .filter(k => k.role === "user")
-                    .at(-1)?.content
-                )
-              }
-              disabled={loading()}
-              h-12
-              bg-slate
-              bg-op-15
-              text-slate
-            >
-              <span class="i-carbon:reset">12312</span>
-            </button>
-            <button
-              title="Clear"
-              onClick={clear}
-              disabled={loading()}
-              h-12
-              w-10
-              bg-slate
-              bg-op-15
-              rounded-r
-              text-slate
-            >
-              <span class="i-carbon:trash-can">12312</span>
-            </button>
+              <button
+                title="发送"
+                onClick={() => handleButtonClick()}
+                class="i-carbon:send-filled text-5 mx-3 hover:text-slate-2"
+              />
+            </div>
           </div>
+          <PromptList
+            prompts={compatiblePrompt()}
+            select={selectPrompt}
+          ></PromptList>
         </Show>
       </div>
-      <Setting setting={setting} setSetting={setSetting} />
+      <Setting
+        setting={setting}
+        setSetting={setSetting}
+        clear={clear}
+        reAnswer={reAnswer}
+      />
     </div>
   )
 }

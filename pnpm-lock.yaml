@@ -5,10 +5,11 @@ specifiers:
   '@astrojs/vercel': ^3.1.3
   '@iconify-json/carbon': ^1.1.16
   '@types/markdown-it': ^12.2.3
-  '@unocss/reset': ^0.50.1
+  '@unocss/reset': ^0.50.3
   '@vercel/node': ^2.8.0
   astro: ^2.0.15
   eventsource-parser: ^0.1.0
+  fzf: ^0.5.1
   highlight.js: ^11.7.0
   katex: ^0.6.0
   markdown-it: ^13.0.1
@@ -25,6 +26,7 @@ dependencies:
   '@unocss/reset': 0.50.3
   astro: 2.0.17
   eventsource-parser: 0.1.0
+  fzf: 0.5.1
   highlight.js: 11.7.0
   katex: 0.6.0
   markdown-it: 13.0.1
@@ -2158,6 +2160,10 @@ packages:
 
   /function-bind/1.1.1:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
+    dev: false
+
+  /fzf/0.5.1:
+    resolution: {integrity: sha512-AJ9BBt/3K/IyCF+pQjdG194kVSS1hU/v/RnZgiCtYZzA0rj2OBVwwjBRUOclo9yJl2ovjtdw3C31/8/rnT0uug==}
     dev: false
 
   /gauge/3.0.2:

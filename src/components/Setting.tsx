@@ -4,19 +4,37 @@ import type { Setting } from "./Generator"
 export default function Setting(props: {
   setting: Accessor<Setting>
   setSetting: Setter<Setting>
+  clear: any
+  reAnswer: any
 }) {
   const [shown, setShown] = createSignal(false)
   return (
     <div class="text-sm text-slate">
-      <div class="flex items-center hover:text-slate-3 justify-between">
+      <div class="flex items-center justify-between">
         <div
-          class="flex items-center cursor-pointer"
+          class="flex items-center cursor-pointer hover:text-slate-3 "
           onClick={() => {
             setShown(!shown())
           }}
         >
           <button class="i-carbon:settings" />
           <span ml-1>设置</span>
+        </div>
+        <div class="flex">
+          <div
+            class="flex items-center cursor-pointer hover:text-slate-3 "
+            onClick={props.reAnswer}
+          >
+            <button class="i-carbon:reset" />
+            <span ml-1>重新回答</span>
+          </div>
+          <div
+            class="flex items-center cursor-pointer ml-3 hover:text-slate-3 "
+            onClick={props.clear}
+          >
+            <button class="i-carbon:trash-can" />
+            <span ml-1>清空对话</span>
+          </div>
         </div>
       </div>
       <Show when={shown()}>
