@@ -1,10 +1,18 @@
-import { createSignal, For, Show } from "solid-js"
+import { createSignal, For, onMount, Show } from "solid-js"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "../types"
 
 export default () => {
   let inputRef: HTMLTextAreaElement
-  const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
+  const [messageList, setMessageList] = createSignal<ChatMessage[]>([
+    // {
+    //   role: "system",
+    //   content: `
+    // \`\`\`js
+    // console.log("Hello World")
+    // `
+    // }
+  ])
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
 

@@ -32,7 +32,8 @@ button.copy {
   transition: border-color 0.25s, background-color 0.25s, opacity 0.25s;
 }
 
-.message-item:hover > button.copy,
+.message-item:hover > .message-copy,
+pre:hover > .code-copy,
 button.copy:focus {
   opacity: 1;
 }

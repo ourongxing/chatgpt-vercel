@@ -1,10 +1,13 @@
-import type { Accessor } from "solid-js"
+import { Accessor, onMount } from "solid-js"
 import type { ChatMessage } from "../types"
 import MarkdownIt from "markdown-it"
 // @ts-ignore
 import mdKatex from "markdown-it-katex"
 import mdHighlight from "markdown-it-highlightjs"
 import Clipboard from "./Clipboard"
+import { preWrapperPlugin } from "../markdown"
+import "../styles/message.css"
+import { useCopyCode } from "../hooks"
 
 interface Props {
   role: ChatMessage["role"]
@@ -12,6 +15,9 @@ interface Props {
 }
 
 export default ({ role, message }: Props) => {
+  onMount(() => {
+    useCopyCode()
+  })
   const roleClass = {
     system: "bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300",
     user: "bg-gradient-to-r from-purple-400 to-yellow-400",
@@ -23,6 +29,7 @@ export default ({ role, message }: Props) => {
     })
       .use(mdKatex)
       .use(mdHighlight)
+      .use(preWrapperPlugin)
 
     if (typeof message === "function") {
       return md.render(message().trim())
