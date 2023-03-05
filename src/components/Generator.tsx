@@ -1,12 +1,4 @@
-import {
-  createEffect,
-  createSignal,
-  For,
-  onCleanup,
-  onMount,
-  Show
-} from "solid-js"
-import { createStore } from "solid-js/store"
+import { createEffect, createSignal, For, onMount, Show } from "solid-js"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "../types"
 import Setting from "./Setting"

@@ -1,8 +1,9 @@
+import { onCleanup, onMount } from "solid-js"
 import { copyToClipboard } from "../utils"
 
 export function useCopyCode() {
   const timeoutIdMap: Map<HTMLElement, NodeJS.Timeout> = new Map()
-  window.addEventListener("click", e => {
+  const listerner = (e: MouseEvent) => {
     const el = e.target as HTMLElement
     if (el.matches(".code-copy")) {
       const parent = el.parentElement
@@ -24,5 +25,11 @@ export function useCopyCode() {
         timeoutIdMap.set(el, timeoutId)
       })
     }
+  }
+  onMount(() => {
+    window.addEventListener("click", listerner)
+  })
+  onCleanup(() => {
+    window.removeEventListener("click", listerner)
   })
 }
