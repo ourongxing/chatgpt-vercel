@@ -15,6 +15,23 @@ export default () => {
   ])
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
+  const [controller, setController] = createSignal<AbortController>()
+
+  const archiveCurrentMessage = () => {
+    if (currentAssistantMessage()) {
+      setMessageList([
+        ...messageList(),
+        {
+          role: "assistant",
+          content: currentAssistantMessage()
+        }
+      ])
+      setCurrentAssistantMessage("")
+      setLoading(false)
+      setController()
+      inputRef.focus()
+    }
+  }
 
   const handleButtonClick = async (value?: string) => {
     const inputValue = value ?? inputRef.value
@@ -33,7 +50,13 @@ export default () => {
         content: inputValue
       }
     ])
+    fetchGPT(inputValue)
+    archiveCurrentMessage()
+  }
 
+  async function fetchGPT(inputValue: string) {
+    const controller = new AbortController()
+    setController(controller)
     const response = await fetch("/api/stream", {
       method: "POST",
       body: JSON.stringify({
@@ -49,7 +72,8 @@ export default () => {
         key: localStorage.getItem("openai-api-key") || "",
         temperature:
           Number(localStorage.getItem("openai-api-range") || "60") / 100
-      })
+      }),
+      signal: controller.signal
     })
     if (!response.ok) {
       throw new Error(response.statusText)
@@ -75,21 +99,19 @@ export default () => {
       }
       done = readerDone
     }
-    setMessageList([
-      ...messageList(),
-      {
-        role: "assistant",
-        content: currentAssistantMessage()
-      }
-    ])
-    setCurrentAssistantMessage("")
-    setLoading(false)
   }
 
   const clear = () => {
     inputRef.value = ""
     setMessageList([])
     setCurrentAssistantMessage("")
+  }
+
+  const stopStreamFetch = () => {
+    if (controller()) {
+      controller()?.abort()
+      archiveCurrentMessage()
+    }
   }
 
   const [height, setHeight] = createSignal("3em")
@@ -107,7 +129,13 @@ export default () => {
         when={!loading()}
         fallback={() => (
           <div class="h-12 my-4 flex items-center justify-center bg-slate bg-op-15 text-slate rounded-sm">
-            AI 正在思考...
+            <span>AI 正在思考...</span>
+            <div
+              class="ml-1em px-2 py-0.5 border border-slate text-slate rounded-md text-sm op-70 cursor-pointer hover:bg-slate/10"
+              onClick={stopStreamFetch}
+            >
+              不需要了
+            </div>
           </div>
         )}
       >
