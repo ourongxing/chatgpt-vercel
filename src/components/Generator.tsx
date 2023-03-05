@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show } from "solid-js"
+import { createEffect, createSignal, For, onMount, Show } from "solid-js"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "../types"
 
@@ -17,7 +17,7 @@ export default () => {
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
 
-  const archiveCurrentMessage = () => {
+  function archiveCurrentMessage() {
     if (currentAssistantMessage()) {
       setMessageList([
         ...messageList(),
@@ -33,28 +33,35 @@ export default () => {
     }
   }
 
-  const handleButtonClick = async (value?: string) => {
+  async function handleButtonClick(value?: string) {
     const inputValue = value ?? inputRef.value
     if (!inputValue) {
       return
     }
-    setLoading(true)
     // @ts-ignore
     if (window?.umami) umami.trackEvent("chat_generate")
     inputRef.value = ""
     setHeight("3em")
-    setMessageList([
-      ...messageList(),
-      {
-        role: "user",
-        content: inputValue
-      }
-    ])
-    fetchGPT(inputValue)
-    archiveCurrentMessage()
+    if (
+      !value ||
+      value !==
+        messageList()
+          .filter(k => k.role === "user")
+          .at(-1)?.content
+    ) {
+      setMessageList([
+        ...messageList(),
+        {
+          role: "user",
+          content: inputValue
+        }
+      ])
+    }
+    await fetchGPT(inputValue)
   }
 
   async function fetchGPT(inputValue: string) {
+    setLoading(true)
     const controller = new AbortController()
     setController(controller)
     const response = await fetch("/api/stream", {
@@ -99,15 +106,16 @@ export default () => {
       }
       done = readerDone
     }
+    archiveCurrentMessage()
   }
 
-  const clear = () => {
+  function clear() {
     inputRef.value = ""
     setMessageList([])
     setCurrentAssistantMessage("")
   }
 
-  const stopStreamFetch = () => {
+  function stopStreamFetch() {
     if (controller()) {
       controller()?.abort()
       archiveCurrentMessage()
@@ -115,6 +123,7 @@ export default () => {
   }
 
   const [height, setHeight] = createSignal("3em")
+
   return (
     <div my-6>
       <For each={messageList()}>
@@ -176,7 +185,13 @@ export default () => {
             <span class="i-carbon:send-filled">123</span>
           </button>
           <button
-            onClick={() => handleButtonClick(messageList().at(-2)?.content)}
+            onClick={() =>
+              handleButtonClick(
+                messageList()
+                  .filter(k => k.role === "user")
+                  .at(-1)?.content
+              )
+            }
             disabled={loading()}
             h-12
             bg-slate
