@@ -7,7 +7,8 @@ const defaultSetting = {
   continuousDialogue: false,
   archiveSession: false,
   openaiAPIKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  openaiAPITemperature: 60
+  openaiAPITemperature: 60,
+  systemRule: "回答要尽可能的客观，不知道就说不知道，不要乱答。"
 }
 
 export type Setting = typeof defaultSetting
@@ -36,6 +37,7 @@ export default () => {
         const parsed = JSON.parse(storage)
         archiveSession = parsed.archiveSession
         setSetting({
+          ...defaultSetting,
           ...parsed,
           continuousDialogue: false
         })
@@ -109,11 +111,17 @@ export default () => {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
-          ? messageList()
+          ? [
+              ...messageList().slice(0, -1),
+              {
+                role: "user",
+                content: setting().systemRule.trim() + "\n" + inputValue
+              }
+            ]
           : [
               {
                 role: "user",
-                content: inputValue
+                content: setting().systemRule.trim() + "\n" + inputValue
               }
             ],
         key: setting().openaiAPIKey,
