@@ -171,7 +171,7 @@ export default () => {
   const [height, setHeight] = createSignal("3em")
 
   return (
-    <div my-6>
+    <div mt-6>
       <For each={messageList()}>
         {message => (
           <MessageItem role={message.role} message={message.content} />
@@ -180,87 +180,89 @@ export default () => {
       {currentAssistantMessage() && (
         <MessageItem role="assistant" message={currentAssistantMessage} />
       )}
-      <Show
-        when={!loading()}
-        fallback={() => (
-          <div class="h-12 my-4 flex items-center justify-center bg-slate bg-op-15 text-slate rounded-sm">
-            <span>AI 正在思考...</span>
-            <div
-              class="ml-1em px-2 py-0.5 border border-slate text-slate rounded-md text-sm op-70 cursor-pointer hover:bg-slate/10"
-              onClick={stopStreamFetch}
-            >
-              不需要了
+      <div mb-6>
+        <Show
+          when={!loading()}
+          fallback={() => (
+            <div class="h-12 my-4 flex items-center justify-center bg-slate bg-op-15 text-slate rounded-sm">
+              <span>AI 正在思考...</span>
+              <div
+                class="ml-1em px-2 py-0.5 border border-slate text-slate rounded-md text-sm op-70 cursor-pointer hover:bg-slate/10"
+                onClick={stopStreamFetch}
+              >
+                不需要了
+              </div>
             </div>
-          </div>
-        )}
-      >
-        <div class="my-4 flex items-end">
-          <textarea
-            ref={inputRef!}
-            id="input"
-            placeholder="与 ta 对话吧"
-            autocomplete="off"
-            autofocus
-            disabled={loading()}
-            onKeyDown={e => {
-              if (e.key === "Enter") {
-                if (!e.shiftKey && !e.isComposing) {
-                  handleButtonClick()
+          )}
+        >
+          <div class="my-4 flex items-end">
+            <textarea
+              ref={inputRef!}
+              id="input"
+              placeholder="与 ta 对话吧"
+              autocomplete="off"
+              autofocus
+              disabled={loading()}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  if (!e.shiftKey && !e.isComposing) {
+                    handleButtonClick()
+                  }
                 }
+              }}
+              onInput={e => {
+                setHeight("3em")
+                setHeight((e.target as HTMLTextAreaElement).scrollHeight + "px")
+              }}
+              style={{
+                height: height()
+              }}
+              class="self-end py-3 resize-none w-full px-3 text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
+              rounded-l
+            />
+            <button
+              onClick={() => handleButtonClick()}
+              disabled={loading()}
+              h-12
+              px-2
+              bg-slate
+              bg-op-15
+              text-slate
+            >
+              <span class="i-carbon:send-filled">123</span>
+            </button>
+            <button
+              onClick={() =>
+                handleButtonClick(
+                  messageList()
+                    .filter(k => k.role === "user")
+                    .at(-1)?.content
+                )
               }
-            }}
-            onInput={e => {
-              setHeight("3em")
-              setHeight((e.target as HTMLTextAreaElement).scrollHeight + "px")
-            }}
-            style={{
-              height: height()
-            }}
-            class="self-end py-3 resize-none w-full px-3 text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
-            rounded-l
-          />
-          <button
-            onClick={() => handleButtonClick()}
-            disabled={loading()}
-            h-12
-            px-2
-            bg-slate
-            bg-op-15
-            text-slate
-          >
-            <span class="i-carbon:send-filled">123</span>
-          </button>
-          <button
-            onClick={() =>
-              handleButtonClick(
-                messageList()
-                  .filter(k => k.role === "user")
-                  .at(-1)?.content
-              )
-            }
-            disabled={loading()}
-            h-12
-            bg-slate
-            bg-op-15
-            text-slate
-          >
-            <span class="i-carbon:reset">12312</span>
-          </button>
-          <button
-            title="Clear"
-            onClick={clear}
-            disabled={loading()}
-            h-12
-            w-10
-            bg-slate
-            bg-op-15
-            rounded-r
-            text-slate
-          >
-            <span class="i-carbon:trash-can">12312</span>
-          </button>
-        </div>
-      </Show>
+              disabled={loading()}
+              h-12
+              bg-slate
+              bg-op-15
+              text-slate
+            >
+              <span class="i-carbon:reset">12312</span>
+            </button>
+            <button
+              title="Clear"
+              onClick={clear}
+              disabled={loading()}
+              h-12
+              w-10
+              bg-slate
+              bg-op-15
+              rounded-r
+              text-slate
+            >
+              <span class="i-carbon:trash-can">12312</span>
+            </button>
+          </div>
+        </Show>
+      </div>
       <Setting setting={setting} setSetting={setSetting} />
     </div>
   )
