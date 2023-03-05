@@ -1,7 +1,24 @@
-import { createEffect, createSignal, For, onMount, Show } from "solid-js"
+import {
+  createEffect,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show
+} from "solid-js"
+import { createStore } from "solid-js/store"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "../types"
+import Setting from "./Setting"
 
+const defaultSetting = {
+  continuousDialogue: false,
+  archiveSession: false,
+  openaiAPIKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  openaiAPITemperature: 60
+}
+
+export type Setting = typeof defaultSetting
 export default () => {
   let inputRef: HTMLTextAreaElement
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([
@@ -16,7 +33,36 @@ export default () => {
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
+  const [setting, setSetting] = createSignal(defaultSetting)
 
+  onMount(() => {
+    const storage = localStorage.getItem("setting")
+    const session = localStorage.getItem("session")
+    try {
+      let archiveSession = false
+      if (storage) {
+        const parsed = JSON.parse(storage)
+        archiveSession = parsed.archiveSession
+        setSetting({
+          ...parsed,
+          continuousDialogue: false
+        })
+      }
+      if (session && archiveSession) {
+        setMessageList(JSON.parse(session))
+      }
+    } catch {
+      console.log("Setting parse error")
+    }
+  })
+
+  createEffect(() => {
+    localStorage.setItem("setting", JSON.stringify(setting()))
+  })
+  createEffect(() => {
+    if (setting().archiveSession)
+      localStorage.setItem("session", JSON.stringify(messageList()))
+  })
   function archiveCurrentMessage() {
     if (currentAssistantMessage()) {
       setMessageList([
@@ -32,7 +78,6 @@ export default () => {
       inputRef.focus()
     }
   }
-
   async function handleButtonClick(value?: string) {
     const inputValue = value ?? inputRef.value
     if (!inputValue) {
@@ -57,9 +102,13 @@ export default () => {
         }
       ])
     }
-    await fetchGPT(inputValue)
+    try {
+      await fetchGPT(inputValue)
+    } catch (error) {
+      setCurrentAssistantMessage(String(error))
+    }
+    archiveCurrentMessage()
   }
-
   async function fetchGPT(inputValue: string) {
     setLoading(true)
     const controller = new AbortController()
@@ -67,18 +116,16 @@ export default () => {
     const response = await fetch("/api/stream", {
       method: "POST",
       body: JSON.stringify({
-        messages:
-          localStorage.getItem("continuous-dialogue") === "true"
-            ? messageList()
-            : [
-                {
-                  role: "user",
-                  content: inputValue
-                }
-              ],
-        key: localStorage.getItem("openai-api-key") || "",
-        temperature:
-          Number(localStorage.getItem("openai-api-range") || "60") / 100
+        messages: setting().continuousDialogue
+          ? messageList()
+          : [
+              {
+                role: "user",
+                content: inputValue
+              }
+            ],
+        key: setting().openaiAPIKey,
+        temperature: setting().openaiAPITemperature / 100
       }),
       signal: controller.signal
     })
@@ -87,7 +134,7 @@ export default () => {
     }
     const data = response.body
     if (!data) {
-      throw new Error("No data")
+      throw new Error("没有返回数据")
     }
     const reader = data.getReader()
     const decoder = new TextDecoder("utf-8")
@@ -106,7 +153,6 @@ export default () => {
       }
       done = readerDone
     }
-    archiveCurrentMessage()
   }
 
   function clear() {
@@ -215,6 +261,7 @@ export default () => {
           </button>
         </div>
       </Show>
+      <Setting setting={setting} setSetting={setSetting} />
     </div>
   )
 }
