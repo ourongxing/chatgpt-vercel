@@ -55,7 +55,7 @@ function Item(props: {
   createEffect(() => {
     if (props.hover) {
       ref.focus()
-      ref.scrollIntoView({ block: "center", behavior: "smooth" })
+      ref.scrollIntoView({ block: "center" })
     }
   })
   return (
