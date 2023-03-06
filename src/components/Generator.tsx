@@ -252,8 +252,9 @@ export default function () {
                 const promptKey = value.replace(/^\/(.*)/, "$1")
                 if (value === "") setCompatiblePrompt([])
                 else if (promptKey !== value) {
-                  if (promptKey === "") setCompatiblePrompt(prompts)
-                  else {
+                  if (promptKey === "") {
+                    setCompatiblePrompt(prompts)
+                  } else {
                     setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
                   }
                 }
@@ -280,10 +281,12 @@ export default function () {
               />
             </div>
           </div>
-          <PromptList
-            prompts={compatiblePrompt()}
-            select={selectPrompt}
-          ></PromptList>
+          <Show when={compatiblePrompt().length}>
+            <PromptList
+              prompts={compatiblePrompt()}
+              select={selectPrompt}
+            ></PromptList>
+          </Show>
         </Show>
       </div>
       <Setting
