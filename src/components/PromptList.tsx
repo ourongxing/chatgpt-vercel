@@ -71,7 +71,7 @@ function Item(props: {
       }}
     >
       <p>{props.prompt.key}</p>
-      <p class="text-0.3em">{props.prompt.value}</p>
+      <p class="text-0.4em">{props.prompt.value}</p>
     </li>
   )
 }

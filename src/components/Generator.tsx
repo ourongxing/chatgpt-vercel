@@ -110,7 +110,11 @@ export default () => {
     try {
       await fetchGPT(inputValue)
     } catch (error) {
-      setCurrentAssistantMessage(String(error))
+      setCurrentAssistantMessage(
+        String(error).includes("The user aborted a request")
+          ? ""
+          : String(error)
+      )
     }
     archiveCurrentMessage()
   }
@@ -118,23 +122,17 @@ export default () => {
     setLoading(true)
     const controller = new AbortController()
     setController(controller)
+    const systemRule = setting().systemRule.trim()
+    const message = {
+      role: "user",
+      content: systemRule ? systemRule + "\n" + inputValue : inputValue
+    }
     const response = await fetch("/api/stream", {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
-          ? [
-              ...messageList().slice(0, -1),
-              {
-                role: "user",
-                content: setting().systemRule.trim() + "\n" + inputValue
-              }
-            ]
-          : [
-              {
-                role: "user",
-                content: setting().systemRule.trim() + "\n" + inputValue
-              }
-            ],
+          ? [...messageList().slice(0, -1), message]
+          : [message],
         key: setting().openaiAPIKey,
         temperature: setting().openaiAPITemperature / 100
       }),
