@@ -3,7 +3,7 @@ import MessageItem from "./MessageItem"
 import type { ChatMessage } from "~/types"
 import Setting from "./Setting"
 import PromptList from "./PromptList"
-import prompts from "../../assets/awesome-chatgpt-prompts-zh.json"
+import prompts from "../../assets/prompts.json"
 import { Fzf } from "fzf"
 
 const defaultSetting = {
@@ -15,8 +15,8 @@ const defaultSetting = {
 }
 
 export interface PromptItem {
-  key: string
-  value: string
+  desc: string
+  prompt: string
 }
 
 export type Setting = typeof defaultSetting
@@ -37,7 +37,7 @@ export default function () {
   const [controller, setController] = createSignal<AbortController>()
   const [setting, setSetting] = createSignal(defaultSetting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
-  const fzf = new Fzf(prompts, { selector: k => `${k.key} (${k.value})` })
+  const fzf = new Fzf(prompts, { selector: k => `${k.desc} (${k.prompt})` })
 
   onMount(() => {
     const storage = localStorage.getItem("setting")

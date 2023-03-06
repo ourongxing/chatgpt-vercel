@@ -12,7 +12,7 @@ export default function PromptList(props: {
     } else if (e.key === "ArrowUp") {
       setHoverIndex(hoverIndex() - 1)
     } else if (e.key === "Enter") {
-      props.select(props.prompts[hoverIndex()].value)
+      props.select(props.prompts[hoverIndex()].prompt)
     }
   }
 
@@ -67,11 +67,11 @@ function Item(props: {
         "bg-op-20": props.hover
       }}
       onClick={() => {
-        props.select(props.prompt.value)
+        props.select(props.prompt.prompt)
       }}
     >
-      <p>{props.prompt.key}</p>
-      <p class="text-0.4em">{props.prompt.value}</p>
+      <p>{props.prompt.desc}</p>
+      <p class="text-0.4em">{props.prompt.prompt}</p>
     </li>
   )
 }
