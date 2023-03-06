@@ -3,7 +3,7 @@ import MessageItem from "./MessageItem"
 import type { ChatMessage } from "~/types"
 import Setting from "./Setting"
 import PromptList from "./PromptList"
-import prompts from "../../assets/prompts.json"
+import prompts from "~/prompts"
 import { Fzf } from "fzf"
 
 const defaultSetting = {
@@ -80,7 +80,7 @@ export default function () {
       setCurrentAssistantMessage("")
       setLoading(false)
       setController()
-      inputRef.focus()
+      // inputRef.focus()
     }
   }
   async function handleButtonClick(value?: string) {
