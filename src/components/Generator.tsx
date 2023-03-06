@@ -9,7 +9,7 @@ import { Fzf } from "fzf"
 const defaultSetting = {
   continuousDialogue: true,
   archiveSession: false,
-  openaiAPIKey: "",
+  openaiAPIKey: "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 ",
   openaiAPITemperature: 60,
   systemRule: ""
 }
