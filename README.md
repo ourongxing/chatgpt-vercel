@@ -23,7 +23,20 @@
     // 你可以填写多个，用 | 分割，随机调用
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
-2. 默认设置在 [这里](https://github.com/ourongxing/chatgpt-demo/blob/9d9948f3a48dfc45c6e3abbc7f9c2d431f383046/src/components/Generator.tsx#L9)，自行修改。
+2. 默认设置在 [这里](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#L9-L15)，自行修改。目前已经移除了一些之前的默认设置，比如默认添加 `系统角色指令`，默认关闭 `开启连续对话`。
+    ```ts
+    const defaultSetting = {
+        // 连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
+        continuousDialogue: true,
+        // 记录对话内容，刷新后不会清空对话
+        archiveSession: false,
+        openaiAPIKey: "",
+        // 0-100 越高 ChatGPT 思维就越发散，开始乱答
+        openaiAPITemperature: 60,
+        // 系统角色指令，会在每次提问时添加到开头。主要用于对 ChatGPT 的语气，口头禅这些进行定制。
+        systemRule: ""
+    }
+    ```
 3. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要将 [这行代码](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#LL53C10-L53C39) 取消注释即可。
 4. `git commit & push` 即可重新部署，vscode 上点几下就可以了。
 
