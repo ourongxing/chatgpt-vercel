@@ -5,19 +5,26 @@ import {
   ReconnectInterval
 } from "eventsource-parser"
 
-const apiKeys = import.meta.env.OPENAI_API_KEY.split(/\s*\|\s*/)
+const apiKeys = (
+  import.meta.env.OPENAI_API_KEY?.split(/\s*\|\s*/) ?? []
+).filter(Boolean)
 
 export const post: APIRoute = async context => {
   const body = await context.request.json()
-  const apiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)]
+  const apiKey = apiKeys.length
+    ? apiKeys[Math.floor(Math.random() * apiKeys.length)]
+    : ""
   let { messages, key = apiKey, temperature = 0.6 } = body
 
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
 
   if (!key.startsWith("sk-")) key = apiKey
+  if (!key) {
+    return new Response("没有填写 OpenAI API key")
+  }
   if (!messages) {
-    return new Response("No input text")
+    return new Response("没有输入任何文字")
   }
 
   const completion = await fetch("https://api.openai.com/v1/chat/completions", {

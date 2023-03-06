@@ -20,7 +20,8 @@ export interface PromptItem {
 }
 
 export type Setting = typeof defaultSetting
-export default () => {
+
+export default function () {
   let inputRef: HTMLTextAreaElement
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([
     // {
@@ -48,8 +49,8 @@ export default () => {
         archiveSession = parsed.archiveSession
         setSetting({
           ...defaultSetting,
-          ...parsed,
-          continuousDialogue: false
+          ...parsed
+          // continuousDialogue: false
         })
       }
       if (session && archiveSession) {
