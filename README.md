@@ -23,8 +23,9 @@
     // 你可以填写多个，用 | 分割，随机调用
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
-2. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要将 [这行代码](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#LL53C10-L53C39) 取消注释即可。
-3. `git commit & push` 即可重新部署，vscode 上点几下就可以了。
+2. 默认设置在 [这里](https://github.com/ourongxing/chatgpt-demo/blob/9d9948f3a48dfc45c6e3abbc7f9c2d431f383046/src/components/Generator.tsx#L9)，自行修改。
+3. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要将 [这行代码](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#LL53C10-L53C39) 取消注释即可。
+4. `git commit & push` 即可重新部署，vscode 上点几下就可以了。
 
 ## API
 

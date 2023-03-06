@@ -7,11 +7,11 @@ import prompts from "~/prompts"
 import { Fzf } from "fzf"
 
 const defaultSetting = {
-  continuousDialogue: false,
+  continuousDialogue: true,
   archiveSession: false,
   openaiAPIKey: "",
   openaiAPITemperature: 60,
-  systemRule: "回答要尽可能的客观，不知道就说不知道，不要乱答。"
+  systemRule: ""
 }
 
 export interface PromptItem {
@@ -249,15 +249,11 @@ export default function () {
                   (e.currentTarget as HTMLTextAreaElement).scrollHeight + "px"
                 )
                 let { value } = e.currentTarget
+                if (value === "") return setCompatiblePrompt([])
+                if (value === "/") return setCompatiblePrompt(prompts)
                 const promptKey = value.replace(/^\/(.*)/, "$1")
-                if (value === "") setCompatiblePrompt([])
-                else if (promptKey !== value) {
-                  if (promptKey === "") {
-                    setCompatiblePrompt(prompts)
-                  } else {
-                    setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
-                  }
-                }
+                if (promptKey !== value)
+                  setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
               }}
               style={{
                 height: height(),
