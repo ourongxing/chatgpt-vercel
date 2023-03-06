@@ -49,7 +49,6 @@ export default () => {
         setSetting({
           ...defaultSetting,
           ...parsed,
-          continuousDialogue: false
         })
       }
       if (session && archiveSession) {
