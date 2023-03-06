@@ -16,11 +16,11 @@
 
 如果你需要部署给更多人用，那么你可能需要将上面创建的你自己的仓库 `git clone` 到本地。
 
-1. 将 `.env.example` 文件修改为 `.env`，然后在里面填入你的 [OpenAI API key](https://platform.openai.com/account/api-keys)。如果用户不填自己的 key，那么就会使用你的 key，所以你需要在这里填入你的 key。
+1. 将 `.env.example` 文件修改为 `.env`，然后在里面填入你的 [OpenAI API key](https://platform.openai.com/account/api-keys)。如果用户不填自己的 key，那么就会使用你的 key。
 
     ```
     OPENAI_API_KEY=sk-xxx...
-    // 你可以填写多个，用 | 分割，随机调用
+    // 你可以填写多个，用 | 分隔，随机调用。最好是多填几个，不太清楚有没有并发上的限制。
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
 2. 默认设置在 [这里](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#L9-L15)，自行修改。目前已经移除了一些之前的默认设置，比如默认添加 `系统角色指令`，默认关闭 `开启连续对话`。
