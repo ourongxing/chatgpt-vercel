@@ -25,6 +25,7 @@ export default function () {
     //   content: defaultMessage + defaultMessage + defaultMessage + defaultMessage
     // }
   ])
+  const [inputContent, setInputContent] = createSignal("")
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
@@ -112,13 +113,13 @@ export default function () {
   }
 
   async function handleButtonClick(value?: string) {
-    const inputValue = value ?? inputRef.value
+    const inputValue = value ?? inputContent()
     if (!inputValue) {
       return
     }
     // @ts-ignore
     if (window?.umami) umami.trackEvent("chat_generate")
-    inputRef.value = ""
+    setInputContent("")
     setCompatiblePrompt([])
     setHeight("48px")
     if (
@@ -197,7 +198,7 @@ export default function () {
   }
 
   function clear() {
-    inputRef.value = ""
+    setInputContent("")
     setMessageList([])
     setCurrentAssistantMessage("")
     setCompatiblePrompt([])
@@ -219,7 +220,7 @@ export default function () {
   }
 
   function selectPrompt(prompt: string) {
-    inputRef.value = prompt
+    setInputContent(prompt)
     // setHeight("48px")
     setHeight(inputRef.scrollHeight + "px")
     setCompatiblePrompt([])
@@ -282,6 +283,7 @@ export default function () {
               id="input"
               placeholder="与 ta 对话吧"
               autocomplete="off"
+              value={inputContent()}
               autofocus
               onClick={scrollToBottom}
               onBlur={() => {
@@ -313,6 +315,7 @@ export default function () {
                   }px`
                 )
                 let { value } = e.currentTarget
+                setInputContent(value)
                 if (value === "") return setCompatiblePrompt([])
                 if (value === "/" || value === " ")
                   return setCompatiblePrompt(prompts)
@@ -329,6 +332,15 @@ export default function () {
               class="self-end py-3 resize-none w-full px-3 text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
               rounded-l
             />
+            <Show when={inputContent()}>
+              <button
+                class="i-carbon:add-filled absolute right-3.5em bottom-3em rotate-45 hover:text-op-100 text-slate text-op-15"
+                onClick={() => {
+                  setInputContent("")
+                  setHeight("48px")
+                }}
+              />
+            </Show>
             <div
               class="flex text-slate bg-slate bg-op-15 h-3em items-center rounded-r"
               style={{
