@@ -278,8 +278,9 @@ export default function () {
                 )
                 let { value } = e.currentTarget
                 if (value === "") return setCompatiblePrompt([])
-                if (value === "/") return setCompatiblePrompt(prompts)
-                const promptKey = value.replace(/^\/(.*)/, "$1")
+                if (value === "/" || value === " ")
+                  return setCompatiblePrompt(prompts)
+                const promptKey = value.replace(/^[\/ ](.*)/, "$1")
                 if (promptKey !== value)
                   setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
               }}
