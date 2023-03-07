@@ -7,10 +7,12 @@
   background: #404552;
   border-top-right-radius: 0.25rem;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #2a2d37;
   border-radius: 0.25rem;
 }
+
 ::-webkit-scrollbar-corner {
   background: transparent;
 }

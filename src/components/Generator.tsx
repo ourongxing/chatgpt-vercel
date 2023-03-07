@@ -304,7 +304,14 @@ export default function () {
               }}
               onInput={e => {
                 setHeight("48px")
-                setHeight(e.currentTarget.scrollHeight + "px")
+                const { scrollHeight } = e.currentTarget
+                setHeight(
+                  `${
+                    scrollHeight > window.innerHeight - 64
+                      ? window.innerHeight - 64
+                      : scrollHeight
+                  }px`
+                )
                 let { value } = e.currentTarget
                 if (value === "") return setCompatiblePrompt([])
                 if (value === "/" || value === " ")
