@@ -338,6 +338,7 @@ export default function () {
                 onClick={() => {
                   setInputContent("")
                   setHeight("48px")
+                  setCompatiblePrompt([])
                 }}
               />
             </Show>
