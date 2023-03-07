@@ -12,6 +12,7 @@ specifiers:
   eventsource-parser: ^0.1.0
   fzf: ^0.5.1
   highlight.js: ^11.7.0
+  just-throttle: ^4.2.0
   katex: ^0.6.0
   markdown-it: ^13.0.1
   markdown-it-highlightjs: ^4.0.1
@@ -30,6 +31,7 @@ dependencies:
   eventsource-parser: 0.1.0
   fzf: 0.5.1
   highlight.js: 11.7.0
+  just-throttle: 4.2.0
   katex: 0.6.0
   markdown-it: 13.0.1
   markdown-it-highlightjs: 4.0.1
@@ -2586,6 +2588,10 @@ packages:
 
   /jsonc-parser/3.2.0:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
+    dev: false
+
+  /just-throttle/4.2.0:
+    resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==}
     dev: false
 
   /katex/0.6.0:

@@ -7,6 +7,7 @@ import PromptList from "./PromptList"
 import prompts from "~/prompts"
 import { Fzf } from "fzf"
 import { defaultMessage, defaultSetting } from "~/default"
+import throttle from "just-throttle"
 
 export interface PromptItem {
   desc: string
@@ -72,6 +73,18 @@ export default function () {
       localStorage.setItem("session", JSON.stringify(messageList()))
   })
 
+  // 坑，不能 function return
+  const scrollToBottom = throttle(
+    () => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+      })
+    },
+    250,
+    { leading: true, trailing: false }
+  )
+
   function archiveCurrentMessage() {
     if (currentAssistantMessage()) {
       setMessageList([
@@ -87,6 +100,7 @@ export default function () {
       inputRef.focus()
     }
   }
+
   async function handleButtonClick(value?: string) {
     const inputValue = value ?? inputRef.value
     if (!inputValue) {
@@ -115,6 +129,8 @@ export default function () {
     try {
       await fetchGPT(inputValue)
     } catch (error) {
+      setLoading(false)
+      setController()
       setCurrentAssistantMessage(
         String(error).includes("The user aborted a request")
           ? ""
@@ -123,6 +139,7 @@ export default function () {
     }
     archiveCurrentMessage()
   }
+
   async function fetchGPT(inputValue: string) {
     setLoading(true)
     const controller = new AbortController()
@@ -162,6 +179,7 @@ export default function () {
           continue
         }
         if (char) {
+          scrollToBottom()
           setCurrentAssistantMessage(currentAssistantMessage() + char)
         }
       }
