@@ -19,7 +19,12 @@ export type Setting = typeof defaultSetting
 export default function () {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
-  const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
+  const [messageList, setMessageList] = createSignal<ChatMessage[]>([
+    // {
+    //   role: "assistant",
+    //   content: defaultMessage + defaultMessage + defaultMessage + defaultMessage
+    // }
+  ])
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
@@ -73,7 +78,12 @@ export default function () {
       localStorage.setItem("session", JSON.stringify(messageList()))
   })
 
-  // 坑，不能 function return
+  createEffect(() => {
+    messageList().length
+    currentAssistantMessage()
+    scrollToBottom()
+  })
+
   const scrollToBottom = throttle(
     () => {
       window.scrollTo({
@@ -179,7 +189,6 @@ export default function () {
           continue
         }
         if (char) {
-          scrollToBottom()
           setCurrentAssistantMessage(currentAssistantMessage() + char)
         }
       }
@@ -227,7 +236,7 @@ export default function () {
         <MessageItem role="assistant" message={currentAssistantMessage} />
       )}
       <div
-        class="pb-6 fixed bottom-0 z-100 op-0"
+        class="pb-2em fixed bottom-0 z-100 op-0"
         style={
           containerWidth() === "init"
             ? {}
@@ -274,6 +283,10 @@ export default function () {
               placeholder="与 ta 对话吧"
               autocomplete="off"
               autofocus
+              onClick={scrollToBottom}
+              onBlur={() => {
+                setCompatiblePrompt([])
+              }}
               onKeyDown={e => {
                 if (compatiblePrompt().length) {
                   if (
