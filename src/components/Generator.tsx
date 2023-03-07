@@ -1,18 +1,12 @@
 import { createEffect, createSignal, For, onMount, Show } from "solid-js"
+import { createResizeObserver } from "@solid-primitives/resize-observer"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "~/types"
 import Setting from "./Setting"
 import PromptList from "./PromptList"
 import prompts from "~/prompts"
 import { Fzf } from "fzf"
-
-const defaultSetting = {
-  continuousDialogue: true,
-  archiveSession: false,
-  openaiAPIKey: "",
-  openaiAPITemperature: 60,
-  systemRule: ""
-}
+import { defaultMessage, defaultSetting } from "~/default"
 
 export interface PromptItem {
   desc: string
@@ -23,23 +17,20 @@ export type Setting = typeof defaultSetting
 
 export default function () {
   let inputRef: HTMLTextAreaElement
-  const [messageList, setMessageList] = createSignal<ChatMessage[]>([
-    // {
-    //   role: "system",
-    //   content: `
-    // \`\`\`js
-    // console.log("Hello World")
-    // `
-    // }
-  ])
+  let containerRef: HTMLDivElement
+  const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
   const [setting, setSetting] = createSignal(defaultSetting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
+  const [containerWidth, setContainerWidth] = createSignal("init")
   const fzf = new Fzf(prompts, { selector: k => `${k.desc} (${k.prompt})` })
 
   onMount(() => {
+    createResizeObserver(containerRef, ({ width, height }, el) => {
+      if (el === containerRef) setContainerWidth(width + "px")
+    })
     const storage = localStorage.getItem("setting")
     const session = localStorage.getItem("session")
     try {
@@ -62,12 +53,24 @@ export default function () {
   })
 
   createEffect(() => {
+    if (messageList().length === 0) {
+      setMessageList([
+        {
+          role: "assistant",
+          content: defaultMessage
+        }
+      ])
+    } else if (
+      messageList().length > 1 &&
+      messageList()[0].content === defaultMessage
+    ) {
+      setMessageList(messageList().slice(1))
+    }
     localStorage.setItem("setting", JSON.stringify(setting()))
-  })
-  createEffect(() => {
     if (setting().archiveSession)
       localStorage.setItem("session", JSON.stringify(messageList()))
   })
+
   function archiveCurrentMessage() {
     if (currentAssistantMessage()) {
       setMessageList([
@@ -197,7 +200,7 @@ export default function () {
   const [height, setHeight] = createSignal("3em")
 
   return (
-    <div mt-6>
+    <div mt-6 ref={containerRef!}>
       <For each={messageList()}>
         {message => (
           <MessageItem role={message.role} message={message.content} />
@@ -206,7 +209,26 @@ export default function () {
       {currentAssistantMessage() && (
         <MessageItem role="assistant" message={currentAssistantMessage} />
       )}
-      <div mb-6>
+      <div
+        class="pb-6 fixed bottom-0 z-100 bg-#171921 op-0"
+        style={
+          containerWidth() === "init"
+            ? {}
+            : {
+                transition: "opacity 0.3s ease-in-out",
+                width: containerWidth(),
+                opacity: 100
+              }
+        }
+      >
+        <Show when={!compatiblePrompt().length}>
+          <Setting
+            setting={setting}
+            setSetting={setSetting}
+            clear={clear}
+            reAnswer={reAnswer}
+          />
+        </Show>
         <Show
           when={!loading()}
           fallback={() => (
@@ -221,7 +243,13 @@ export default function () {
             </div>
           )}
         >
-          <div class="mt-4 flex items-end">
+          <Show when={compatiblePrompt().length}>
+            <PromptList
+              prompts={compatiblePrompt()}
+              select={selectPrompt}
+            ></PromptList>
+          </Show>
+          <div class="flex items-end">
             <textarea
               ref={inputRef!}
               id="input"
@@ -257,7 +285,7 @@ export default function () {
               }}
               style={{
                 height: height(),
-                "border-bottom-left-radius":
+                "border-top-left-radius":
                   compatiblePrompt().length === 0 ? "0.25rem" : 0
               }}
               class="self-end py-3 resize-none w-full px-3 text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
@@ -266,7 +294,7 @@ export default function () {
             <div
               class="flex text-slate bg-slate bg-op-15 h-3em items-center rounded-r"
               style={{
-                "border-bottom-right-radius":
+                "border-top-right-radius":
                   compatiblePrompt().length === 0 ? "0.25rem" : 0
               }}
             >
@@ -277,20 +305,8 @@ export default function () {
               />
             </div>
           </div>
-          <Show when={compatiblePrompt().length}>
-            <PromptList
-              prompts={compatiblePrompt()}
-              select={selectPrompt}
-            ></PromptList>
-          </Show>
         </Show>
       </div>
-      <Setting
-        setting={setting}
-        setSetting={setSetting}
-        clear={clear}
-        reAnswer={reAnswer}
-      />
     </div>
   )
 }

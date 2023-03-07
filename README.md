@@ -1,4 +1,4 @@
-# ChatGPT-API Vercel
+# ChatGPT-Vercel
 
 ![](assets/screenshot.png)
 

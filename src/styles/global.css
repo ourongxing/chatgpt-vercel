@@ -13,3 +13,17 @@
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+html {
+  font-family: system-ui, sans-serif;
+  background-color: #171921;
+  color: #ffffff;
+}
+main {
+  max-width: 70ch;
+  margin: 0 auto;
+  padding: 8em 2em;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}

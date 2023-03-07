@@ -18,8 +18,8 @@ export default ({ role, message }: Props) => {
   useCopyCode()
   const roleClass = {
     system: "bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300",
-    user: "bg-gradient-to-r from-purple-400 to-yellow-400",
-    assistant: "bg-gradient-to-r from-yellow-200 via-green-200 to-green-300"
+    user: "bg-gradient-to-r from-sky-400 to-emerald-500",
+    assistant: "bg-gradient-to-r from-yellow-300 to-red-700 "
   }
 
   const htmlString = () => {

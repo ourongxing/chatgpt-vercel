@@ -4,6 +4,7 @@ specifiers:
   '@astrojs/solid-js': ^2.0.2
   '@astrojs/vercel': ^3.1.3
   '@iconify-json/carbon': ^1.1.16
+  '@solid-primitives/resize-observer': ^2.0.11
   '@types/markdown-it': ^12.2.3
   '@unocss/reset': ^0.50.3
   '@vercel/node': ^2.8.0
@@ -23,6 +24,7 @@ specifiers:
 dependencies:
   '@astrojs/solid-js': 2.0.2_solid-js@1.6.11
   '@astrojs/vercel': 3.1.4_astro@2.0.17
+  '@solid-primitives/resize-observer': 2.0.11_solid-js@1.6.11
   '@unocss/reset': 0.50.3
   astro: 2.0.17
   eventsource-parser: 0.1.0
@@ -791,6 +793,43 @@ packages:
       estree-walker: 2.0.2
       picomatch: 2.3.1
     dev: true
+
+  /@solid-primitives/event-listener/2.2.8_solid-js@1.6.11:
+    resolution: {integrity: sha512-I3Fw6+1g1YrXBWHwnNi6UaYuRVeaRBN2pvfGvKgnHH4OtfN6mgkGXi7s+/QOJjS29sEdwRDR9tQgxckaIxKZ7A==}
+    peerDependencies:
+      solid-js: ^1.6.0
+    dependencies:
+      '@solid-primitives/utils': 5.4.0_solid-js@1.6.11
+      solid-js: 1.6.11
+    dev: false
+
+  /@solid-primitives/resize-observer/2.0.11_solid-js@1.6.11:
+    resolution: {integrity: sha512-d9ePqQWVnHrr05u2IQaQNSPHaE898LUU5vuUcJzyjAP+3y6w/OD7wQKF/+BifploVqu3Fz7hLGlJA9GoDF2c2Q==}
+    peerDependencies:
+      solid-js: ^1.6.0
+    dependencies:
+      '@solid-primitives/event-listener': 2.2.8_solid-js@1.6.11
+      '@solid-primitives/rootless': 1.2.6_solid-js@1.6.11
+      '@solid-primitives/utils': 5.4.0_solid-js@1.6.11
+      solid-js: 1.6.11
+    dev: false
+
+  /@solid-primitives/rootless/1.2.6_solid-js@1.6.11:
+    resolution: {integrity: sha512-gcEF2JqdLDyKsfA7FWRZok1JkbKKjQesaRAj4odfkHTakEzU95YfBQxH9NHZ/ezP5WSR7m/xEh5eQjHs+7XPPA==}
+    peerDependencies:
+      solid-js: ^1.6.11
+    dependencies:
+      '@solid-primitives/utils': 5.4.0_solid-js@1.6.11
+      solid-js: 1.6.11
+    dev: false
+
+  /@solid-primitives/utils/5.4.0_solid-js@1.6.11:
+    resolution: {integrity: sha512-cSya9Tnh8KW6OYtJbZYs3//CVWWQAOXhMckH9paSzMQcoM09P+R1lLUN9BhQOws4c6PMA0apPNrbWsQzqZzIEw==}
+    peerDependencies:
+      solid-js: ^1.6.0
+    dependencies:
+      solid-js: 1.6.11
+    dev: false
 
   /@ts-morph/common/0.11.1:
     resolution: {integrity: sha512-7hWZS0NRpEsNV8vWJzg7FEz6V8MaLNeJOmwmghqUXTpzk16V1LLZhdo+4QvE/+zv4cVci0OviuJFnqhEfoV3+g==}

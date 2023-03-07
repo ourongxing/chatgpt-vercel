@@ -1,11 +1,13 @@
 ---
-import Logo from './Logo.astro'
+import Logo from "./Logo.astro"
 ---
 
 <header>
   <Logo />
   <div class="flex items-center mt-2">
-    <span class="text-2xl text-slate font-extrabold mr-1">ChatGPT</span>
+    <span
+      class="text-2xl text-transparent font-extrabold bg-clip-text bg-gradient-to-r from-yellow-300 to-red-700 mr-1" >ChatGPT</span
+    >
+    <span class="ml-1 text-2xl  font-extrabold text-slate">Vercel</span>
   </div>
-  <p mt-1 text-slate op-60>由 OpenAI API (gpt-3.5-turbo) 提供支持</p>
 </header>
