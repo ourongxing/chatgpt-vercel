@@ -83,7 +83,7 @@ export default function () {
       setCurrentAssistantMessage("")
       setLoading(false)
       setController()
-      // inputRef.focus()
+      inputRef.focus()
     }
   }
   async function handleButtonClick(value?: string) {
