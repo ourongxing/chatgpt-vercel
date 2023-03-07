@@ -23,7 +23,7 @@
     // 你可以填写多个，用 | 分隔，随机调用。最好是多填几个，不太清楚有没有并发上的限制。
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
-2. 默认设置在 [这里](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#L9-L15)，自行修改。目前已经移除了一些之前的默认设置，比如默认添加 `系统角色指令`，默认关闭 `开启连续对话`。
+2. 默认设置在 `src/default.ts` 文件中，自行修改。默认的提示问题也在这里。
     ```ts
     const defaultSetting = {
         // 连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
@@ -37,12 +37,13 @@
         systemRule: ""
     }
     ```
-3. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要将 [这行代码](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#LL53C10-L53C39) 取消注释即可。
+3. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要将 [这行代码](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#L46) 取消注释即可。
+
 4. `git commit & push` 即可重新部署，vscode 上点几下就可以了。
 
 如果你需要在本地开发和调试，有点麻烦
 1. 升级到 `node18`，要用到原生的 `fetch`。
-2. API 被墙了，自己想办法开代理，不然要报错。
+2. API 被墙了，自己想办法开代理，不然要报错。也可以直接 `vercel deploy` 部署到 vercel 开发环境上调试。
 3. `pnpm i` 安装依赖。
 4. `pnpm dev` 启动项目。
 ## API
