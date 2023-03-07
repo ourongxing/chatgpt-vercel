@@ -21,7 +21,7 @@
     // 你可以填写多个，用 | 分隔，随机调用。最好是多填几个，不太清楚有没有并发上的限制。
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
-2. 默认设置在 `src/default.ts` 文件中，自行修改。默认的提示问题也在这里。
+2. 默认设置在 `src/default.ts` 文件中，自行修改。默认的提示信息也在这里。
     ```ts
     const defaultSetting = {
         // 连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
