@@ -31,6 +31,12 @@ main {
   padding: 8em 2em;
 }
 
+@media (max-width: 768px) {
+  main {
+    padding-top: 2em;
+  }
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
 }
