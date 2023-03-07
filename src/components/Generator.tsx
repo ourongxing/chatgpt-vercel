@@ -286,9 +286,9 @@ export default function () {
               value={inputContent()}
               autofocus
               onClick={scrollToBottom}
-              onBlur={() => {
-                setCompatiblePrompt([])
-              }}
+              // onBlur={() => {
+              //   setCompatiblePrompt([])
+              // }}
               onKeyDown={e => {
                 if (compatiblePrompt().length) {
                   if (
