@@ -232,7 +232,7 @@ export default function () {
         <Show
           when={!loading()}
           fallback={() => (
-            <div class="h-12 my-4 flex items-center justify-center bg-slate bg-op-15 text-slate rounded">
+            <div class="h-12 flex items-center justify-center bg-slate bg-op-15 text-slate rounded">
               <span>AI 正在思考...</span>
               <div
                 class="ml-1em px-2 py-0.5 border border-slate text-slate rounded-md text-sm op-70 cursor-pointer hover:bg-slate/10"
