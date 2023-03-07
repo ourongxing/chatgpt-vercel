@@ -14,13 +14,19 @@
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+:root {
+  --bg: #171921;
+}
+
 html {
   font-family: system-ui, sans-serif;
-  background-color: #171921;
+  background-color: var(--bg);
   color: #ffffff;
 }
+
 main {
-  max-width: 70ch;
+  max-width: 72ch;
   margin: 0 auto;
   padding: 8em 2em;
 }

@@ -44,7 +44,7 @@ export default ({ role, message }: Props) => {
 
   return (
     <div
-      class="flex py-2 gap-3 -mx-4 px-4 rounded-lg transition-colors md:hover:bg-slate/3 relative message-item"
+      class="flex py-2 gap-3 px-4 rounded-lg transition-colors md:hover:bg-slate/3 relative message-item"
       class:op-75={role === "user"}
     >
       <div

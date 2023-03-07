@@ -31,7 +31,7 @@ export default function () {
 
   onMount(() => {
     createResizeObserver(containerRef, ({ width, height }, el) => {
-      if (el === containerRef) setContainerWidth(width + "px")
+      if (el === containerRef) setContainerWidth(`${width}px`)
     })
     const storage = localStorage.getItem("setting")
     const session = localStorage.getItem("session")
@@ -227,14 +227,15 @@ export default function () {
         <MessageItem role="assistant" message={currentAssistantMessage} />
       )}
       <div
-        class="pb-6 fixed bottom-0 z-100 bg-#171921 op-0"
+        class="pb-6 fixed bottom-0 z-100 op-0"
         style={
           containerWidth() === "init"
             ? {}
             : {
                 transition: "opacity 0.3s ease-in-out",
                 width: containerWidth(),
-                opacity: 100
+                opacity: 100,
+                "background-color": "var(--bg)"
               }
         }
       >
