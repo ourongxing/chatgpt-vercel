@@ -1,8 +1,6 @@
 # ChatGPT-Vercel
 
-![](assets/screenshot.png)
-
-对 [diu8081/chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo) 进行功能上的增强。
+![](assets/preview.png)
 
 预览: [https://vercel-chatgpt-github.vercel.app](https://vercel-chatgpt-github.vercel.app)
 
