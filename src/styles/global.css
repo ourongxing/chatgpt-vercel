@@ -5,10 +5,11 @@
 }
 ::-webkit-scrollbar-track {
   background: #404552;
-  border-radius: 2px;
+  border-top-right-radius: 0.25rem;
 }
 ::-webkit-scrollbar-thumb {
   background: #2a2d37;
+  border-radius: 0.25rem;
 }
 ::-webkit-scrollbar-corner {
   background: transparent;

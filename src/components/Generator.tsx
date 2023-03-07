@@ -26,6 +26,7 @@ export default function () {
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
   const fzf = new Fzf(prompts, { selector: k => `${k.desc} (${k.prompt})` })
+  const [height, setHeight] = createSignal("48px")
 
   onMount(() => {
     createResizeObserver(containerRef, ({ width, height }, el) => {
@@ -95,7 +96,7 @@ export default function () {
     if (window?.umami) umami.trackEvent("chat_generate")
     inputRef.value = ""
     setCompatiblePrompt([])
-    setHeight("3em")
+    setHeight("48px")
     if (
       !value ||
       value !==
@@ -192,12 +193,10 @@ export default function () {
 
   function selectPrompt(prompt: string) {
     inputRef.value = prompt
-    // setHeight("3em")
+    // setHeight("48px")
     setHeight(inputRef.scrollHeight + "px")
     setCompatiblePrompt([])
   }
-
-  const [height, setHeight] = createSignal("3em")
 
   return (
     <div mt-6 ref={containerRef!}>
@@ -221,7 +220,7 @@ export default function () {
               }
         }
       >
-        <Show when={!compatiblePrompt().length}>
+        <Show when={!compatiblePrompt().length && height() === "48px"}>
           <Setting
             setting={setting}
             setSetting={setSetting}
@@ -272,10 +271,8 @@ export default function () {
                 }
               }}
               onInput={e => {
-                setHeight("3em")
-                setHeight(
-                  (e.currentTarget as HTMLTextAreaElement).scrollHeight + "px"
-                )
+                setHeight("48px")
+                setHeight(e.currentTarget.scrollHeight + "px")
                 let { value } = e.currentTarget
                 if (value === "") return setCompatiblePrompt([])
                 if (value === "/" || value === " ")
@@ -286,6 +283,7 @@ export default function () {
               }}
               style={{
                 height: height(),
+                "border-top-right-radius": height() === "48px" ? 0 : "0.25rem",
                 "border-top-left-radius":
                   compatiblePrompt().length === 0 ? "0.25rem" : 0
               }}
