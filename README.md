@@ -21,6 +21,8 @@
     // 你可以填写多个，用 | 分隔，随机调用。最好是多填几个，不太清楚有没有并发上的限制。
     OPENAI_API_KEY=sk-xxx|sk-yyy
     ```
+    最新版本支持读取 Vercel 的环境变量，所以你也可以直接在 Vercel 上设置环境变量，如图所示。对于大部分人来说这个更方便。会在下次部署时生效。
+    ![](assets/environment.png)
 2. 默认设置在 `src/default.ts` 文件中，自行修改。默认的提示信息也在这里。
     ```ts
     const defaultSetting = {
