@@ -8,6 +8,7 @@ import prompts from "~/prompts"
 import { Fzf } from "fzf"
 import { defaultMessage, defaultSetting } from "~/default"
 import throttle from "just-throttle"
+import { isMobile } from "~/utils"
 
 export interface PromptItem {
   desc: string
@@ -80,9 +81,14 @@ export default function () {
   })
 
   createEffect(() => {
-    messageList().length
-    currentAssistantMessage()
-    scrollToBottom()
+    if (messageList().length || currentAssistantMessage()) scrollToBottom()
+  })
+
+  createEffect(() => {
+    if (inputContent() === "") {
+      setHeight("48px")
+      setCompatiblePrompt([])
+    }
   })
 
   const scrollToBottom = throttle(
@@ -108,7 +114,7 @@ export default function () {
       setCurrentAssistantMessage("")
       setLoading(false)
       setController()
-      inputRef.focus()
+      !isMobile() && inputRef.focus()
     }
   }
 
@@ -120,8 +126,6 @@ export default function () {
     // @ts-ignore
     if (window?.umami) umami.trackEvent("chat_generate")
     setInputContent("")
-    setCompatiblePrompt([])
-    setHeight("48px")
     if (
       !value ||
       value !==
@@ -197,11 +201,10 @@ export default function () {
     }
   }
 
-  function clear() {
-    setInputContent("")
+  function clearSession() {
+    // setInputContent("")
     setMessageList([])
     setCurrentAssistantMessage("")
-    setCompatiblePrompt([])
   }
 
   function stopStreamFetch() {
@@ -221,9 +224,16 @@ export default function () {
 
   function selectPrompt(prompt: string) {
     setInputContent(prompt)
-    // setHeight("48px")
-    setHeight(inputRef.scrollHeight + "px")
     setCompatiblePrompt([])
+    const { scrollHeight } = inputRef
+    setHeight(
+      `${
+        scrollHeight > window.innerHeight - 64
+          ? window.innerHeight - 64
+          : scrollHeight
+      }px`
+    )
+    inputRef.focus()
   }
 
   return (
@@ -253,7 +263,7 @@ export default function () {
           <Setting
             setting={setting}
             setSetting={setSetting}
-            clear={clear}
+            clear={clearSession}
             reAnswer={reAnswer}
           />
         </Show>
@@ -316,7 +326,6 @@ export default function () {
                 )
                 let { value } = e.currentTarget
                 setInputContent(value)
-                if (value === "") return setCompatiblePrompt([])
                 if (value === "/" || value === " ")
                   return setCompatiblePrompt(prompts)
                 const promptKey = value.replace(/^[\/ ](.*)/, "$1")
@@ -337,8 +346,7 @@ export default function () {
                 class="i-carbon:add-filled absolute right-3.5em bottom-3em rotate-45 hover:text-op-100 text-slate text-op-15"
                 onClick={() => {
                   setInputContent("")
-                  setHeight("48px")
-                  setCompatiblePrompt([])
+                  inputRef.focus()
                 }}
               />
             </Show>
