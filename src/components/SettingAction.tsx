@@ -105,10 +105,16 @@ export default function SettingAction(props: {
             setShown(!shown())
           }}
           icon="i-carbon:settings"
+          label="设置"
         />
         <div class="flex">
-          <ActionItem onClick={exportJpg} icon="i-carbon:image" />
           <ActionItem
+            onClick={exportJpg}
+            icon="i-carbon:image"
+            label="导出图片"
+          />
+          <ActionItem
+            label="导出 Markdown"
             onClick={async () => {
               await exportMD(props.messaages)
               setCopied(true)
@@ -118,8 +124,16 @@ export default function SettingAction(props: {
               copied() ? "i-ri:check-fill text-yellow" : "i-ri:markdown-line"
             }
           />
-          <ActionItem onClick={props.reAnswer} icon="i-carbon:reset" />
-          <ActionItem onClick={props.clear} icon="i-carbon:trash-can" />
+          <ActionItem
+            onClick={props.reAnswer}
+            icon="i-carbon:reset"
+            label="重新回答"
+          />
+          <ActionItem
+            onClick={props.clear}
+            icon="i-carbon:trash-can"
+            label="清空对话"
+          />
         </div>
       </div>
     </div>
@@ -148,16 +162,13 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
       class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
       onClick={props.onClick}
     >
-      <button class={props.icon} />
-      <Show when={props.label}>
-        <span ml-1>{props.label}</span>
-      </Show>
+      <button class={props.icon} title={props.label} />
     </div>
   )
 }
 
 function exportJpg() {
-  toJpeg(document.querySelector("#message-container") as HTMLElement).then(
+  toJpeg(document.querySelector("#message-container") as HTMLElement, {}).then(
     url => {
       const a = document.createElement("a")
       a.href = url
