@@ -5,9 +5,12 @@ import {
   ReconnectInterval
 } from "eventsource-parser"
 
-const apiKeys = (
-  import.meta.env.OPENAI_API_KEY?.split(/\s*\|\s*/) ?? []
-).filter(Boolean)
+const localEnv = import.meta.env.OPENAI_API_KEY
+const vercelEnv = process.env.OPENAI_API_KEY
+
+const apiKeys = ((localEnv || vercelEnv)?.split(/\s*\|\s*/) ?? []).filter(
+  Boolean
+)
 
 export const post: APIRoute = async context => {
   const body = await context.request.json()

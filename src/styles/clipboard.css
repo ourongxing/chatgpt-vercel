@@ -1,12 +1,19 @@
 :root {
   --block-bg-light: #1e1e20;
   --copy-border-color: transparent;
-  --copy-bg: #2a2d38;
-  --copy-hover-border-color: rgba(60, 60, 67, 0.12);
-  --copy-hover-bg: #303540;
-  --copy-active-text: rgba(235, 235, 245, 0.6);
+  --copy-bg: #e9e9e9;
+  --copy-hover-border-color: var(--copy-hover-bg);
+  --copy-hover-bg: #eaeaea;
+  --copy-active-text: #808080;
   --icon-copy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2'/%3E%3C/svg%3E");
   --icon-copied: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4'/%3E%3C/svg%3E");
+}
+
+.dark:root {
+  --block-bg-light: #1e1e20;
+  --copy-bg: #2a2d38;
+  --copy-hover-bg: #303540;
+  --copy-active-text: rgba(235, 235, 245, 0.6);
 }
 
 button.copy {

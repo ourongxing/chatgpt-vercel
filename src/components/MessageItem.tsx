@@ -18,16 +18,19 @@ export default ({ role, message }: Props) => {
   useCopyCode()
   const roleClass = {
     system: "bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300",
-    user: "bg-gradient-to-r from-purple-400 to-yellow-400",
-    assistant: "bg-gradient-to-r from-yellow-200 via-green-200 to-green-300"
+    user: "bg-gradient-to-r from-sky-400 to-emerald-500",
+    assistant: "bg-gradient-to-r from-yellow-300 to-red-700 "
   }
 
   const htmlString = () => {
     const md = MarkdownIt({
-      breaks: true
+      html: true,
+      linkify: true
     })
       .use(mdKatex)
-      .use(mdHighlight)
+      .use(mdHighlight, {
+        inline: true
+      })
       .use(preWrapperPlugin)
 
     if (typeof message === "function") {
@@ -44,14 +47,14 @@ export default ({ role, message }: Props) => {
 
   return (
     <div
-      class="flex py-2 gap-3 -mx-4 px-4 rounded-lg transition-colors md:hover:bg-slate/3 relative message-item"
-      class:op-75={role === "user"}
+      class="flex py-2 gap-3 px-4 rounded-lg transition-colors md:hover:bg-slate/5 dark:md:hover:bg-slate/2 relative message-item"
+      // class:op-75={role === "user"}
     >
       <div
         class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 ${roleClass[role]}`}
       ></div>
       <div
-        class="message prose text-slate break-words overflow-hidden"
+        class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
         innerHTML={htmlString()}
       />
       <Clipboard
