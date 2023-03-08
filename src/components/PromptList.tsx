@@ -5,7 +5,9 @@ export default function PromptList(props: {
   prompts: PromptItem[]
   select: (k: string) => void
 }) {
+  let containerRef: HTMLUListElement
   const [hoverIndex, setHoverIndex] = createSignal(0)
+  const [maxHeight, setMaxHeight] = createSignal("320px")
   function listener(e: KeyboardEvent) {
     if (e.key === "ArrowDown") {
       setHoverIndex(hoverIndex() + 1)
@@ -24,6 +26,17 @@ export default function PromptList(props: {
     }
   })
 
+  createEffect(() => {
+    if (containerRef && props.prompts.length)
+      setMaxHeight(
+        `${
+          window.innerHeight - containerRef.clientHeight > 112
+            ? 320
+            : window.innerHeight - 112
+        }px`
+      )
+  })
+
   onMount(() => {
     window.addEventListener("keydown", listener)
   })
@@ -32,7 +45,13 @@ export default function PromptList(props: {
   })
 
   return (
-    <ul class="bg-slate bg-op-15 text-slate overflow-y-auto max-h-20em rounded-t">
+    <ul
+      ref={containerRef!}
+      class="bg-slate bg-op-15 text-slate overflow-y-auto rounded-t"
+      style={{
+        "max-height": maxHeight()
+      }}
+    >
       <For each={props.prompts}>
         {(prompt, i) => (
           <Item
