@@ -1,6 +1,7 @@
 import { Accessor, createSignal, JSXElement, Setter, Show } from "solid-js"
 import type { Setting } from "./Generator"
-import html2canvas from "html2canvas"
+import { toJpeg } from "html-to-image"
+import { dateFormat } from "~/utils"
 
 export default function Setting(props: {
   setting: Accessor<Setting>
@@ -105,12 +106,12 @@ export default function Setting(props: {
         <div class="flex">
           <ButtonItem
             onClick={() => {
-              html2canvas(
+              toJpeg(
                 document.querySelector("#message-container") as HTMLElement
-              ).then(canvas => {
+              ).then(url => {
                 const a = document.createElement("a")
-                a.href = canvas.toDataURL("image/png")
-                a.download = "chat.png"
+                a.href = url
+                a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
                 a.click()
               })
             }}
@@ -144,7 +145,7 @@ function SettingItem(props: {
 function ButtonItem(props: { onClick: any; icon: string; label?: string }) {
   return (
     <div
-      class="flex items-center cursor-pointer p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
+      class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
       onClick={props.onClick}
     >
       <button class={props.icon} />
