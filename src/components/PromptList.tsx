@@ -32,7 +32,7 @@ export default function PromptList(props: {
   })
 
   return (
-    <ul class="bg-slate bg-op-15 text-slate overflow-y-auto max-h-20em rounded-b">
+    <ul class="bg-slate bg-op-15 text-slate overflow-y-auto max-h-20em rounded-t">
       <For each={props.prompts}>
         {(prompt, i) => (
           <Item
