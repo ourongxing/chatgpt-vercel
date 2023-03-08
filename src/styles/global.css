@@ -18,12 +18,12 @@
 }
 
 :root {
-  --bg: #171921;
+  --c-bg: #171921;
 }
 
 html {
   font-family: system-ui, sans-serif;
-  background-color: var(--bg);
+  background-color: var(--c-bg);
   color: #ffffff;
 }
 

@@ -245,7 +245,7 @@ export default function () {
                 transition: "opacity 0.3s ease-in-out",
                 width: containerWidth(),
                 opacity: 100,
-                "background-color": "var(--bg)"
+                "background-color": "var(--c-bg)"
               }
         }
       >
