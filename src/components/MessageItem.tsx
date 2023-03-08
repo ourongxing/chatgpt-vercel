@@ -24,11 +24,13 @@ export default ({ role, message }: Props) => {
 
   const htmlString = () => {
     const md = MarkdownIt({
-      breaks: true,
-      html: true
+      html: true,
+      linkify: true
     })
       .use(mdKatex)
-      .use(mdHighlight)
+      .use(mdHighlight, {
+        inline: true
+      })
       .use(preWrapperPlugin)
 
     if (typeof message === "function") {

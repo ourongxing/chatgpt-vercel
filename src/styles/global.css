@@ -3,6 +3,7 @@
   height: 10px;
   /**/
 }
+
 ::-webkit-scrollbar-track {
   background: #404552;
   border-top-right-radius: 0.25rem;

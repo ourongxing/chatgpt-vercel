@@ -8,6 +8,10 @@
   background-color: transparent;
 }
 
+.message pre .lang {
+  opacity: 0.5;
+}
+
 .message table {
   font-size: 0.8em;
 }
@@ -17,7 +21,8 @@
   text-align: left;
 }
 
-.message table th, .message table td {
+.message table th,
+.message table td {
   padding: 0.6rem 1rem;
 }
 

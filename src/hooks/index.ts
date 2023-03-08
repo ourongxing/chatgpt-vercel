@@ -14,7 +14,7 @@ export function useCopyCode() {
 
       let text = sibling.innerText
 
-      copyToClipboard(text).then(() => {
+      copyToClipboard(text.trim()).then(() => {
         el.classList.add("copied")
         clearTimeout(timeoutIdMap.get(el))
         const timeoutId = setTimeout(() => {
