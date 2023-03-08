@@ -1,12 +1,6 @@
-import {
-  Accessor,
-  children,
-  createSignal,
-  JSXElement,
-  Setter,
-  Show
-} from "solid-js"
+import { Accessor, createSignal, JSXElement, Setter, Show } from "solid-js"
 import type { Setting } from "./Generator"
+import html2canvas from "html2canvas"
 
 export default function Setting(props: {
   setting: Accessor<Setting>
@@ -110,6 +104,20 @@ export default function Setting(props: {
           label="设置"
         />
         <div class="flex">
+          <ButtonItem
+            onClick={() => {
+              html2canvas(
+                document.querySelector("#message-container") as HTMLElement
+              ).then(canvas => {
+                const a = document.createElement("a")
+                a.href = canvas.toDataURL("image/png")
+                a.download = "chat.png"
+                a.click()
+              })
+            }}
+            icon="i-carbon:image"
+            label="导出图片"
+          />
           <ButtonItem
             onClick={props.reAnswer}
             icon="i-carbon:reset"

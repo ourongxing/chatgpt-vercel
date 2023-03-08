@@ -242,14 +242,21 @@ export default function () {
 
   return (
     <div mt-6 ref={containerRef!}>
-      <For each={messageList()}>
-        {message => (
-          <MessageItem role={message.role} message={message.content} />
+      <div
+        id="message-container"
+        style={{
+          "background-color": "var(--c-bg)"
+        }}
+      >
+        <For each={messageList()}>
+          {message => (
+            <MessageItem role={message.role} message={message.content} />
+          )}
+        </For>
+        {currentAssistantMessage() && (
+          <MessageItem role="assistant" message={currentAssistantMessage} />
         )}
-      </For>
-      {currentAssistantMessage() && (
-        <MessageItem role="assistant" message={currentAssistantMessage} />
-      )}
+      </div>
       <div
         class="pb-2em fixed bottom-0 z-100 op-0"
         style={

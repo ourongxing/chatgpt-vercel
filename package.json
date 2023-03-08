@@ -20,6 +20,7 @@
     "eventsource-parser": "^0.1.0",
     "fzf": "^0.5.1",
     "highlight.js": "^11.7.0",
+    "html2canvas": "^1.4.1",
     "just-throttle": "^4.2.0",
     "katex": "^0.6.0",
     "markdown-it": "^13.0.1",
