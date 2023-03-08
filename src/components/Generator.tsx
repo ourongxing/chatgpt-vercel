@@ -276,6 +276,7 @@ export default function () {
             setSetting={setSetting}
             clear={clearSession}
             reAnswer={reAnswer}
+            messaages={messageList()}
           />
         </Show>
         <Show

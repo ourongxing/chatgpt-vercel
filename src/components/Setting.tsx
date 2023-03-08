@@ -1,15 +1,18 @@
 import { Accessor, createSignal, JSXElement, Setter, Show } from "solid-js"
 import type { Setting } from "./Generator"
 import { toJpeg } from "html-to-image"
-import { dateFormat } from "~/utils"
+import { copyToClipboard, dateFormat } from "~/utils"
+import type { ChatMessage } from "~/types"
 
 export default function Setting(props: {
   setting: Accessor<Setting>
   setSetting: Setter<Setting>
   clear: any
   reAnswer: any
+  messaages: ChatMessage[]
 }) {
   const [shown, setShown] = createSignal(false)
+  const [copied, setCopied] = createSignal(false)
   return (
     <div class="text-sm text-slate-7 dark:text-slate mb-2">
       <Show when={shown()}>
@@ -104,19 +107,16 @@ export default function Setting(props: {
           icon="i-carbon:settings"
         />
         <div class="flex">
+          <ButtonItem onClick={exportJpg} icon="i-carbon:image" />
           <ButtonItem
-            onClick={() => {
-              toJpeg(
-                document.querySelector("#message-container") as HTMLElement
-              ).then(url => {
-                const a = document.createElement("a")
-                a.href = url
-                a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
-                a.click()
-              })
+            onClick={async () => {
+              await exportMD(props.messaages)
+              setCopied(true)
+              setTimeout(() => setCopied(false), 1000)
             }}
-            icon="i-carbon:image"
-            label=""
+            icon={
+              copied() ? "i-ri:check-fill text-yellow" : "i-ri:markdown-line"
+            }
           />
           <ButtonItem onClick={props.reAnswer} icon="i-carbon:reset" />
           <ButtonItem onClick={props.clear} icon="i-carbon:trash-can" />
@@ -153,5 +153,31 @@ function ButtonItem(props: { onClick: any; icon: string; label?: string }) {
         <span ml-1>{props.label}</span>
       </Show>
     </div>
+  )
+}
+
+function exportJpg() {
+  toJpeg(document.querySelector("#message-container") as HTMLElement).then(
+    url => {
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
+      a.click()
+    }
+  )
+}
+
+async function exportMD(messages: ChatMessage[]) {
+  const role = {
+    system: "系统",
+    user: "我",
+    assistant: "ChatGPT"
+  }
+  await copyToClipboard(
+    messages
+      .map(k => {
+        return `### ${role[k.role]}\n\n${k.content}`
+      })
+      .join("\n\n")
   )
 }

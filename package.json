@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.1.16",
+    "@iconify-json/ri": "^1.1.5",
     "@types/markdown-it": "^12.2.3",
     "@vercel/node": "^2.8.0",
     "punycode": "^2.3.0",
