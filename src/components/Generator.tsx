@@ -81,7 +81,9 @@ export default function () {
   })
 
   createEffect(() => {
-    if (messageList().length || currentAssistantMessage()) scrollToBottom()
+    messageList()
+    currentAssistantMessage()
+    scrollToBottom()
   })
 
   createEffect(() => {
