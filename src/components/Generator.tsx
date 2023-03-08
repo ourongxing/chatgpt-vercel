@@ -2,7 +2,7 @@ import { createEffect, createSignal, For, onMount, Show } from "solid-js"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "~/types"
-import Setting from "./Setting"
+import SettingAction from "./SettingAction"
 import PromptList from "./PromptList"
 import prompts from "~/prompts"
 import { Fzf } from "fzf"
@@ -271,7 +271,7 @@ export default function () {
         }
       >
         <Show when={!compatiblePrompt().length && height() === "48px"}>
-          <Setting
+          <SettingAction
             setting={setting}
             setSetting={setSetting}
             clear={clearSession}

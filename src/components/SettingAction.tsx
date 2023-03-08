@@ -4,7 +4,7 @@ import { toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat } from "~/utils"
 import type { ChatMessage } from "~/types"
 
-export default function Setting(props: {
+export default function SettingAction(props: {
   setting: Accessor<Setting>
   setSetting: Setter<Setting>
   clear: any
@@ -100,15 +100,15 @@ export default function Setting(props: {
         <hr class="mt-2 bg-slate-5 bg-op-15 border-none h-1px"></hr>
       </Show>
       <div class="mt-2 flex items-center justify-between">
-        <ButtonItem
+        <ActionItem
           onClick={() => {
             setShown(!shown())
           }}
           icon="i-carbon:settings"
         />
         <div class="flex">
-          <ButtonItem onClick={exportJpg} icon="i-carbon:image" />
-          <ButtonItem
+          <ActionItem onClick={exportJpg} icon="i-carbon:image" />
+          <ActionItem
             onClick={async () => {
               await exportMD(props.messaages)
               setCopied(true)
@@ -118,8 +118,8 @@ export default function Setting(props: {
               copied() ? "i-ri:check-fill text-yellow" : "i-ri:markdown-line"
             }
           />
-          <ButtonItem onClick={props.reAnswer} icon="i-carbon:reset" />
-          <ButtonItem onClick={props.clear} icon="i-carbon:trash-can" />
+          <ActionItem onClick={props.reAnswer} icon="i-carbon:reset" />
+          <ActionItem onClick={props.clear} icon="i-carbon:trash-can" />
         </div>
       </div>
     </div>
@@ -142,7 +142,7 @@ function SettingItem(props: {
   )
 }
 
-function ButtonItem(props: { onClick: any; icon: string; label?: string }) {
+function ActionItem(props: { onClick: any; icon: string; label?: string }) {
   return (
     <div
       class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
@@ -176,8 +176,8 @@ async function exportMD(messages: ChatMessage[]) {
   await copyToClipboard(
     messages
       .map(k => {
-        return `### ${role[k.role]}\n\n${k.content}`
+        return `### ${role[k.role]}\n\n${k.content.trim()}`
       })
-      .join("\n\n")
+      .join("\n\n\n\n")
   )
 }
