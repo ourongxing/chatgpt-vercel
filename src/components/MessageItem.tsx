@@ -47,14 +47,14 @@ export default ({ role, message }: Props) => {
 
   return (
     <div
-      class="flex py-2 gap-3 px-4 rounded-lg transition-colors md:hover:bg-slate/3 relative message-item"
-      class:op-75={role === "user"}
+      class="flex py-2 gap-3 px-4 rounded-lg transition-colors md:hover:bg-slate/5 dark:md:hover:bg-slate/2 relative message-item"
+      // class:op-75={role === "user"}
     >
       <div
         class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 ${roleClass[role]}`}
       ></div>
       <div
-        class="message prose text-slate break-words overflow-hidden"
+        class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
         innerHTML={htmlString()}
       />
       <Clipboard

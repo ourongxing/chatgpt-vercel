@@ -47,7 +47,7 @@ export default function PromptList(props: {
   return (
     <ul
       ref={containerRef!}
-      class="bg-slate bg-op-15 text-slate overflow-y-auto rounded-t"
+      class="bg-slate bg-op-15 dark:text-slate text-slate-7 overflow-y-auto rounded-t"
       style={{
         "max-height": maxHeight()
       }}

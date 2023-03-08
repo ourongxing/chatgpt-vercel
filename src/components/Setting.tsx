@@ -16,13 +16,13 @@ export default function Setting(props: {
 }) {
   const [shown, setShown] = createSignal(false)
   return (
-    <div class="text-sm text-slate mb-2">
+    <div class="text-sm text-slate-7 dark:text-slate mb-2">
       <Show when={shown()}>
         <SettingItem icon="i-carbon:api" label="OpenAI API Key">
           <input
             type="password"
             value={props.setting().openaiAPIKey}
-            class="max-w-150px ml-1em px-1 text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
+            class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
             onInput={e => {
               props.setSetting({
                 ...props.setting(),
@@ -35,7 +35,7 @@ export default function Setting(props: {
           <input
             type="text"
             value={props.setting().systemRule}
-            class="text-ellipsis  max-w-150px ml-1em px-1 text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:op-30"
+            class="text-ellipsis max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
             onInput={e => {
               props.setSetting({
                 ...props.setting(),
@@ -50,7 +50,7 @@ export default function Setting(props: {
             min={0}
             max={100}
             value={String(props.setting().openaiAPITemperature)}
-            class="max-w-150px w-full h-2 bg-slate bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate-3"
+            class="max-w-150px w-full h-2 bg-slate bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
             onInput={e => {
               props.setSetting({
                 ...props.setting(),
@@ -102,30 +102,24 @@ export default function Setting(props: {
         <hr class="mt-2 bg-slate-5 bg-op-15 border-none h-1px"></hr>
       </Show>
       <div class="mt-2 flex items-center justify-between">
-        <div
-          class="flex items-center cursor-pointer hover:text-slate-3 "
+        <ButtonItem
           onClick={() => {
             setShown(!shown())
           }}
-        >
-          <button class="i-carbon:settings" />
-          <span ml-1>设置</span>
-        </div>
+          icon="i-carbon:settings"
+          label="设置"
+        />
         <div class="flex">
-          <div
-            class="flex items-center cursor-pointer hover:text-slate-3 "
+          <ButtonItem
             onClick={props.reAnswer}
-          >
-            <button class="i-carbon:reset" />
-            <span ml-1>重新回答</span>
-          </div>
-          <div
-            class="flex items-center cursor-pointer ml-3 hover:text-slate-3 "
+            icon="i-carbon:reset"
+            label="重新回答"
+          />
+          <ButtonItem
             onClick={props.clear}
-          >
-            <button class="i-carbon:trash-can" />
-            <span ml-1>清空对话</span>
-          </div>
+            icon="i-carbon:trash-can"
+            label="清空对话"
+          />
         </div>
       </div>
     </div>
@@ -138,12 +132,24 @@ function SettingItem(props: {
   label: string
 }) {
   return (
-    <div class="flex items-center hover:text-slate-3 mt-2 justify-between">
+    <div class="flex items-center p-1 justify-between hover:bg-slate hover:bg-op-10 rounded">
       <div class="flex items-center">
         <button class={props.icon} />
         <span ml-1>{props.label}</span>
       </div>
       {props.children}
+    </div>
+  )
+}
+
+function ButtonItem(props: { onClick: any; icon: string; label: string }) {
+  return (
+    <div
+      class="flex items-center cursor-pointer p-1 hover:bg-slate hover:bg-op-10 rounded"
+      onClick={props.onClick}
+    >
+      <button class={props.icon} />
+      <span ml-1>{props.label}</span>
     </div>
   )
 }

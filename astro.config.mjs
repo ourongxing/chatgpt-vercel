@@ -16,7 +16,11 @@ export default defineConfig({
       presets: [
         presetAttributify(),
         presetUno(),
-        presetTypography(),
+        presetTypography({
+          cssExtend: {
+            ":not(pre) > code::before,:not(pre) > code::after": ""
+          }
+        }),
         presetIcons()
       ]
     }),

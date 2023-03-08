@@ -1,10 +1,19 @@
+---
+import ThemeToggle from "./ThemeToggle.astro"
+---
+
 <header>
-  <img src="/favicon.svg" width="100px" />
+  <div class="flex justify-between items-center">
+    <img src="/favicon.svg" width="100px" />
+    <ThemeToggle />
+  </div>
   <div class="flex items-center mt-4">
     <span
       class="text-2xl text-transparent font-extrabold bg-clip-text bg-gradient-to-r from-yellow-300 to-red-700 mr-1"
       >ChatGPT</span
     >
-    <span class="ml-1 text-2xl font-extrabold text-slate">Vercel</span>
+    <span class="ml-1 text-2xl font-extrabold text-slate-7 dark:text-slate"
+      >Vercel</span
+    >
   </div>
 </header>
