@@ -101,7 +101,6 @@ export default function Setting(props: {
             setShown(!shown())
           }}
           icon="i-carbon:settings"
-          label="设置"
         />
         <div class="flex">
           <ButtonItem
@@ -116,18 +115,10 @@ export default function Setting(props: {
               })
             }}
             icon="i-carbon:image"
-            label="导出图片"
+            label=""
           />
-          <ButtonItem
-            onClick={props.reAnswer}
-            icon="i-carbon:reset"
-            label="重新回答"
-          />
-          <ButtonItem
-            onClick={props.clear}
-            icon="i-carbon:trash-can"
-            label="清空对话"
-          />
+          <ButtonItem onClick={props.reAnswer} icon="i-carbon:reset" />
+          <ButtonItem onClick={props.clear} icon="i-carbon:trash-can" />
         </div>
       </div>
     </div>
@@ -150,14 +141,16 @@ function SettingItem(props: {
   )
 }
 
-function ButtonItem(props: { onClick: any; icon: string; label: string }) {
+function ButtonItem(props: { onClick: any; icon: string; label?: string }) {
   return (
     <div
-      class="flex items-center cursor-pointer p-1 hover:bg-slate hover:bg-op-10 rounded"
+      class="flex items-center cursor-pointer p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
       onClick={props.onClick}
     >
       <button class={props.icon} />
-      <span ml-1>{props.label}</span>
+      <Show when={props.label}>
+        <span ml-1>{props.label}</span>
+      </Show>
     </div>
   )
 }
