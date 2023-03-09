@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle.astro"
 
 <header>
   <div class="flex justify-between items-center">
-    <img src="/favicon.svg" width="100px" />
+    <img src="/favicon.svg" class="logo-before" id="logo" />
     <ThemeToggle />
   </div>
   <div class="flex items-center mt-4">
@@ -17,3 +17,16 @@ import ThemeToggle from "./ThemeToggle.astro"
     >
   </div>
 </header>
+
+<style is:inline>
+  .logo {
+    width: 100px;
+    margin-top: 0px;
+    transition: all 1s ease-in-out;
+  }
+
+  .logo-before {
+    width: 200px;
+    margin-top: 200px;
+  }
+</style>

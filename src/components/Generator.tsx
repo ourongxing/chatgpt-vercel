@@ -61,6 +61,8 @@ export default function (props: { prompts: PromptItem[] }) {
     } catch {
       console.log("Setting parse error")
     }
+    document.querySelector("#logo")?.classList.add("logo")
+    document.querySelector("#logo")?.classList.remove("logo-before")
   })
 
   createEffect(() => {
