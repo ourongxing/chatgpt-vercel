@@ -39,9 +39,22 @@
 }
 
 .message {
-  --c-text: #b3b7bc;
+  --c-text: rgba(255, 255, 255, 0.6);
   --un-prose-invert-headings: var(--c-text);
   --un-prose-invert-links: var(--c-text);
   --un-prose-invert-code: var(--c-text);
   --un-prose-invert-body: var(--c-text);
+}
+
+.message a {
+  text-decoration: none;
+  border-bottom: 1px dashed;
+}
+
+.message a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid;
+}
+.dark .message a:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
