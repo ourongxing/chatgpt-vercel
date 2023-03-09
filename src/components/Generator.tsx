@@ -346,6 +346,7 @@ export default function () {
               }}
               style={{
                 height: height(),
+                "border-bottom-right-radius": 0,
                 "border-top-right-radius": height() === "48px" ? 0 : "0.25rem",
                 "border-top-left-radius":
                   compatiblePrompt().length === 0 ? "0.25rem" : 0
