@@ -3,8 +3,7 @@ import * as md from "../../prompts.md"
 export async function parsePrompts() {
   return md
     .rawContent()
-    .split("## Prompts")[1]
-    .split(/^### (.+)$/m)
+    .split(/^## (.+)$/m)
     .filter(k => k.trim())
     .reduce(
       (acc, cur, i) => {
