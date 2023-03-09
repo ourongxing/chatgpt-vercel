@@ -1,6 +1,7 @@
 # ChatGPT-Vercel
 
-![](assets/preview.png)
+![](assets/preview-light.png#gh-light-mode-only)
+![](assets/preview-dark.png#gh-dark-mode-only)
 
 预览: [https://vercel-chatgpt-github.vercel.app](https://vercel-chatgpt-github.vercel.app)
 
@@ -37,7 +38,14 @@
         systemRule: ""
     }
     ```
-3. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要将 [这行代码](https://github.com/ourongxing/chatgpt-vercel/blob/main/src/components/Generator.tsx#L46) 取消注释即可。
+3. 之前版本我设置了每次刷新重置 `开启连续对话` 选项，因为一般用不上这个，比较费钱。当前版本我已经移除了这个特性，如果你需要给更多人用，建议打开，只要在 `src/components/Generator.tsx`文件中将下面这行代码取消注释即可。
+    ```ts
+        setSetting({
+          ...defaultSetting,
+          ...parsed
+          // continuousDialogue: false
+        })
+    ```
 
 4. `git commit & push` 即可重新部署，vscode 上点几下就可以了。
 
@@ -46,9 +54,28 @@
 2. API 被墙了，自己想办法开代理，不然要报错。也可以直接 `vercel deploy` 部署到 vercel 开发环境上调试。
 3. `pnpm i` 安装依赖。
 4. `pnpm dev` 启动项目。
+
+## 提交你的 Prompts
+1. Fork 本项目
+2. 修改 `prompts.md`。
+3. Pull Request 即可。
+
+如果你不懂这个操作，也可以直接在 Issues 提交你的 Prompts。
+
+### 要求
+- 把需要输入的内容放在最后，可以提示 ChatGPT 开始输入了，比如 “我的第一句话是：”。
+- 尽可能去优化已有的 Prompts，而不是重复添加。
+- 添加到结尾，我会定期整理。
+
+### 感谢
+
+大部分 Prompts 来自于 [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh)，当然，这个仓库大多数也是翻译的 [awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts)，一并感谢。
+
 ## API
 
 ### POST /api
+
+这个 API 没有开启 stream，会直接返回答案。stream 版的 API 自己看源码，也可以直接调用，相当于一个代理了，不过并没有按照原版的请求规范。
 
 ```ts
 await fetch("/api", {
@@ -59,7 +86,6 @@ await fetch("/api", {
     })
 })
 ```
-
 
 ## 赞赏
 如果本项目对你有所帮助，可以给小猫买点零食，但不接受任何付费功能请求。
