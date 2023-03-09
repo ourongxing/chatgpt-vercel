@@ -6,11 +6,13 @@ import "~/styles/global.css"
 import "@unocss/reset/tailwind.css"
 import "katex/dist/katex.min.css"
 import "highlight.js/styles/atom-one-dark.css"
+const res = await fetch('https://cdn.jsdelivr.net/gh/ourongxing/chatgpt-prompts-zh/prompts.json');
+const prompts= await res.json();
 ---
 
 <Layout title="ChatGPT">
   <main>
     <Header />
-    <Generator client:load />
+    <Generator prompts={prompts} client:visible/>
   </main>
 </Layout>

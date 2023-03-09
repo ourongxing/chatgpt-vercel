@@ -4,7 +4,6 @@ import MessageItem from "./MessageItem"
 import type { ChatMessage } from "~/types"
 import SettingAction from "./SettingAction"
 import PromptList from "./PromptList"
-import prompts from "~/prompts"
 import { Fzf } from "fzf"
 import { defaultMessage, defaultSetting } from "~/default"
 import throttle from "just-throttle"
@@ -18,7 +17,7 @@ export interface PromptItem {
 
 export type Setting = typeof defaultSetting
 
-export default function () {
+export default function (props: { prompts: PromptItem[] }) {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([
@@ -34,7 +33,9 @@ export default function () {
   const [setting, setSetting] = createSignal(defaultSetting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
-  const fzf = new Fzf(prompts, { selector: k => `${k.desc} (${k.prompt})` })
+  const fzf = new Fzf(props.prompts, {
+    selector: k => `${k.desc} (${k.prompt})`
+  })
   const [height, setHeight] = createSignal("48px")
 
   onMount(() => {
@@ -339,7 +340,7 @@ export default function () {
                 let { value } = e.currentTarget
                 setInputContent(value)
                 if (value === "/" || value === " ")
-                  return setCompatiblePrompt(prompts)
+                  return setCompatiblePrompt(props.prompts)
                 const promptKey = value.replace(/^[\/ ](.*)/, "$1")
                 if (promptKey !== value)
                   setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
