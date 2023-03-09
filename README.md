@@ -49,6 +49,7 @@
 ## API
 
 ### POST /api
+
 ```ts
 await fetch("/api", {
     method: "POST",
@@ -58,6 +59,12 @@ await fetch("/api", {
     })
 })
 ```
+
+
+## 赞赏
+如果本项目对你有所帮助，可以给小猫买点零食，但不接受任何付费功能请求。
+
+![](./assets/reward.gif)
 ## License
 
-MIT
+[MIT](./LICENSE)
