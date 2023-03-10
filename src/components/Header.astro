@@ -19,6 +19,11 @@ import ThemeToggle from "./ThemeToggle.astro"
   </div>
 </header>
 
+<script is:inline>
+  if(navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")) {
+    document.querySelector("header").classList.remove("before");
+  }
+</script>
 <style is:inline>
   .title,
   .logo {
