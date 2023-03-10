@@ -17,6 +17,7 @@ export const post: APIRoute = async context => {
   const apiKey = apiKeys.length
     ? apiKeys[Math.floor(Math.random() * apiKeys.length)]
     : ""
+  console.log(apiKey)
   let { messages, key = apiKey, temperature = 0.6 } = body
 
   const encoder = new TextEncoder()
