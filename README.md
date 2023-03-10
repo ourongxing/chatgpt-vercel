@@ -3,11 +3,13 @@
 ![](assets/preview-light.png#gh-light-mode-only)
 ![](assets/preview-dark.png#gh-dark-mode-only)
 
+> 本项目基于 [chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo) 开发。
+
 预览:
 1. [aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供。
 2. [chatsverse.xyz](https://www.chatsverse.xyz)，由 [@Airyland](https://m.okjike.com/users/C6C8DE3A-E89D-4978-9E7D-B2E167D835A9) 免费提供。
 
-API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 和 [@ourongxing](https://github.com/ourongxing) 免费提供
+API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 和 [@ourongxing](https://github.com/ourongxing) 免费提供。
 
 ## 部署一个你自己的（免费）
 
