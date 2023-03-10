@@ -4,14 +4,12 @@
 ![](assets/preview-dark.png#gh-dark-mode-only)
 
 预览:
-1. [aitoolgpt.com](www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供。
-2. [chatsverse.xyz](www.chatsverse.xyz)，由 [@Airyland](https://m.okjike.com/users/C6C8DE3A-E89D-4978-9E7D-B2E167D835A9) 免费提供。
+1. [aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供。
+2. [chatsverse.xyz](https://www.chatsverse.xyz)，由 [@Airyland](https://m.okjike.com/users/C6C8DE3A-E89D-4978-9E7D-B2E167D835A9) 免费提供。
 
 API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 和 [@ourongxing](https://github.com/ourongxing) 免费提供
 
 ## 部署一个你自己的（免费）
-
-> 本项目主要面向中文用户，所以用中文，原版是英文的。
 
 如果你只需要部署一个你自己用的网站，而不需要定制，那么你完全不需要在本地跑起来，你可以直接点击下面的按钮，然后按照提示操作即可。 vercel 域名已经被墙，但 vercel 本身没有被墙，所以你绑定自己的域名就可以了。
 
