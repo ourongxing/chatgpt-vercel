@@ -3,9 +3,9 @@ import Logo from "./Logo.astro"
 import ThemeToggle from "./ThemeToggle.astro"
 ---
 
-<header class="before">
-  <div class="flex justify-between items-center">
-    <span class="w-100px logo">
+<header>
+  <div class="flex justify-between items-start">
+    <span class="w-100px h-100px logo">
       <Logo />
     </span>
     <ThemeToggle />
@@ -19,33 +19,39 @@ import ThemeToggle from "./ThemeToggle.astro"
   </div>
 </header>
 
-<script is:inline>
-  if(navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")) {
-    document.querySelector("header").classList.remove("before");
-  }
-</script>
 <style is:inline>
   .title,
-  .logo {
-    transition: all 1s ease-in-out;
+  #themeToggle,
+  .logo,
+  #message-container {
+    transition-property: transform, opacity;
+    transition-duration: 1s;
+    transition-timing-function: ease-in-out;
   }
 
   .before .logo {
-    width: 200px;
-    margin-top: 200px;
+    transform: translate3D(25px, 150px, 0) scale(2);
+  }
+  .before #themeToggle {
+    transform: translate3D(0, 200px, 0) rotate(540deg);
   }
 
-  .before .title {
-    font-size: 2em;
+  .before .title,
+  .before #message-container {
+    transform: translate3D(0, 200px, 0);
   }
 
   #themeToggle {
     border: 0;
-    transition: opacity 1s ease-in-out;
     opacity: 1;
   }
 
-  .before #themeToggle {
+  .before #themeToggle,
+  .before #message-container {
     opacity: 0;
+  }
+
+  #message-container {
+    opacity: 1;
   }
 </style>

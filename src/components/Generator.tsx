@@ -39,7 +39,7 @@ export default function (props: { prompts: PromptItem[] }) {
   const [height, setHeight] = createSignal("48px")
 
   onMount(() => {
-    document.querySelector("header")?.classList.remove("before")
+    document.querySelector("main")?.classList.remove("before")
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
