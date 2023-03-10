@@ -40,6 +40,7 @@ export default function (props: { prompts: PromptItem[] }) {
 
   onMount(() => {
     document.querySelector("main")?.classList.remove("before")
+    document.querySelector("main")?.classList.add("after")
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })

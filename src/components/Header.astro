@@ -20,10 +20,10 @@ import ThemeToggle from "./ThemeToggle.astro"
 </header>
 
 <style is:inline>
-  .title,
-  #themeToggle,
-  .logo,
-  #message-container {
+  .after .title,
+  .after #themeToggle,
+  .after .logo,
+  .after #message-container {
     transition-property: transform, opacity;
     transition-duration: 1s;
     transition-timing-function: ease-in-out;
@@ -51,7 +51,7 @@ import ThemeToggle from "./ThemeToggle.astro"
     opacity: 0;
   }
 
-  #message-container {
+ .after #message-container {
     opacity: 1;
   }
 </style>
