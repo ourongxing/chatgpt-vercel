@@ -1,10 +1,13 @@
 ---
+import Logo from "./Logo.astro"
 import ThemeToggle from "./ThemeToggle.astro"
 ---
 
 <header class="before">
   <div class="flex justify-between items-center">
-    <img src="/favicon.svg" class="w-100px logo" />
+    <span class="w-100px logo">
+      <Logo />
+    </span>
     <ThemeToggle />
   </div>
   <div class="flex items-center mt-4 text-2xl title">

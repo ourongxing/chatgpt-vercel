@@ -265,7 +265,7 @@ export default function (props: { prompts: PromptItem[] }) {
           containerWidth() === "init"
             ? {}
             : {
-                transition: "opacity 0.3s ease-in-out",
+                transition: "opacity 1s ease-in-out",
                 width: containerWidth(),
                 opacity: 100,
                 "background-color": "var(--c-bg)"
