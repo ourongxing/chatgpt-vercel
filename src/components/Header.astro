@@ -32,6 +32,7 @@ import ThemeToggle from "./ThemeToggle.astro"
   .before .logo {
     transform: translate3D(25px, 150px, 0) scale(2);
   }
+
   .before #themeToggle {
     transform: translate3D(0, 200px, 0) rotate(540deg);
   }
@@ -41,17 +42,17 @@ import ThemeToggle from "./ThemeToggle.astro"
     transform: translate3D(0, 200px, 0);
   }
 
-  #themeToggle {
-    border: 0;
-    opacity: 1;
-  }
-
+  .before .title,
   .before #themeToggle,
   .before #message-container {
     opacity: 0;
   }
 
- .after #message-container {
+  #themeToggle {
+    border: 0;
+    opacity: 1;
+  }
+  .after #message-container {
     opacity: 1;
   }
 </style>
