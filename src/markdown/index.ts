@@ -12,7 +12,7 @@ export function preWrapperPlugin(md: MarkdownIt) {
     const rawCode = fence(...args)
     return rawCode.replace(
       "<pre>",
-      `<pre style="position: relative"><span class="lang">${lang}</span><button title="Copy Code" class="code-copy copy"></button>`
+      `<pre style="position: relative"><span class="lang">${lang}</span><button title="Copy Code" class="copy"></button>`
     )
   }
 }

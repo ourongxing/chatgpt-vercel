@@ -5,7 +5,7 @@ export function useCopyCode() {
   const timeoutIdMap: Map<HTMLElement, NodeJS.Timeout> = new Map()
   const listerner = (e: MouseEvent) => {
     const el = e.target as HTMLElement
-    if (el.matches(".code-copy")) {
+    if (el.matches(".copy")) {
       const parent = el.parentElement
       const sibling = el.nextElementSibling as HTMLPreElement | null
       if (!parent || !sibling) {
