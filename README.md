@@ -17,9 +17,7 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ourongxing/chatgpt-vercel)
 
-如果你需要部署给更多人用，那么你可能需要将上面创建的你自己的仓库 `git clone` 到本地。
-
-改完了  `git commit & push` 即可重新部署，vscode 上点几下就可以了。也可以用 vercel 的 cli，`vercel deploy --prod`。
+如果你需要部署给更多人用，需要修改一些代码，那么你可能需要将上面创建的你自己的仓库 `git clone` 到本地。改完了  `git commit & push` 即可重新部署，vscode 上点几下就可以了。也可以用 vercel 的 cli，`vercel deploy --prod`。
 
 如果你需要在本地开发和调试，有点麻烦：
 
@@ -39,7 +37,7 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 
 有两种设置方式
 1. 将 `.env.example` 文件修改为 `.env`，在 `.env` 中设置。
-2. Vercel 中设置 `Environment Variables`。
+2. Vercel 中设置 `Environment Variables`。尽量使用这种方式，比较方便。会在下次部署时生效。
     ![](assets/environment.png)
 
 
@@ -58,8 +56,11 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 }
 ```
 
+
+
 ## 提交你的 Prompts
-1. Fork 本项目
+
+1. Fork 本项目。
 2. 修改 `prompts.md`。
 3. Pull Request 即可。
 
