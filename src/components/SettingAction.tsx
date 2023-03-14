@@ -121,7 +121,9 @@ export default function SettingAction(props: {
               setTimeout(() => setCopied(false), 1000)
             }}
             icon={
-              copied() ? "i-ri:check-fill text-yellow" : "i-ri:markdown-line"
+              copied()
+                ? "i-ri:check-fill dark:text-yellow text-yellow-6"
+                : "i-ri:markdown-line"
             }
           />
           <ActionItem
