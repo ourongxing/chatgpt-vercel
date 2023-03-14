@@ -128,9 +128,18 @@ export default function (props: {
   })
 
   createEffect(() => {
+    setHeight("48px")
     if (inputContent() === "") {
-      setHeight("48px")
       setCompatiblePrompt([])
+    } else {
+      const { scrollHeight } = inputRef
+      setHeight(
+        `${
+          scrollHeight > window.innerHeight - 64
+            ? window.innerHeight - 64
+            : scrollHeight
+        }px`
+      )
     }
   })
 
@@ -140,7 +149,7 @@ export default function (props: {
         ...messageList(),
         {
           role: "assistant",
-          content: currentAssistantMessage()
+          content: currentAssistantMessage().trim()
         }
       ])
       setCurrentAssistantMessage("")
@@ -314,12 +323,18 @@ export default function (props: {
         }}
       >
         <For each={messageList()}>
-          {message => (
-            <MessageItem role={message.role} message={message.content} />
+          {(message, index) => (
+            <MessageItem
+              role={message.role}
+              message={message.content}
+              index={index()}
+              setInputContent={setInputContent}
+              setMessageList={setMessageList}
+            />
           )}
         </For>
         {currentAssistantMessage() && (
-          <MessageItem role="assistant" message={currentAssistantMessage} />
+          <MessageItem role="assistant" message={currentAssistantMessage()} />
         )}
       </div>
       <div
@@ -388,7 +403,6 @@ export default function (props: {
                     handleButtonClick()
                   }
                 } else if (e.key === "ArrowUp") {
-                  e.preventDefault()
                   const userMessages = messageList()
                     .filter(k => k.role === "user")
                     .map(k => k.content)
@@ -403,7 +417,6 @@ export default function (props: {
                     t && setInputContent(t)
                   } else setInputContent(content)
                 } else if (e.key === "ArrowDown") {
-                  e.preventDefault()
                   const userMessages = messageList()
                     .filter(k => k.role === "user")
                     .map(k => k.content)
