@@ -5,6 +5,7 @@ specifiers:
   '@astrojs/vercel': ^3.1.3
   '@iconify-json/carbon': ^1.1.16
   '@iconify-json/ri': ^1.1.5
+  '@solid-primitives/event-listener': ^2.2.8
   '@solid-primitives/resize-observer': ^2.0.11
   '@types/markdown-it': ^12.2.3
   '@unocss/reset': ^0.50.3
@@ -28,6 +29,7 @@ specifiers:
 dependencies:
   '@astrojs/solid-js': 2.0.2_6xgbh54wsmvzb2na55qkvz25wm
   '@astrojs/vercel': 3.1.4_astro@2.0.17+react@18.2.0
+  '@solid-primitives/event-listener': 2.2.8_solid-js@1.6.11
   '@solid-primitives/resize-observer': 2.0.11_solid-js@1.6.11
   '@unocss/reset': 0.50.3
   astro: 2.0.17_@types+node@14.18.33

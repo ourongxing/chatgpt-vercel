@@ -1,5 +1,6 @@
 import { createEffect, createSignal, For, onCleanup, onMount } from "solid-js"
 import type { PromptItem } from "./Generator"
+import { makeEventListener } from "@solid-primitives/event-listener"
 
 export default function PromptList(props: {
   prompts: PromptItem[]
@@ -8,15 +9,6 @@ export default function PromptList(props: {
   let containerRef: HTMLUListElement
   const [hoverIndex, setHoverIndex] = createSignal(0)
   const [maxHeight, setMaxHeight] = createSignal("320px")
-  function listener(e: KeyboardEvent) {
-    if (e.key === "ArrowDown") {
-      setHoverIndex(hoverIndex() + 1)
-    } else if (e.key === "ArrowUp") {
-      setHoverIndex(hoverIndex() - 1)
-    } else if (e.key === "Enter") {
-      props.select(props.prompts[hoverIndex()].prompt)
-    }
-  }
 
   createEffect(() => {
     if (hoverIndex() < 0) {
@@ -38,10 +30,20 @@ export default function PromptList(props: {
   })
 
   onMount(() => {
-    window.addEventListener("keydown", listener)
-  })
-  onCleanup(() => {
-    window.removeEventListener("keydown", listener)
+    makeEventListener(
+      window,
+      "keydown",
+      e => {
+        if (e.key === "ArrowDown") {
+          setHoverIndex(hoverIndex() + 1)
+        } else if (e.key === "ArrowUp") {
+          setHoverIndex(hoverIndex() - 1)
+        } else if (e.key === "Enter") {
+          props.select(props.prompts[hoverIndex()].prompt)
+        }
+      },
+      { passive: true }
+    )
   })
 
   return (

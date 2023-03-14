@@ -7,8 +7,8 @@ import "@unocss/reset/tailwind.css"
 import "katex/dist/katex.min.css"
 import "highlight.js/styles/atom-one-dark.css"
 import { parsePrompts } from "~/utils/parse"
-import { setting, message, resetContinuousDialogue   } from "~/system.ts"
-const prompts = await parsePrompts()
+import { setting, message, resetContinuousDialogue   } from "~/system"
+const prompts = parsePrompts()
 const defaultMessage = import.meta.env.DEFAULT_MESSAGE || process.env.DEFAULT_MESSAGE || message
 let defaultSetting
 try {

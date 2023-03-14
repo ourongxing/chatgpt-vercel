@@ -1,6 +1,6 @@
 import * as md from "../../prompts.md"
 
-export async function parsePrompts() {
+export function parsePrompts() {
   return md
     .rawContent()
     .split(/^## (.+)$/m)
