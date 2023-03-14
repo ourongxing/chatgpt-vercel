@@ -5,9 +5,9 @@ import type { ChatMessage } from "~/types"
 import SettingAction from "./SettingAction"
 import PromptList from "./PromptList"
 import { Fzf } from "fzf"
-import { defaultMessage, defaultSetting } from "~/default"
 import throttle from "just-throttle"
 import { isMobile } from "~/utils"
+import type { Setting } from "~/system"
 // import { mdMessage } from "~/temp"
 
 export interface PromptItem {
@@ -15,11 +15,18 @@ export interface PromptItem {
   prompt: string
 }
 
-export type Setting = typeof defaultSetting
-
-export default function (props: { prompts: PromptItem[] }) {
+export default function (props: {
+  prompts: PromptItem[]
+  env: {
+    defaultSetting: Setting
+    defaultMessage: string
+    resetContinuousDialogue: string
+  }
+}) {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
+
+  const { defaultMessage, defaultSetting, resetContinuousDialogue } = props.env
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([
     // {
     //   role: "assistant",
@@ -53,8 +60,8 @@ export default function (props: { prompts: PromptItem[] }) {
         archiveSession = parsed.archiveSession
         setSetting({
           ...defaultSetting,
-          ...parsed
-          // continuousDialogue: false
+          ...parsed,
+          ...(resetContinuousDialogue ? { continuousDialogue: false } : {})
         })
       }
       if (session && archiveSession) {

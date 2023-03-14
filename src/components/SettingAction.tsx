@@ -1,8 +1,8 @@
 import { Accessor, createSignal, JSXElement, Setter, Show } from "solid-js"
-import type { Setting } from "./Generator"
 import { toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat } from "~/utils"
 import type { ChatMessage } from "~/types"
+import type { Setting } from "~/system"
 
 export default function SettingAction(props: {
   setting: Accessor<Setting>
