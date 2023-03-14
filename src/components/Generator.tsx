@@ -271,7 +271,6 @@ export default function (props: {
 
   const find = throttle(
     (value: string) => {
-      console.log("1")
       if (value === "/" || value === " ")
         return setCompatiblePrompt(props.prompts.slice(0, 20))
       const query = value.replace(/^[\/ ](.*)/, "$1")
@@ -388,6 +387,37 @@ export default function (props: {
                   if (!e.shiftKey) {
                     handleButtonClick()
                   }
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault()
+                  const userMessages = messageList()
+                    .filter(k => k.role === "user")
+                    .map(k => k.content)
+                  const content = userMessages.at(-1)
+                  if (!content) return
+                  if (inputContent()) {
+                    const index = userMessages.findIndex(
+                      k => k === inputContent()
+                    )
+                    if (index === -1) return
+                    const t = userMessages.at(index - 1)
+                    t && setInputContent(t)
+                  } else setInputContent(content)
+                } else if (e.key === "ArrowDown") {
+                  e.preventDefault()
+                  const userMessages = messageList()
+                    .filter(k => k.role === "user")
+                    .map(k => k.content)
+                  const content = userMessages.at(0)
+                  if (!content) return
+                  if (inputContent()) {
+                    const index = userMessages.findIndex(
+                      k => k === inputContent()
+                    )
+                    if (index === -1) return
+                    setInputContent(
+                      userMessages[(index + 1) % userMessages.length]
+                    )
+                  } else setInputContent(content)
                 }
               }}
               onInput={handleInput}
