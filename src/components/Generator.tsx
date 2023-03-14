@@ -269,6 +269,27 @@ export default function (props: {
     inputRef.focus()
   }
 
+  const find = throttle(
+    (value: string) => {
+      console.log("1")
+      if (value === "/" || value === " ")
+        return setCompatiblePrompt(props.prompts.slice(0, 20))
+      const query = value.replace(/^[\/ ](.*)/, "$1")
+      if (query !== value)
+        setCompatiblePrompt(
+          fzf
+            .find(query)
+            .map(k => k.item)
+            .slice(0, 20)
+        )
+    },
+    250,
+    {
+      trailing: false,
+      leading: true
+    }
+  )
+
   async function handleInput() {
     setHeight("48px")
     const { scrollHeight } = inputRef
@@ -282,16 +303,7 @@ export default function (props: {
     if (!compositionend()) return
     let { value } = inputRef
     setInputContent(value)
-    if (value === "/" || value === " ")
-      return setCompatiblePrompt(props.prompts.slice(0, 10))
-    const query = value.replace(/^[\/ ](.*)/, "$1")
-    if (query !== value)
-      setCompatiblePrompt(
-        fzf
-          .find(query)
-          .map(k => k.item)
-          .slice(0, 10)
-      )
+    find(value)
   }
 
   return (
