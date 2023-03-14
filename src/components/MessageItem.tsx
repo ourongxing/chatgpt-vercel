@@ -4,6 +4,7 @@ import MarkdownIt from "markdown-it"
 // @ts-ignore
 import mdKatex from "markdown-it-katex"
 import mdHighlight from "markdown-it-highlightjs"
+import mdKbd from "markdown-it-kbd"
 import Clipboard from "./Clipboard"
 import { preWrapperPlugin } from "../markdown"
 import "../styles/message.css"
@@ -30,6 +31,7 @@ export default ({ role, message }: Props) => {
       .use(mdHighlight, {
         inline: true
       })
+      .use(mdKbd)
       .use(preWrapperPlugin)
 
     if (typeof message === "function") {
