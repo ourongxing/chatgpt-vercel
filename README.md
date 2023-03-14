@@ -46,6 +46,8 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 
 ### 默认设置
 
+> 记得删除注释，或者直接复制表格里的。
+
 ```json5
 {
   "continuousDialogue": true, // 开启连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
