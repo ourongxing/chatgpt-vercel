@@ -8,6 +8,7 @@ import { Fzf } from "fzf"
 import throttle from "just-throttle"
 import { isMobile } from "~/utils"
 import type { Setting } from "~/system"
+import { makeEventListener } from "@solid-primitives/event-listener"
 // import { mdMessage } from "~/temp"
 
 export interface PromptItem {
@@ -20,7 +21,7 @@ export default function (props: {
   env: {
     defaultSetting: Setting
     defaultMessage: string
-    resetContinuousDialogue: string
+    resetContinuousDialogue: boolean
   }
 }) {
   let inputRef: HTMLTextAreaElement
@@ -44,8 +45,37 @@ export default function (props: {
     selector: k => `${k.desc} (${k.prompt})`
   })
   const [height, setHeight] = createSignal("48px")
+  const [compositionend, setCompositionend] = createSignal(true)
+
+  const scrollToBottom = throttle(
+    () => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+      })
+    },
+    250,
+    { leading: true, trailing: false }
+  )
 
   onMount(() => {
+    makeEventListener(
+      inputRef,
+      "compositionend",
+      () => {
+        setCompositionend(true)
+        handleInput()
+      },
+      { passive: true }
+    )
+    makeEventListener(
+      inputRef,
+      "compositionstart",
+      () => {
+        setCompositionend(false)
+      },
+      { passive: true }
+    )
     document.querySelector("main")?.classList.remove("before")
     document.querySelector("main")?.classList.add("after")
     createResizeObserver(containerRef, ({ width, height }, el) => {
@@ -103,17 +133,6 @@ export default function (props: {
       setCompatiblePrompt([])
     }
   })
-
-  const scrollToBottom = throttle(
-    () => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-      })
-    },
-    250,
-    { leading: true, trailing: false }
-  )
 
   function archiveCurrentMessage() {
     if (currentAssistantMessage()) {
@@ -250,6 +269,31 @@ export default function (props: {
     inputRef.focus()
   }
 
+  async function handleInput() {
+    setHeight("48px")
+    const { scrollHeight } = inputRef
+    setHeight(
+      `${
+        scrollHeight > window.innerHeight - 64
+          ? window.innerHeight - 64
+          : scrollHeight
+      }px`
+    )
+    if (!compositionend()) return
+    let { value } = inputRef
+    setInputContent(value)
+    if (value === "/" || value === " ")
+      return setCompatiblePrompt(props.prompts.slice(0, 10))
+    const query = value.replace(/^[\/ ](.*)/, "$1")
+    if (query !== value)
+      setCompatiblePrompt(
+        fzf
+          .find(query)
+          .map(k => k.item)
+          .slice(0, 10)
+      )
+  }
+
   return (
     <div mt-6 ref={containerRef!}>
       <div
@@ -318,10 +362,8 @@ export default function (props: {
               value={inputContent()}
               autofocus
               onClick={scrollToBottom}
-              // onBlur={() => {
-              //   setCompatiblePrompt([])
-              // }}
               onKeyDown={e => {
+                if (e.isComposing) return
                 if (compatiblePrompt().length) {
                   if (
                     e.key === "ArrowUp" ||
@@ -331,29 +373,12 @@ export default function (props: {
                     e.preventDefault()
                   }
                 } else if (e.key === "Enter") {
-                  if (!e.shiftKey && !e.isComposing) {
+                  if (!e.shiftKey) {
                     handleButtonClick()
                   }
                 }
               }}
-              onInput={e => {
-                setHeight("48px")
-                const { scrollHeight } = e.currentTarget
-                setHeight(
-                  `${
-                    scrollHeight > window.innerHeight - 64
-                      ? window.innerHeight - 64
-                      : scrollHeight
-                  }px`
-                )
-                let { value } = e.currentTarget
-                setInputContent(value)
-                if (value === "/" || value === " ")
-                  return setCompatiblePrompt(props.prompts)
-                const promptKey = value.replace(/^[\/ ](.*)/, "$1")
-                if (promptKey !== value)
-                  setCompatiblePrompt(fzf.find(promptKey).map(k => k.item))
-              }}
+              onInput={handleInput}
               style={{
                 height: height(),
                 "border-bottom-right-radius": 0,
