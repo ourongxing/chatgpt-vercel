@@ -16,6 +16,19 @@ export default function SettingAction(props: {
   return (
     <div class="text-sm text-slate-7 dark:text-slate mb-2">
       <Show when={shown()}>
+        <SettingItem icon="i-ri:lock-password-line" label="网站密码">
+          <input
+            type="password"
+            value={props.setting().password}
+            class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+            onInput={e => {
+              props.setSetting({
+                ...props.setting(),
+                password: (e.target as HTMLInputElement).value
+              })
+            }}
+          />
+        </SettingItem>
         <SettingItem icon="i-carbon:api" label="OpenAI API Key">
           <input
             type="password"

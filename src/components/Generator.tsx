@@ -220,7 +220,8 @@ export default function (props: {
           ? [...messageList().slice(0, -1), message]
           : [message],
         key: setting().openaiAPIKey,
-        temperature: setting().openaiAPITemperature / 100
+        temperature: setting().openaiAPITemperature / 100,
+        password: setting().password
       }),
       signal: controller.signal
     })

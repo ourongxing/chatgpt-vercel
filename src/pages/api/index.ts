@@ -19,12 +19,14 @@ const baseURL = (
   "api.openai.com"
 ).replace(/^https?:\/\//, "")
 
+const pwd = import.meta.env.PASSWORD || process.env.PASSWORD
+
 export const post: APIRoute = async context => {
   const body = await context.request.json()
   const apiKey = apiKeys.length
     ? apiKeys[Math.floor(Math.random() * apiKeys.length)]
     : ""
-  let { messages, key = apiKey, temperature = 0.6 } = body
+  let { messages, key = apiKey, temperature = 0.6, password } = body
 
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
@@ -35,6 +37,9 @@ export const post: APIRoute = async context => {
   }
   if (!messages) {
     return new Response("没有输入任何文字")
+  }
+  if (pwd && pwd !== password) {
+    return new Response("密码错误，请联系网站管理员")
   }
 
   const completion = await fetch(`https://${baseURL}/v1/chat/completions`, {
