@@ -83,7 +83,7 @@ export const post: APIRoute = async context => {
       model: "gpt-3.5-turbo",
       messages,
       temperature,
-      max_tokens: 4096 - tokens,
+      // max_tokens: 4096 - tokens,
       stream: true
     })
   })
