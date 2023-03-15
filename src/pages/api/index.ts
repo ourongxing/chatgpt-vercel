@@ -4,9 +4,11 @@ import {
   ParsedEvent,
   ReconnectInterval
 } from "eventsource-parser"
-import { countTokens } from "gptoken"
+
 import type { ChatMessage } from "~/types"
 
+import GPT3Tokenizer from "gpt3-tokenizer"
+const tokenizer = new GPT3Tokenizer({ type: "gpt3" })
 const apiKeys = (
   import.meta.env.OPENAI_API_KEY ||
   process.env.OPENAI_API_KEY ||
@@ -59,7 +61,8 @@ export const post: APIRoute = async context => {
   }
 
   const tokens = messages.reduce((acc, cur) => {
-    return acc + countTokens(cur.content)
+    const tokens = tokenizer.encode(cur.content).bpe.length
+    return acc + tokens
   }, 0)
 
   if (tokens > (Number.isInteger(maxTokens) ? maxTokens : 3072)) {
@@ -80,6 +83,7 @@ export const post: APIRoute = async context => {
       model: "gpt-3.5-turbo",
       messages,
       temperature,
+      max_tokens: 4096 - tokens,
       stream: true
     })
   })
