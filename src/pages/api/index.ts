@@ -5,16 +5,22 @@ import {
   ReconnectInterval
 } from "eventsource-parser"
 
-const localEnv = import.meta.env.OPENAI_API_KEY
-const vercelEnv = process.env.OPENAI_API_KEY
-
-const apiKeys = ((localEnv || vercelEnv)?.split(/\s*\|\s*/) ?? []).filter(
-  Boolean
+const apiKeys = (
+  import.meta.env.OPENAI_API_KEY ||
+  process.env.OPENAI_API_KEY ||
+  ""
 )
+  .split(/\s*\|\s*/)
+  .filter(Boolean)
+
+const baseURL = (
+  import.meta.env.OPENAI_API_BASE_URL ||
+  process.env.OPENAI_API_BASE_URL ||
+  "api.openai.com"
+).replace(/^https?:\/\//, "")
 
 export const post: APIRoute = async context => {
   const body = await context.request.json()
-  console.log(context.request.headers.get("Authorization"))
   const apiKey = apiKeys.length
     ? apiKeys[Math.floor(Math.random() * apiKeys.length)]
     : ""
@@ -31,7 +37,7 @@ export const post: APIRoute = async context => {
     return new Response("没有输入任何文字")
   }
 
-  const completion = await fetch("https://api.openai.com/v1/chat/completions", {
+  const completion = await fetch(`https://${baseURL}/v1/chat/completions`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${key}`
@@ -55,15 +61,6 @@ export const post: APIRoute = async context => {
             return
           }
           try {
-            // response = {
-            //   id: 'chatcmpl-6pULPSegWhFgi0XQ1DtgA3zTa1WR6',
-            //   object: 'chat.completion.chunk',
-            //   created: 1677729391,
-            //   model: 'gpt-3.5-turbo-0301',
-            //   choices: [
-            //     { delta: { content: '你' }, index: 0, finish_reason: null }
-            //   ],
-            // }
             const json = JSON.parse(data)
             const text = json.choices[0].delta?.content
             const queue = encoder.encode(text)
