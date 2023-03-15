@@ -47,8 +47,23 @@ export default (props: Props) => {
   }
 
   function del() {
-    if (props.setMessageList) {
-      props.setMessageList(list => list.filter((_, i) => i !== props.index))
+    if (props.setMessageList && props.index !== undefined) {
+      props.setMessageList(list => {
+        if (list[props.index!]?.role === "user") {
+          const arr = list.reduce(
+            (acc, cur, i) => {
+              if (cur.role === "assistant" && i === acc.at(-1)! + 1) acc.push(i)
+              return acc
+            },
+            [props.index] as number[]
+          )
+
+          return list.filter((_, i) => {
+            return !arr.includes(i)
+          })
+        }
+        return list.filter((_, i) => i !== props.index)
+      })
     }
   }
 
