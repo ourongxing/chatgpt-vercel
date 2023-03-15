@@ -323,7 +323,7 @@ export default function (props: {
   }
 
   return (
-    <div ref={containerRef!}>
+    <div ref={containerRef!} class="mt-2">
       <div
         id="message-container"
         style={{
