@@ -41,6 +41,7 @@ export default function (props: {
   const [setting, setSetting] = createSignal(defaultSetting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
+  const [messageListLength, setMessageListLength] = createSignal(0)
   const fzf = new Fzf(props.prompts, {
     selector: k => `${k.desc} (${k.prompt})`
   })
@@ -122,7 +123,13 @@ export default function (props: {
   })
 
   createEffect(() => {
-    messageList()
+    if (messageList().length > messageListLength()) {
+      scrollToBottom()
+      setMessageListLength(messageList().length)
+    }
+  })
+
+  createEffect(() => {
     currentAssistantMessage()
     scrollToBottom()
   })
