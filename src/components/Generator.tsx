@@ -408,6 +408,7 @@ export default function (props: {
                   }
                 } else if (e.key === "Enter") {
                   if (!e.shiftKey) {
+                    e.preventDefault()
                     handleButtonClick()
                   }
                 } else if (e.key === "ArrowUp") {
