@@ -315,7 +315,7 @@ export default function (props: {
   }
 
   return (
-    <div mt-6 ref={containerRef!}>
+    <div ref={containerRef!}>
       <div
         id="message-container"
         style={{
