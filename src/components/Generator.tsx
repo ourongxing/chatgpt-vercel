@@ -148,6 +148,7 @@ export default function (props: {
         }px`
       )
     }
+    inputRef.focus()
   })
 
   function archiveCurrentMessage() {
