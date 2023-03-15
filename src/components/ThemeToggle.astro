@@ -1,6 +1,7 @@
 <button
   id="themeToggle"
   class="flex items-center justify-center w-10 h-10 rounded-md border transition-colors hover:bg-slate/10"
+  onclick="handleToggleTheme()"
 >
   <svg width="20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path
@@ -57,8 +58,4 @@
     darkSchema.removeEventListener("change", listener)
     localStorage.setItem("theme", isDark ? "dark" : "light")
   }
-
-  document
-    .getElementById("themeToggle")
-    ?.addEventListener("click", handleToggleTheme)
 </script>

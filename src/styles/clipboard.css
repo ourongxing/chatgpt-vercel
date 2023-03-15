@@ -53,10 +53,9 @@ button.copy {
   background-position: 50%;
   background-size: 20px;
   background-repeat: no-repeat;
-  transition: border-color 0.25s, background-color 0.25s, opacity 0.25s;
 }
 
-pre:hover > button.copy,
+.message-item:not(.temporary) pre:hover > button.copy,
 button.copy:focus {
   opacity: 1;
 }
