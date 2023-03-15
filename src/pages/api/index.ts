@@ -4,6 +4,8 @@ import {
   ParsedEvent,
   ReconnectInterval
 } from "eventsource-parser"
+import { countTokens } from "gptoken"
+import type { ChatMessage } from "~/types"
 
 const apiKeys = (
   import.meta.env.OPENAI_API_KEY ||
@@ -19,6 +21,10 @@ const baseURL = (
   "api.openai.com"
 ).replace(/^https?:\/\//, "")
 
+const maxTokens = Number(
+  import.meta.env.MAX_INPUT_TOKENS || process.env.MAX_INPUT_TOKENS
+)
+
 const pwd = import.meta.env.PASSWORD || process.env.PASSWORD
 
 export const post: APIRoute = async context => {
@@ -26,20 +32,42 @@ export const post: APIRoute = async context => {
   const apiKey = apiKeys.length
     ? apiKeys[Math.floor(Math.random() * apiKeys.length)]
     : ""
-  let { messages, key = apiKey, temperature = 0.6, password } = body
+  let {
+    messages,
+    key = apiKey,
+    temperature = 0.6,
+    password
+  } = body as {
+    messages?: ChatMessage[]
+    key?: string
+    temperature?: number
+    password?: string
+  }
 
   const encoder = new TextEncoder()
   const decoder = new TextDecoder()
 
   if (!key.startsWith("sk-")) key = apiKey
   if (!key) {
-    return new Response("没有填写 OpenAI API key")
+    return new Response("没有填写 OpenAI API key。")
   }
   if (!messages) {
-    return new Response("没有输入任何文字")
+    return new Response("没有输入任何文字。")
   }
   if (pwd && pwd !== password) {
-    return new Response("密码错误，请联系网站管理员")
+    return new Response("密码错误，请联系网站管理员。")
+  }
+
+  const tokens = messages.reduce((acc, cur) => {
+    return acc + countTokens(cur.content)
+  }, 0)
+
+  if (tokens > (Number.isInteger(maxTokens) ? maxTokens : 3072)) {
+    if (messages.length > 1)
+      return new Response(
+        `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
+      )
+    else return new Response("太长了，缩短一点吧。")
   }
 
   const completion = await fetch(`https://${baseURL}/v1/chat/completions`, {

@@ -13,6 +13,7 @@ specifiers:
   astro: ^2.0.15
   eventsource-parser: ^0.1.0
   fzf: ^0.5.1
+  gptoken: ^0.0.1
   highlight.js: ^11.7.0
   html-to-image: ^1.11.11
   just-throttle: ^4.2.0
@@ -35,6 +36,7 @@ dependencies:
   astro: 2.0.17_@types+node@14.18.33
   eventsource-parser: 0.1.0
   fzf: 0.5.1
+  gptoken: 0.0.1
   highlight.js: 11.7.0
   html-to-image: 1.11.11
   just-throttle: 4.2.0
@@ -2254,6 +2256,10 @@ packages:
 
   /globrex/0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+    dev: false
+
+  /gptoken/0.0.1:
+    resolution: {integrity: sha512-i0Fu3wke+paMqK8+OYSzTcGOXhYswJK6HxdBYKLAUSdPByrpsaIysJ4hrI2bXmt15RA/qsbJOn+HxWRLaqitvw==}
     dev: false
 
   /graceful-fs/4.2.10:

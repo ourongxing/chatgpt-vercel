@@ -20,6 +20,7 @@
     "astro": "^2.0.15",
     "eventsource-parser": "^0.1.0",
     "fzf": "^0.5.1",
+    "gptoken": "^0.0.1",
     "highlight.js": "^11.7.0",
     "html-to-image": "^1.11.11",
     "just-throttle": "^4.2.0",
