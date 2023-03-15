@@ -13,9 +13,9 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 
 ## 部署一个你自己的 ChatGPT 网站（免费）
 
-如果你只需要部署一个你自己用的网站，而不需要定制，那么你完全不需要在本地跑起来，你可以直接点击下面的按钮，然后按照提示操作，然后在 Vercel 中填入环境变量即可。 vercel.app 域名已经被墙，但 vercel 本身没有被墙，所以你绑定自己的域名就可以了。
+如果你只需要部署一个你自己用的网站，而不需要定制，那么你完全不需要在本地跑起来，你可以直接点击下面的按钮，然后按照提示操作，然后在 Vercel 中填入环境变量即可。vercel.app 域名已经被墙，但 vercel 本身没有被墙，所以你绑定自己的域名就可以了。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ourongxing/chatgpt-vercel)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ourongxing/chatgpt-vercel&env=OPENAI_API_KEY)
 
 如果你需要部署给更多人用，需要修改一些代码，那么你可能需要将上面创建的你自己的仓库 `git clone` 到本地。改完了  `git commit & push` 即可重新部署，vscode 上点几下就可以了。也可以用 vercel 的 cli，`vercel deploy --prod`。
 
@@ -26,6 +26,13 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 3. `pnpm i` 安装依赖。
 4. `pnpm dev` 启动项目。
 
+### 更多部署方案
+Astro 提供了很多部署方案，自行 [查看设置方法](https://docs.astro.build/zh-cn/guides/server-side-rendering/)，本项目主要针对 Vercel，故不多做解释。你也可以查看 [ddiu8081/chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo/blob/main/astro.config.mjs) 的设置方法。
+- [Cloudflare](https://github.com/withastro/astro/tree/main/packages/integrations/cloudflare)
+- [Deno](https://github.com/withastro/astro/tree/main/packages/integrations/deno)
+- [Netlify](https://github.com/withastro/astro/tree/main/packages/integrations/netlify)
+- [Node.js](https://github.com/withastro/astro/tree/main/packages/integrations/node)
+- [Vercel](https://github.com/withastro/astro/tree/main/packages/integrations/vercel)
 ### 环境变量
 
 | 环境变量                           | 说明                                                                                                                           | 默认值                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -71,22 +78,6 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 - 把需要输入的内容放在最后，可以提示 ChatGPT 开始输入了，比如 “我的第一句话是：”。
 - 尽可能去优化已有的 Prompts，而不是重复添加。
 - 添加到结尾，我会定期整理。
-
-## API
-
-### POST /api
-
-这个 API 没有开启 stream，会直接返回答案。stream 版的 API 自己看源码，也可以直接调用，相当于一个代理了，不过并没有按照原版的请求规范。
-
-```ts
-await fetch("/api", {
-    method: "POST",
-    body: JSON.stringify({
-        message: "xxx",
-        key: "xxxx"
-    })
-})
-```
 
 ## 赞赏
 如果本项目对你有所帮助，可以给小猫买点零食，但不接受任何付费功能请求。

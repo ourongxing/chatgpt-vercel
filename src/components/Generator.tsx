@@ -213,7 +213,7 @@ export default function (props: {
       role: "user",
       content: systemRule ? systemRule + "\n" + inputValue : inputValue
     }
-    const response = await fetch("/api/stream", {
+    const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
