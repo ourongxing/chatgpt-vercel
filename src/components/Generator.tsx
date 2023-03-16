@@ -41,7 +41,6 @@ export default function (props: {
   const [setting, setSetting] = createSignal(defaultSetting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
-  const [messageListLength, setMessageListLength] = createSignal(0)
   const fzf = new Fzf(props.prompts, {
     selector: k => `${k.desc} (${k.prompt})`
   })
@@ -97,58 +96,75 @@ export default function (props: {
       }
       if (session && archiveSession) {
         setMessageList(JSON.parse(session))
-      }
+      } else
+        setMessageList([
+          {
+            role: "assistant",
+            content: defaultMessage
+          }
+        ])
     } catch {
       console.log("Setting parse error")
     }
   })
 
-  createEffect(() => {
-    if (messageList().length === 0) {
-      setMessageList([
-        {
-          role: "assistant",
-          content: defaultMessage
-        }
-      ])
-    } else if (
-      messageList().length > 1 &&
-      messageList()[0].content === defaultMessage
-    ) {
-      setMessageList(messageList().slice(1))
-    }
-    localStorage.setItem("setting", JSON.stringify(setting()))
-    if (setting().archiveSession)
-      localStorage.setItem("session", JSON.stringify(messageList()))
-  })
-
-  createEffect(() => {
-    if (messageList().length > messageListLength()) {
+  createEffect((prev: number | undefined) => {
+    if (prev !== undefined && messageList().length > prev) {
       scrollToBottom()
-      setMessageListLength(messageList().length)
     }
+    return messageList().length
   })
 
   createEffect(() => {
-    currentAssistantMessage()
-    scrollToBottom()
+    if (currentAssistantMessage()) scrollToBottom()
+  })
+
+  createEffect(prev => {
+    messageList()
+    if (prev) {
+      if (messageList().length === 0) {
+        setMessageList([
+          {
+            role: "assistant",
+            content: defaultMessage
+          }
+        ])
+      } else if (
+        messageList().length > 1 &&
+        messageList()[0].content === defaultMessage
+      ) {
+        setMessageList(messageList().slice(1))
+      }
+      if (setting().archiveSession) {
+        localStorage.setItem("session", JSON.stringify(messageList()))
+      }
+    }
+    return true
   })
 
   createEffect(() => {
-    setHeight("48px")
-    if (inputContent() === "") {
-      setCompatiblePrompt([])
-    } else {
-      const { scrollHeight } = inputRef
-      setHeight(
-        `${
-          scrollHeight > window.innerHeight - 64
-            ? window.innerHeight - 64
-            : scrollHeight
-        }px`
-      )
+    localStorage.setItem("setting", JSON.stringify(setting()))
+  })
+
+  createEffect(prev => {
+    inputContent()
+    if (prev) {
+      setHeight("48px")
+      if (inputContent() === "") {
+        setCompatiblePrompt([])
+      } else {
+        const { scrollHeight } = inputRef
+        setHeight(
+          `${
+            scrollHeight > window.innerHeight - 64
+              ? window.innerHeight - 64
+              : scrollHeight
+          }px`
+        )
+      }
+      inputRef.focus()
     }
-    inputRef.focus()
+    return true
   })
 
   function archiveCurrentMessage() {
@@ -164,7 +180,6 @@ export default function (props: {
       setLoading(false)
       setController()
       !isMobile() && inputRef.focus()
-      scrollToBottom.flush()
     }
   }
 
@@ -253,7 +268,6 @@ export default function (props: {
   }
 
   function clearSession() {
-    // setInputContent("")
     setMessageList([])
     setCurrentAssistantMessage("")
   }
