@@ -14,7 +14,7 @@ const apiKeys = (
   process.env.OPENAI_API_KEY ||
   ""
 )
-  .split(/\s*\|\s*/)
+  .split(/\s*[\|\n]\s*/)
   .filter(Boolean)
 
 const baseURL = (
