@@ -1,0 +1,60 @@
+.message pre {
+  background-color: #1c1e29;
+  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+}
+
+.dark .message pre {
+  background-color: #64748b10;
+}
+
+.message pre .lang {
+  color: #939090;
+}
+
+.dark .message pre .lang {
+  opacity: 0.5;
+}
+
+.message .hljs {
+  background-color: transparent;
+}
+
+.message table {
+  font-size: 0.8em;
+}
+
+.message table thead tr {
+  background-color: #64748b40;
+  text-align: left;
+}
+
+.message table th,
+.message table td {
+  padding: 0.6rem 1rem;
+}
+
+.message table tbody tr:last-of-type {
+  border-bottom: 2px solid #64748b40;
+}
+
+.message {
+  --c-text: rgba(255, 255, 255, 0.6);
+  --un-prose-invert-headings: var(--c-text);
+  --un-prose-invert-links: var(--c-text);
+  --un-prose-invert-code: var(--c-text);
+  --un-prose-invert-body: var(--c-text);
+}
+
+.message a {
+  text-decoration: none;
+  border-bottom: 1px dashed;
+}
+
+.message a:hover {
+  text-decoration: none;
+  border-bottom: 1px solid;
+}
+.dark .message a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}

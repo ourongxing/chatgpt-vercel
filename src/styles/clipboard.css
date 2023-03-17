@@ -1,0 +1,73 @@
+:root {
+  --block-bg-light: #1e1e20;
+  --copy-border-color: transparent;
+  --copy-bg: #2a2d38;
+  --copy-hover-border-color: var(--copy-hover-bg);
+  --copy-hover-bg: #303540;
+  --copy-active-text: rgba(235, 235, 245, 0.6);
+  --icon-copy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2'/%3E%3C/svg%3E");
+  --icon-copied: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' height='20' width='20' stroke='rgba(128,128,128,1)' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4'/%3E%3C/svg%3E");
+}
+
+.i-un\:copy,
+[i-un\:copy=""] {
+  -webkit-mask: var(--icon-copy) no-repeat;
+  mask: var(--icon-copy) no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  color: inherit;
+  width: 1em;
+  height: 1em;
+}
+
+.i-un\:copied,
+[i-un\:copied=""] {
+  -webkit-mask: var(--icon-copied) no-repeat;
+  mask: var(--icon-copied) no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  color: inherit;
+  width: 1em;
+  height: 1em;
+}
+
+button.copy {
+  direction: ltr;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--copy-border-color);
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--copy-bg);
+  opacity: 0;
+  cursor: pointer;
+  background-image: var(--icon-copy);
+  background-position: 50%;
+  background-size: 20px;
+  background-repeat: no-repeat;
+}
+
+.message-item:not(.temporary) pre:hover > button.copy,
+button.copy:focus {
+  opacity: 1;
+}
+
+button.copy:hover,
+button.copy.copied {
+  border-color: var(--copy-hover-border-color);
+  background-color: var(--copy-hover-bg);
+}
+
+button.copy.copied,
+button.copy:hover.copied {
+  background-color: var(--copy-hover-bg);
+  background-image: var(--icon-copied);
+}
