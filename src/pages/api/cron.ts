@@ -10,6 +10,8 @@ const sendChannel =
 export const get: APIRoute = async () => {
   try {
     const keys = splitKeys(localKey)
+    if (keys.length === 0) return new Response(`ok`)
+    if (!sendKey) return new Response(`ok`)
     const status = await Promise.all(keys.map(k => checkBan(k)))
     const bannedKey = keys.filter((_, i) => status[i])
     const unbanKey = keys.filter((_, i) => !status[i])
@@ -21,7 +23,8 @@ export const get: APIRoute = async () => {
     if (bannedKey.length) {
       titles[1] = "有帐号被 ban"
       descs[1] =
-        "以下帐号被 ban，请检查\n\n" + bannedKey.map(k => "- " + k).join("\n")
+        "\n\n以下帐号被 ban，请检查\n\n" +
+        bannedKey.map(k => "- " + k.slice(0, 8)).join("\n")
     }
     await push(titles.join("，"), descs.join("\n\n"))
   } catch (e) {
