@@ -35,7 +35,10 @@ export default defineConfig({
         presetTypography({
           cssExtend: {
             ":not(pre) > code::before,:not(pre) > code::after": ""
-          }
+          }，
+          "ul,ol": {
+          "list-style-position":"inside"
+        }
         }),
         presetIcons()
       ]
