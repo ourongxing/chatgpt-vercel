@@ -9,6 +9,7 @@ specifiers:
   '@solid-primitives/resize-observer': ^2.0.11
   '@types/markdown-it': ^12.2.3
   '@unocss/reset': ^0.50.3
+  '@vercel/edge-config': ^0.1.2
   '@vercel/node': ^2.8.0
   astro: ^2.0.15
   eventsource-parser: ^0.1.0
@@ -33,6 +34,7 @@ dependencies:
   '@solid-primitives/event-listener': 2.2.8_solid-js@1.6.11
   '@solid-primitives/resize-observer': 2.0.11_solid-js@1.6.11
   '@unocss/reset': 0.50.3
+  '@vercel/edge-config': 0.1.2
   astro: 2.0.17_@types+node@14.18.33
   eventsource-parser: 0.1.0
   fzf: 0.5.1
@@ -1131,6 +1133,11 @@ packages:
   /@vercel/build-utils/6.3.2:
     resolution: {integrity: sha512-wUYa8eUyTg1jPGRCrjpIxJm1r6hQE7ccbECWzDCAikuWG4iadS2zWrF7bsAcuUj7fTMf8sNFhmsknTJgyN3B3g==}
     dev: true
+
+  /@vercel/edge-config/0.1.2:
+    resolution: {integrity: sha512-rSX5ttw+qGgHyA2YNxIDBzn5cV5h7mr8wsk//M9pKdTiKz2GhjmsyMXfrlJJ6v7J/fk8prfcha+rhqETHauTwg==}
+    engines: {node: '>=14.6'}
+    dev: false
 
   /@vercel/nft/0.22.6:
     resolution: {integrity: sha512-gTsFnnT4mGxodr4AUlW3/urY+8JKKB452LwF3m477RFUJTAaDmcz2JqFuInzvdybYIeyIv1sSONEJxsxnbQ5JQ==}

@@ -229,19 +229,13 @@ export default function (props: {
       role: "user",
       content: systemRule ? systemRule + "\n" + inputValue : inputValue
     }
-    const apiKeys = setting()
-      .openaiAPIKey.split(/\s*[\|\n]\s*/)
-      .filter(Boolean)
-    const key = apiKeys.length
-      ? apiKeys[Math.floor(Math.random() * apiKeys.length)]
-      : ""
     const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
           ? [...messageList().slice(0, -1), message]
           : [message],
-        key,
+        key: setting().openaiAPIKey || undefined,
         temperature: setting().openaiAPITemperature / 100,
         password: setting().password
       }),

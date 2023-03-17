@@ -67,3 +67,29 @@ export function dateFormat(date: Date, fmt = "YYYY-mm-dd HH:MM") {
   })
   return fmt
 }
+
+export function splitKeys(keys: string) {
+  return keys
+    .trim()
+    .split(/\s*[\|\n]\s*/)
+    .filter(k => /sk-\w{48}/.test(k))
+}
+
+export function randomKey(keys: string[]) {
+  return keys.length ? keys[Math.floor(Math.random() * keys.length)] : ""
+}
+
+export function randomWithWeight(items: string[], weights: number[]) {
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+  const randomValue = Math.random() * totalWeight
+  let weightSum = 0
+
+  for (let i = 0; i < items.length; i++) {
+    weightSum += weights[i]
+    if (randomValue <= weightSum) {
+      return items[i]
+    }
+  }
+
+  return items[items.length - 1]
+}
