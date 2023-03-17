@@ -6,8 +6,7 @@ import {
 } from "eventsource-parser"
 import type { ChatMessage } from "~/types"
 import GPT3Tokenizer from "gpt3-tokenizer"
-import { getAll } from "@vercel/edge-config"
-import { splitKeys, randomWithWeight, randomKey } from "~/utils"
+import { splitKeys, randomKey } from "~/utils"
 
 const tokenizer = new GPT3Tokenizer({ type: "gpt3" })
 
@@ -53,16 +52,22 @@ export const post: APIRoute = async context => {
       const content = messages.at(-1)!.content.trim()
       if (content.startsWith("查询填写的 Key 的余额")) {
         if (key !== localKey) {
-          return new Response(await genBillingsTable(splitKeys(key)))
+          const billings = await Promise.all(
+            splitKeys(key).map(k => fetchBilling(k))
+          )
+          return new Response(await genBillingsTable(billings))
         } else {
           return new Response("没有填写 OpenAI API key，不会查询内置的 Key。")
         }
       } else if (content.startsWith("sk-")) {
-        return new Response(await genBillingsTable(splitKeys(content)))
+        const billings = await Promise.all(
+          splitKeys(content).map(k => fetchBilling(k))
+        )
+        return new Response(await genBillingsTable(billings))
       }
     }
 
-    const apiKey = randomKeyWithBalance(splitKeys(key))
+    const apiKey = randomKey(splitKeys(key))
 
     if (!apiKey)
       return new Response("没有填写 OpenAI API key，或者 key 填写错误。")
@@ -130,27 +135,47 @@ export const post: APIRoute = async context => {
   }
 }
 
-export async function fetchBilling(key: string) {
-  return (await fetch(`https://${baseURL}/dashboard/billing/credit_grants`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${key}`
+type Billing = {
+  key: string
+  rate: number
+  total_granted: number
+  total_used: number
+  total_available: number
+}
+
+export async function fetchBilling(key: string): Promise<Billing> {
+  try {
+    const res = await fetch(
+      `https://${baseURL}/dashboard/billing/credit_grants`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${key}`
+        }
+      }
+    ).then(res => res.json())
+    return {
+      ...res,
+      key,
+      rate: res.total_available / res.total_granted
     }
-  }).then(res => res.json())) as {
-    total_granted: number
-    total_used: number
-    total_available: number
+  } catch {
+    return {
+      key,
+      rate: 0,
+      total_granted: 0,
+      total_used: 0,
+      total_available: 0
+    }
   }
 }
 
-export async function genBillingsTable(keys: string[]) {
-  const res = await Promise.all(keys.map(k => fetchBilling(k)))
-  const table = res
+export async function genBillingsTable(billings: Billing[]) {
+  const table = billings
     .map(
       (k, i) =>
-        `| ${keys[i].slice(0, 8)} | ${k.total_available.toFixed(4)}(${(
-          (k.total_available / k.total_granted) *
-          100
+        `| ${k.key.slice(0, 8)} | ${k.total_available.toFixed(4)}(${(
+          k.rate * 100
         ).toFixed(1)}%) | ${k.total_used.toFixed(4)} | ${k.total_granted} |`
     )
     .join("\n")
@@ -159,12 +184,4 @@ export async function genBillingsTable(keys: string[]) {
 | ---- | ---- | ---- | ------ |
 ${table}
 `
-}
-
-async function randomKeyWithBalance(keys: string[]) {
-  if (process.env.EDGE_CONFIG) {
-    const map = await getAll()
-    const weights = keys.map(k => map[k] || 5) as number[]
-    return randomWithWeight(keys, weights)
-  } else return randomKey(keys)
 }

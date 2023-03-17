@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron-available",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron-banned",
+      "schedule": "10 12 * * *"
+    }
+  ]
+}

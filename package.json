@@ -17,7 +17,6 @@
     "@solid-primitives/event-listener": "^2.2.8",
     "@solid-primitives/resize-observer": "^2.0.11",
     "@unocss/reset": "^0.50.3",
-    "@vercel/edge-config": "^0.1.2",
     "astro": "^2.0.15",
     "eventsource-parser": "^0.1.0",
     "fzf": "^0.5.1",
@@ -30,6 +29,7 @@
     "markdown-it-highlightjs": "^4.0.1",
     "markdown-it-katex": "^2.0.3",
     "markdown-it-kbd": "^2.2.2",
+    "node-fetch-retry-timeout": "^1.2.1",
     "solid-js": "^1.6.11"
   },
   "devDependencies": {

@@ -9,7 +9,6 @@ specifiers:
   '@solid-primitives/resize-observer': ^2.0.11
   '@types/markdown-it': ^12.2.3
   '@unocss/reset': ^0.50.3
-  '@vercel/edge-config': ^0.1.2
   '@vercel/node': ^2.8.0
   astro: ^2.0.15
   eventsource-parser: ^0.1.0
@@ -23,6 +22,7 @@ specifiers:
   markdown-it-highlightjs: ^4.0.1
   markdown-it-katex: ^2.0.3
   markdown-it-kbd: ^2.2.2
+  node-fetch-retry-timeout: ^1.2.1
   punycode: ^2.3.0
   solid-js: ^1.6.11
   typescript: ^4.8.3
@@ -34,7 +34,6 @@ dependencies:
   '@solid-primitives/event-listener': 2.2.8_solid-js@1.6.11
   '@solid-primitives/resize-observer': 2.0.11_solid-js@1.6.11
   '@unocss/reset': 0.50.3
-  '@vercel/edge-config': 0.1.2
   astro: 2.0.17_@types+node@14.18.33
   eventsource-parser: 0.1.0
   fzf: 0.5.1
@@ -47,6 +46,7 @@ dependencies:
   markdown-it-highlightjs: 4.0.1
   markdown-it-katex: 2.0.3
   markdown-it-kbd: 2.2.2
+  node-fetch-retry-timeout: 1.2.1
   solid-js: 1.6.11
 
 devDependencies:
@@ -1134,11 +1134,6 @@ packages:
     resolution: {integrity: sha512-wUYa8eUyTg1jPGRCrjpIxJm1r6hQE7ccbECWzDCAikuWG4iadS2zWrF7bsAcuUj7fTMf8sNFhmsknTJgyN3B3g==}
     dev: true
 
-  /@vercel/edge-config/0.1.2:
-    resolution: {integrity: sha512-rSX5ttw+qGgHyA2YNxIDBzn5cV5h7mr8wsk//M9pKdTiKz2GhjmsyMXfrlJJ6v7J/fk8prfcha+rhqETHauTwg==}
-    engines: {node: '>=14.6'}
-    dev: false
-
   /@vercel/nft/0.22.6:
     resolution: {integrity: sha512-gTsFnnT4mGxodr4AUlW3/urY+8JKKB452LwF3m477RFUJTAaDmcz2JqFuInzvdybYIeyIv1sSONEJxsxnbQ5JQ==}
     engines: {node: '>=14'}
@@ -1208,6 +1203,13 @@ packages:
 
   /abbrev/1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
+    dev: false
+
+  /abort-controller/3.0.0:
+    resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
+    engines: {node: '>=6.5'}
+    dependencies:
+      event-target-shim: 5.0.1
     dev: false
 
   /acorn-walk/8.2.0:
@@ -2073,6 +2075,11 @@ packages:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
     dependencies:
       '@types/estree': 1.0.0
+    dev: false
+
+  /event-target-shim/5.0.1:
+    resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
+    engines: {node: '>=6'}
     dev: false
 
   /events/3.3.0:
@@ -3229,6 +3236,15 @@ packages:
   /node-fetch-native/1.0.2:
     resolution: {integrity: sha512-KIkvH1jl6b3O7es/0ShyCgWLcfXxlBrLBbP3rOr23WArC66IMcU4DeZEeYEOwnopYhawLTn7/y+YtmASe8DFVQ==}
     dev: true
+
+  /node-fetch-retry-timeout/1.2.1:
+    resolution: {integrity: sha512-OuexeJn+ib2H2b/tfqpMed+01Kj5yveMSKrmCRIjxCUBPCZghvZ00F768CeOCRrT7CNXHeAArRm+naQoTjni2Q==}
+    dependencies:
+      abort-controller: 3.0.0
+      node-fetch: 2.6.7
+    transitivePeerDependencies:
+      - encoding
+    dev: false
 
   /node-fetch/2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
