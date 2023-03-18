@@ -55,7 +55,7 @@ export default function (props: {
       })
     },
     250,
-    { leading: true, trailing: false }
+    { leading: false, trailing: true }
   )
 
   onMount(() => {
@@ -208,13 +208,13 @@ export default function (props: {
     }
     try {
       await fetchGPT(inputValue)
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false)
       setController()
       setCurrentAssistantMessage(
-        String(error).includes("The user aborted a request")
+        error.message.includes("The user aborted a request")
           ? ""
-          : String(error)
+          : error.message.replace(/(sk-\w{5})\w+/g, "$1")
       )
     }
     archiveCurrentMessage()
@@ -242,7 +242,8 @@ export default function (props: {
       signal: controller.signal
     })
     if (!response.ok) {
-      throw new Error(response.statusText)
+      const res = await response.json()
+      throw new Error(res.error.message)
     }
     const data = response.body
     if (!data) {
