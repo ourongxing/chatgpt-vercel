@@ -13,13 +13,14 @@ const tokenizer = new GPT3Tokenizer({ type: "gpt3" })
 export const localKey =
   import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
 
-export const baseURL = process.env.VERCEL
-  ? "api.openai.com"
-  : (
-      import.meta.env.OPENAI_API_BASE_URL ||
-      process.env.OPENAI_API_BASE_URL ||
-      "api.openai.com"
-    ).replace(/^https?:\/\//, "")
+export const baseURL =
+  process.env.VERCEL || process.env.NOGFW
+    ? "api.openai.com"
+    : (
+        import.meta.env.OPENAI_API_BASE_URL ||
+        process.env.OPENAI_API_BASE_URL ||
+        "api.openai.com"
+      ).replace(/^https?:\/\//, "")
 
 const maxTokens = Number(
   import.meta.env.MAX_INPUT_TOKENS || process.env.MAX_INPUT_TOKENS
