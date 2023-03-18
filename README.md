@@ -22,7 +22,7 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 如果你需要在本地开发和调试，有点麻烦：
 
 1. 升级到 `node18`，要用到原生的 `fetch`。
-2. API 被墙了，自己想办法开代理，不然要报错。也可以直接 `vercel deploy` 部署到 vercel 开发环境上调试。
+2. API 被墙了，自己想办法开代理，不然要报错。可以设置 OpenAI 的代理 API，也可以直接 `vercel deploy` 部署到 vercel 开发环境上调试。
 3. `pnpm i` 安装依赖。
 4. `pnpm dev` 启动项目。
 
