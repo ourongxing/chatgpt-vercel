@@ -13,7 +13,9 @@ export const get: APIRoute = async () => {
     const status = await Promise.all(keys.map(k => checkBan(k)))
     const bannedKeys = keys.filter((_, i) => status[i])
     const billings = await Promise.all(keys.map(k => fetchBilling(k)))
-    const table = await genBillingsTable(billings)
+    const table = await genBillingsTable(
+      billings.sort((a, b) => b.rate - a.rate)
+    )
     const titles = ["帐号余额充足", "没有帐号不可用"]
     const descs = [table, ""]
     if (billings.some(k => k.rate < 0.05)) titles[0] = "有帐号余额已少于 5%"
