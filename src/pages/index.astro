@@ -23,11 +23,6 @@ try {
 const _reset =
   import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION ||
   process.env.RESET_CONTINUOUS_DIALOGUE_OPTION
-
-const reset =
-  _reset && _reset !== String(resetContinuousDialogue)
-    ? !resetContinuousDialogue
-    : resetContinuousDialogue
 ---
 
 <Layout title="ChatGPT">
@@ -37,9 +32,10 @@ const reset =
       env={{
         defaultSetting,
         defaultMessage,
-        resetContinuousDialogue: reset
-          ? resetContinuousDialogue
-          : !resetContinuousDialogue
+        resetContinuousDialogue:
+          _reset && _reset !== String(resetContinuousDialogue)
+            ? !resetContinuousDialogue
+            : resetContinuousDialogue
       }}
       prompts={prompts}
       client:visible
