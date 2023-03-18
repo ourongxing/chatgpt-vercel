@@ -88,6 +88,7 @@ export default (props: Props) => {
         del={del}
         copy={copy}
         edit={edit}
+        role={props.role}
         hidden={props.index === undefined}
       />
     </div>

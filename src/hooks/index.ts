@@ -12,7 +12,7 @@ export function useCopyCode() {
         return
       }
 
-      let text = sibling.innerText
+      const text = sibling.innerText
 
       copyToClipboard(text.trim()).then(() => {
         el.classList.add("copied")

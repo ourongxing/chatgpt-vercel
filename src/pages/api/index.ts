@@ -1,25 +1,21 @@
 import type { APIRoute } from "astro"
-import {
-  createParser,
-  ParsedEvent,
-  ReconnectInterval
-} from "eventsource-parser"
+import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
+import { createParser } from "eventsource-parser"
 import type { ChatMessage } from "~/types"
-import GPT3Tokenizer from "gpt3-tokenizer"
+import { countTokens } from "~/utils/tokens"
 import { splitKeys, randomKey } from "~/utils"
-
-const tokenizer = new GPT3Tokenizer({ type: "gpt3" })
 
 export const localKey =
   import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
 
-export const baseURL = process.env.VERCEL
-  ? "api.openai.com"
-  : (
-      import.meta.env.OPENAI_API_BASE_URL ||
-      process.env.OPENAI_API_BASE_URL ||
-      "api.openai.com"
-    ).replace(/^https?:\/\//, "")
+export const baseURL =
+  process.env.VERCEL || process.env.NETLIFY || process.env.NOGFW
+    ? "api.openai.com"
+    : (
+        import.meta.env.OPENAI_API_BASE_URL ||
+        process.env.OPENAI_API_BASE_URL ||
+        "api.openai.com"
+      ).replace(/^https?:\/\//, "")
 
 const maxTokens = Number(
   import.meta.env.MAX_INPUT_TOKENS || process.env.MAX_INPUT_TOKENS
@@ -43,11 +39,11 @@ export const post: APIRoute = async context => {
     }
 
     if (pwd && pwd !== password) {
-      return new Response("密码错误，请联系网站管理员。")
+      throw new Error("密码错误，请联系网站管理员。")
     }
 
     if (!messages?.length) {
-      return new Response("没有输入任何文字。")
+      throw new Error("没有输入任何文字。")
     } else {
       const content = messages.at(-1)!.content.trim()
       if (content.startsWith("查询填写的 Key 的余额")) {
@@ -57,7 +53,7 @@ export const post: APIRoute = async context => {
           )
           return new Response(await genBillingsTable(billings))
         } else {
-          return new Response("没有填写 OpenAI API key，不会查询内置的 Key。")
+          throw new Error("没有填写 OpenAI API key，不会查询内置的 Key。")
         }
       } else if (content.startsWith("sk-")) {
         const billings = await Promise.all(
@@ -69,26 +65,25 @@ export const post: APIRoute = async context => {
 
     const apiKey = randomKey(splitKeys(key))
 
-    if (!apiKey)
-      return new Response("没有填写 OpenAI API key，或者 key 填写错误。")
+    if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
     const tokens = messages.reduce((acc, cur) => {
-      const tokens = tokenizer.encode(cur.content).bpe.length
+      const tokens = countTokens(cur.content)
       return acc + tokens
     }, 0)
 
     if (tokens > (Number.isInteger(maxTokens) ? maxTokens : 3072)) {
       if (messages.length > 1)
-        return new Response(
+        throw new Error(
           `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
         )
-      else return new Response("太长了，缩短一点吧。")
+      else throw new Error("太长了，缩短一点吧。")
     }
 
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
-    const completion = await fetch(`https://${baseURL}/v1/chat/completions`, {
+    const rawRes = await fetch(`https://${baseURL}/v1/chat/completions`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`
@@ -101,7 +96,23 @@ export const post: APIRoute = async context => {
         // max_tokens: 4096 - tokens,
         stream: true
       })
+    }).catch(err => {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: err.message
+          }
+        }),
+        { status: 500 }
+      )
     })
+
+    if (!rawRes.ok) {
+      return new Response(rawRes.body, {
+        status: rawRes.status,
+        statusText: rawRes.statusText
+      })
+    }
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -123,15 +134,22 @@ export const post: APIRoute = async context => {
           }
         }
         const parser = createParser(streamParser)
-        for await (const chunk of completion.body as any) {
+        for await (const chunk of rawRes.body as any) {
           parser.feed(decoder.decode(chunk))
         }
       }
     })
 
     return new Response(stream)
-  } catch (e) {
-    return new Response(String(e).replace(/sk-\w+/g, "sk-xxxxxxxx"))
+  } catch (err: any) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          message: err.message
+        }
+      }),
+      { status: 400 }
+    )
   }
 }
 
