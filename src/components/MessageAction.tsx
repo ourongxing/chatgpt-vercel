@@ -1,5 +1,6 @@
 import { createSignal, Show } from "solid-js"
 export default function MessageAction(props: {
+  role: "system" | "user" | "assistant"
   hidden: boolean
   edit: () => void
   del: () => void
@@ -18,7 +19,13 @@ export default function MessageAction(props: {
           }}
           icon={copied() ? "i-un:copied" : "i-un:copy"}
         />
-        <ActionItem label="编辑" onClick={props.edit} icon={"i-carbon:edit"} />
+        <Show when={props.role === "user"}>
+          <ActionItem
+            label="编辑"
+            onClick={props.edit}
+            icon={"i-carbon:edit"}
+          />
+        </Show>
         <ActionItem
           label="删除"
           onClick={props.del}
