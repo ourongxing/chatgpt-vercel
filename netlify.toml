@@ -3,5 +3,4 @@
   NODE_VERSION = "18"
 
 [build]
-  command = "pnpm build:netlify"
   publish = "dist"

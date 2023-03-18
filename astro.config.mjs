@@ -12,9 +12,9 @@ import {
 import solidJs from "@astrojs/solid-js"
 
 const adapter = () => {
-  if (process.env.SERVER == "vercel") {
+  if (process.env.VERCEL) {
     return vercel()
-  } else if (process.env.SERVER == "netlify") {
+  } else if (process.env.NETLIFY) {
     return netlify()
   } else {
     return node({

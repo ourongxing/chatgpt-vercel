@@ -9,7 +9,7 @@ export const localKey =
   import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
 
 export const baseURL =
-  process.env.VERCEL || process.env.NOGFW
+  process.env.VERCEL || process.env.NETLIFY || process.env.NOGFW
     ? "api.openai.com"
     : (
         import.meta.env.OPENAI_API_BASE_URL ||
