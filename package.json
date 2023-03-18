@@ -14,6 +14,8 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/netlify": "^2.2.0",
+    "@astrojs/node": "^5.1.0",
     "@astrojs/solid-js": "^2.1.0",
     "@astrojs/vercel": "^3.2.1",
     "@solid-primitives/event-listener": "^2.2.8",

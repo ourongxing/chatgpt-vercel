@@ -5,10 +5,8 @@ import {
   ReconnectInterval
 } from "eventsource-parser"
 import type { ChatMessage } from "~/types"
-import GPT3Tokenizer from "gpt3-tokenizer"
+import GPTTokenizer from "gpt3-tokenizer"
 import { splitKeys, randomKey } from "~/utils"
-
-const tokenizer = new GPT3Tokenizer({ type: "gpt3" })
 
 export const localKey =
   import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
@@ -73,7 +71,7 @@ export const post: APIRoute = async context => {
     if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
     const tokens = messages.reduce((acc, cur) => {
-      const tokens = tokenizer.encode(cur.content).bpe.length
+      const tokens = countTokens(cur.content)
       return acc + tokens
     }, 0)
 
@@ -207,4 +205,9 @@ export async function genBillingsTable(billings: Billing[]) {
 | ---- | ---- | ---- | ------ |
 ${table}
 `
+}
+
+function countTokens(text: string) {
+  const tokenizer = new GPTTokenizer({ type: "gpt3" })
+  return tokenizer.encode(text).bpe.length
 }

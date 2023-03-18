@@ -41,5 +41,5 @@ export default defineConfig({
     solidJs()
   ],
   output: "server",
-  adapter
+  adapter: adapter()
 })
