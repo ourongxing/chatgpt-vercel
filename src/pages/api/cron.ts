@@ -1,8 +1,6 @@
 import type { APIRoute } from "astro"
 import { splitKeys } from "~/utils"
 import { localKey, genBillingsTable, baseURL, fetchBilling } from "."
-// @ts-ignore
-import fetch from "node-fetch-retry-timeout"
 const sendKey = import.meta.env.SENDKEY || process.env.SENDKEY
 const sendChannel =
   import.meta.env.SENDCHANNEL || process.env.SENDCHANNEL || "9"
@@ -34,23 +32,26 @@ export const get: APIRoute = async () => {
 
 async function checkBan(key: string) {
   try {
-    const res = await fetch(`https://${baseURL}/v1/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`
-      },
-      timeout: 700,
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: "Hello"
-          }
-        ]
-      })
-    }).then((res: any) => res.json())
+    const res = await fetchWithTimeout(
+      `https://${baseURL}/v1/chat/completions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${key}`
+        },
+        timeout: 500,
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "user",
+              content: "Hello"
+            }
+          ]
+        })
+      }
+    ).then((res: any) => res.json())
     return res.error?.type === "access_terminated"
   } catch {
     return false
@@ -70,4 +71,20 @@ async function push(title: string, desp?: string) {
         channel: Number.isInteger(sendChannel) ? Number(sendChannel) : 9
       })
     })
+}
+
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init?: (RequestInit & { timeout?: number }) | undefined
+) {
+  const { timeout = 500 } = init ?? {}
+
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  const response = await fetch(input, {
+    ...init,
+    signal: controller.signal
+  })
+  clearTimeout(id)
+  return response
 }
