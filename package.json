@@ -44,6 +44,7 @@
     "typescript": "^5.0.2",
     "unocss": "^0.50.6"
   },
+  "packageManager": "pnpm@7.29.0",
   "engines": {
     "node": ">18.0.0"
   }
