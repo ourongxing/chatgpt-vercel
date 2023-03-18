@@ -3,5 +3,5 @@
   NODE_VERSION = "18"
 
 [build]
-  command = "astro build:netlify"
+  command = "pnpm build:netlify"
   publish = "dist"

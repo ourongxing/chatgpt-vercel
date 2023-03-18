@@ -1,5 +1,5 @@
 {
-  "buildCommand": "astro build:vercel",
+  "buildCommand": "pnpm build:vercel",
   "crons": [
     {
       "path": "/api/cron",
