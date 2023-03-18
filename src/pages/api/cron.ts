@@ -9,22 +9,21 @@ const sendChannel =
 
 export const get: APIRoute = async () => {
   try {
-    const keys = splitKeys(localKey)
+    const keys = Array.from(new Set(splitKeys(localKey)))
     if (keys.length === 0) return new Response(`ok`)
     if (!sendKey) return new Response(`ok`)
     const status = await Promise.all(keys.map(k => checkBan(k)))
-    const bannedKey = keys.filter((_, i) => status[i])
-    const unbanKey = keys.filter((_, i) => !status[i])
-    const billings = await Promise.all(unbanKey.map(k => fetchBilling(k)))
+    const bannedKeys = keys.filter((_, i) => status[i])
+    const billings = await Promise.all(keys.map(k => fetchBilling(k)))
     const table = await genBillingsTable(billings)
-    const titles = ["帐号余额充足", "没有帐号被 ban"]
+    const titles = ["帐号余额充足", "没有帐号不可用"]
     const descs = [table, ""]
     if (billings.some(k => k.rate < 0.05)) titles[0] = "有帐号余额已少于 5%"
-    if (bannedKey.length) {
-      titles[1] = "有帐号被 ban"
+    if (bannedKeys.length) {
+      titles[1] = "有帐号不可用"
       descs[1] =
-        "\n\n以下帐号被 ban，请检查\n\n" +
-        bannedKey.map(k => "- " + k.slice(0, 8)).join("\n")
+        "\n\n以下帐号不可用，请检查\n\n" +
+        bannedKeys.map(k => "- " + k.slice(0, 8)).join("\n")
     }
     await push(titles.join("，"), descs.join("\n\n"))
   } catch (e) {
