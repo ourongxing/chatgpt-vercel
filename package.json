@@ -11,7 +11,10 @@
     "build:netlify": "SERVER=netlify astro build",
     "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lint:fix": "eslint . --fix --ext .ts",
+    "lint": "eslint . --ext .ts",
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "@astrojs/netlify": "^2.2.0",
@@ -35,7 +38,25 @@
     "markdown-it-kbd": "^2.2.2",
     "solid-js": "^1.6.15"
   },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json}": [
+      "prettier --write",
+      "eslint --cache --fix",
+      "git add"
+    ]
+  },
   "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "simple-git-hooks": "^2.8.1",
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
+    "@typescript-eslint/parser": "^5.36.2",
     "@iconify-json/carbon": "^1.1.16",
     "@iconify-json/ri": "^1.1.5",
     "@types/markdown-it": "^12.2.3",

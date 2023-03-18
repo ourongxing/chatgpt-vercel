@@ -1,9 +1,6 @@
 import type { APIRoute } from "astro"
-import {
-  createParser,
-  ParsedEvent,
-  ReconnectInterval
-} from "eventsource-parser"
+import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
+import { createParser } from "eventsource-parser"
 import type { ChatMessage } from "~/types"
 import { countTokens } from "~/utils/tokens"
 import { splitKeys, randomKey } from "~/utils"
