@@ -20,11 +20,14 @@ try {
   defaultSetting = setting
 }
 
+const _reset =
+  import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION ||
+  process.env.RESET_CONTINUOUS_DIALOGUE_OPTION
+
 const reset =
-  import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION ===
-    String(resetContinuousDialogue) ||
-  process.env.RESET_CONTINUOUS_DIALOGUE_OPTION ===
-    String(resetContinuousDialogue)
+  _reset && _reset !== String(resetContinuousDialogue)
+    ? !resetContinuousDialogue
+    : resetContinuousDialogue
 ---
 
 <Layout title="ChatGPT">
