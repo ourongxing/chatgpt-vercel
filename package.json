@@ -6,8 +6,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
     "build": "astro build",
+    "build:vercel": "SERVER=vercel astro build",
+    "build:netlify": "SERVER=netlify astro build",
+    "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
