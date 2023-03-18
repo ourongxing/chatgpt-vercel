@@ -5,7 +5,7 @@ import {
   ReconnectInterval
 } from "eventsource-parser"
 import type { ChatMessage } from "~/types"
-import GPTTokenizer from "gpt3-tokenizer"
+import { countTokens } from "~/utils/tokens"
 import { splitKeys, randomKey } from "~/utils"
 
 export const localKey =
@@ -205,9 +205,4 @@ export async function genBillingsTable(billings: Billing[]) {
 | ---- | ---- | ---- | ------ |
 ${table}
 `
-}
-
-function countTokens(text: string) {
-  const tokenizer = new GPTTokenizer({ type: "gpt3" })
-  return tokenizer.encode(text).bpe.length
 }
