@@ -29,7 +29,12 @@ API Key 由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515
 
 ### 更多部署方案
 
-不建议使用除 Vercel 以外的部署方案，包括 Netlify。
+目前本项目除 Vercel 以外还支持
+
+- [Netlify](https://www.netlify.com/)
+- [Railway](https://railway.app/)
+
+直接导入即可，但是不建议使用除 Vercel 以外的部署方案。 除了比较慢以外，更重要的是只有 Vercel 支持设置 Edge Function 服务器的地区，其他平台会自动使用距离最近的服务器，有可能是 OpenAI 不支持的地区，导致封号。
 
 ### 环境变量
 
