@@ -19,6 +19,7 @@ const { title } = Astro.props
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="192x192" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <meta name="theme-color" content="#f6f8fa">
     <script src="/src/pwa.ts"></script>
     {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
   </head>

@@ -38,6 +38,9 @@
 
   function listener() {
     document.documentElement.classList.toggle("dark", darkSchema?.matches)
+    document
+      .querySelector('meta[name="theme-color"]')
+      .setAttribute("content", darkSchema?.matches ? "#16161a" : "#f6f8fa")
   }
 
   if (persistentTheme) {
@@ -55,6 +58,9 @@
     element.classList.toggle("dark")
 
     const isDark = element.classList.contains("dark")
+    document
+      .querySelector('meta[name="theme-color"]')
+      .setAttribute("content", isDark ? "#16161a" : "#f6f8fa")
     darkSchema.removeEventListener("change", listener)
     localStorage.setItem("theme", isDark ? "dark" : "light")
   }
