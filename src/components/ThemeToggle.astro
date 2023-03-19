@@ -51,6 +51,9 @@
   } else {
     darkSchema.addEventListener("change", listener)
     document.documentElement.classList.toggle("dark", darkSchema?.matches)
+    document
+      .querySelector('meta[name="theme-color"]')
+      .setAttribute("content", darkSchema?.matches ? "#16161a" : "#f6f8fa")
   }
 
   function handleToggleTheme() {
