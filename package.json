@@ -15,6 +15,7 @@
     "prettier": "prettier --write ."
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^6.2.1",
     "@astrojs/netlify": "^2.2.0",
     "@astrojs/node": "^5.1.0",
     "@astrojs/solid-js": "^2.1.0",
@@ -47,19 +48,19 @@
     ]
   },
   "devDependencies": {
+    "@iconify-json/carbon": "^1.1.16",
+    "@iconify-json/ri": "^1.1.5",
+    "@types/markdown-it": "^12.2.3",
+    "@typescript-eslint/eslint-plugin": "^5.36.2",
+    "@typescript-eslint/parser": "^5.36.2",
+    "@vercel/node": "^2.9.13",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
-    "simple-git-hooks": "^2.8.1",
-    "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@typescript-eslint/parser": "^5.36.2",
-    "@iconify-json/carbon": "^1.1.16",
-    "@iconify-json/ri": "^1.1.5",
-    "@types/markdown-it": "^12.2.3",
-    "@vercel/node": "^2.9.13",
     "punycode": "^2.3.0",
+    "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.2",
     "unocss": "^0.50.6"
   },

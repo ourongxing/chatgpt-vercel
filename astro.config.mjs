@@ -2,6 +2,7 @@ import { defineConfig } from "astro/config"
 import vercel from "@astrojs/vercel/edge"
 import node from "@astrojs/node"
 import netlify from "@astrojs/netlify/edge-functions"
+import cloudflare from "@astrojs/cloudflare"
 import unocss from "unocss/astro"
 import {
   presetUno,
@@ -16,6 +17,8 @@ const adapter = () => {
     return vercel()
   } else if (process.env.NETLIFY) {
     return netlify()
+  } else if (process.env.CLOUDFLARE) {
+    return cloudflare()
   } else {
     return node({
       mode: "standalone"
