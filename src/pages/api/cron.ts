@@ -1,9 +1,8 @@
 import type { APIRoute } from "astro"
 import { fetchWithTimeout, splitKeys } from "~/utils"
 import { localKey, genBillingsTable, baseURL, fetchBilling } from "."
-const sendKey = import.meta.env.SENDKEY || process.env.SENDKEY
-const sendChannel =
-  import.meta.env.SENDCHANNEL || process.env.SENDCHANNEL || "9"
+const sendKey = import.meta.env.SENDKEY
+const sendChannel = import.meta.env.SENDCHANNEL || "9"
 
 export const get: APIRoute = async () => {
   try {

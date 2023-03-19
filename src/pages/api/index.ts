@@ -5,23 +5,18 @@ import type { ChatMessage } from "~/types"
 import { countTokens } from "~/utils/tokens"
 import { splitKeys, randomKey, fetchWithTimeout } from "~/utils"
 
-export const localKey =
-  import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
+export const localKey = import.meta.env.OPENAI_API_KEY || ""
 
-export const baseURL =
-  process.env.VERCEL || process.env.NETLIFY || process.env.NOGFW
-    ? "api.openai.com"
-    : (
-        import.meta.env.OPENAI_API_BASE_URL ||
-        process.env.OPENAI_API_BASE_URL ||
-        "api.openai.com"
-      ).replace(/^https?:\/\//, "")
+export const baseURL = import.meta.env.NOGFW
+  ? "api.openai.com"
+  : (import.meta.env.OPENAI_API_BASE_URL || "api.openai.com").replace(
+      /^https?:\/\//,
+      ""
+    )
 
-const maxTokens = Number(
-  import.meta.env.MAX_INPUT_TOKENS || process.env.MAX_INPUT_TOKENS
-)
+const maxTokens = Number(import.meta.env.MAX_INPUT_TOKENS)
 
-const pwd = import.meta.env.PASSWORD || process.env.PASSWORD
+const pwd = import.meta.env.PASSWORD
 
 export const post: APIRoute = async context => {
   try {
