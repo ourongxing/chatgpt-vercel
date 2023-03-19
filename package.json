@@ -68,8 +68,5 @@
     "vite-plugin-pwa": "^0.14.4",
     "workbox-window": "^6.5.4"
   },
-  "packageManager": "pnpm@7.29.0",
-  "engines": {
-    "node": ">18"
-  }
+  "packageManager": "pnpm@7.29.0"
 }
