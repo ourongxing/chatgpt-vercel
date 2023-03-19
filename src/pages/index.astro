@@ -9,20 +9,15 @@ import "highlight.js/styles/atom-one-dark.css"
 import { parsePrompts } from "~/utils/parse"
 import { setting, message, resetContinuousDialogue } from "~/system"
 const prompts = parsePrompts()
-const defaultMessage =
-  import.meta.env.DEFAULT_MESSAGE || process.env.DEFAULT_MESSAGE || message
+const defaultMessage = import.meta.env.DEFAULT_MESSAGE || message
 let defaultSetting
 try {
-  defaultSetting = JSON.parse(
-    import.meta.env.DEFAULT_SETTING || process.env.DEFAULT_SETTING
-  )
+  defaultSetting = JSON.parse(import.meta.env.DEFAULT_SETTING)
 } catch {
   defaultSetting = setting
 }
 
-const _reset =
-  import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION ||
-  process.env.RESET_CONTINUOUS_DIALOGUE_OPTION
+const _reset = import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION
 ---
 
 <Layout title="ChatGPT">
