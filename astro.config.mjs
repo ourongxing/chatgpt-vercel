@@ -18,6 +18,7 @@ const adapter = () => {
   } else if (process.env.NETLIFY) {
     return netlify()
   } else if (process.env.CLOUDFLARE) {
+    // cloudflare 无法提供 node18 环境，所以目前无法正常运行。
     return cloudflare()
   } else {
     return node({
