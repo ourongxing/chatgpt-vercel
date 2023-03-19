@@ -14,6 +14,16 @@
     "lint": "eslint . --ext .ts",
     "prettier": "prettier --write ."
   },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json}": [
+      "prettier --write",
+      "eslint --cache --fix",
+      "git add"
+    ]
+  },
   "dependencies": {
     "@astrojs/cloudflare": "^6.2.1",
     "@astrojs/netlify": "2.0.0",
@@ -37,16 +47,6 @@
     "markdown-it-kbd": "^2.2.2",
     "solid-js": "^1.6.15"
   },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json}": [
-      "prettier --write",
-      "eslint --cache --fix",
-      "git add"
-    ]
-  },
   "devDependencies": {
     "@iconify-json/carbon": "^1.1.16",
     "@iconify-json/ri": "^1.1.5",
@@ -62,7 +62,10 @@
     "punycode": "^2.3.0",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.2",
-    "unocss": "^0.50.6"
+    "unocss": "^0.50.6",
+    "@vite-pwa/astro": "^0.0.5",
+    "vite-plugin-pwa": "^0.14.4",
+    "workbox-window": "^6.5.4"
   },
   "packageManager": "pnpm@7.29.0",
   "engines": {
