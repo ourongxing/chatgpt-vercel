@@ -3,7 +3,7 @@ import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { createParser } from "eventsource-parser"
 import type { ChatMessage } from "~/types"
 import { countTokens } from "~/utils/tokens"
-import { splitKeys, randomKey } from "~/utils"
+import { splitKeys, randomKey, fetchWithTimeout } from "~/utils"
 
 export const localKey =
   import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
@@ -83,20 +83,24 @@ export const post: APIRoute = async context => {
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
-    const rawRes = await fetch(`https://${baseURL}/v1/chat/completions`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      method: "POST",
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages,
-        temperature,
-        // max_tokens: 4096 - tokens,
-        stream: true
-      })
-    }).catch(err => {
+    const rawRes = await fetchWithTimeout(
+      `https://${baseURL}/v1/chat/completions`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        timeout: 10000,
+        method: "POST",
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages,
+          temperature,
+          // max_tokens: 4096 - tokens,
+          stream: true
+        })
+      }
+    ).catch(err => {
       return new Response(
         JSON.stringify({
           error: {

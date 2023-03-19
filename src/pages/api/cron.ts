@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro"
-import { splitKeys } from "~/utils"
+import { fetchWithTimeout, splitKeys } from "~/utils"
 import { localKey, genBillingsTable, baseURL, fetchBilling } from "."
 const sendKey = import.meta.env.SENDKEY || process.env.SENDKEY
 const sendChannel =
@@ -73,20 +73,4 @@ async function push(title: string, desp?: string) {
         channel: Number.isInteger(sendChannel) ? Number(sendChannel) : 9
       })
     })
-}
-
-async function fetchWithTimeout(
-  input: RequestInfo | URL,
-  init?: (RequestInit & { timeout?: number }) | undefined
-) {
-  const { timeout = 500 } = init ?? {}
-
-  const controller = new AbortController()
-  const id = setTimeout(() => controller.abort(), timeout)
-  const response = await fetch(input, {
-    ...init,
-    signal: controller.signal
-  })
-  clearTimeout(id)
-  return response
 }
