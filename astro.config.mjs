@@ -18,12 +18,12 @@ const adapter = () => {
     return vercel()
   } else if (process.env.NETLIFY) {
     return netlify()
-  } else if (process.env.CLOUDFLARE) {
+  } else if (process.env.CF_PAGES) {
     // cloudflare 无法提供 node18 环境，所以目前无法正常运行。
     return cloudflare()
   } else {
     return node({
-      mode: "standalone"
+      mode: "middleware"
     })
   }
 }
@@ -79,6 +79,10 @@ export default defineConfig({
       workbox: {
         navigateFallback: "/404",
         globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,astro}"]
+      },
+      devOptions: {
+        enabled: true,
+        navigateFallbackAllowlist: [/^\/404$/]
       }
     })
   ],
