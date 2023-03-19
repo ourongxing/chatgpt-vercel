@@ -14,7 +14,9 @@ import solidJs from "@astrojs/solid-js"
 
 const adapter = () => {
   if (process.env.VERCEL) {
-    return vercel()
+    return vercel({
+      analytics: true
+    })
   } else if (process.env.NETLIFY) {
     return netlify()
   } else if (process.env.CLOUDFLARE) {
