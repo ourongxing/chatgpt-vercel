@@ -23,7 +23,7 @@ const adapter = () => {
     return cloudflare()
   } else {
     return node({
-      mode: "middleware"
+      mode: "standalone"
     })
   }
 }
