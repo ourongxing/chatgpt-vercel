@@ -1,2 +1,2 @@
-[variables]
+[env]
 NIXPACKS_NODE_VERSION = "18"
