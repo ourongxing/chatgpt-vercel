@@ -35,25 +35,22 @@
 <script is:inline>
   const persistentTheme = localStorage.getItem("theme")
   const darkSchema = window.matchMedia("(prefers-color-scheme: dark)")
-
-  function listener() {
-    document.documentElement.classList.toggle("dark", darkSchema?.matches)
+  function toggle(flag) {
+    document.documentElement.classList.toggle("dark", flag)
     document
       .querySelector('meta[name="theme-color"]')
-      .setAttribute("content", darkSchema?.matches ? "#16161a" : "#f6f8fa")
+      .setAttribute("content", flag ? "#16161a" : "#f6f8fa")
+  }
+
+  function listener() {
+    toggle(darkSchema?.matches)
   }
 
   if (persistentTheme) {
-    document.documentElement.classList.toggle(
-      "dark",
-      persistentTheme === "dark"
-    )
+    toggle(persistentTheme === "dark")
   } else {
     darkSchema.addEventListener("change", listener)
-    document.documentElement.classList.toggle("dark", darkSchema?.matches)
-    document
-      .querySelector('meta[name="theme-color"]')
-      .setAttribute("content", darkSchema?.matches ? "#16161a" : "#f6f8fa")
+    toggle(darkSchema?.matches)
   }
 
   function handleToggleTheme() {
