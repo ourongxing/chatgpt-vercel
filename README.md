@@ -44,6 +44,8 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ourongxing/chatgpt-vercel&env=OPENAI_API_KEY)
 
+不过上面这种方式不容易更新，最好还是先 fork 本仓库，然后在 vercel 中导入你自己的仓库，之后点击 `Sync fork` 就可以同步更新了。
+
 如果你需要部署给更多人用，需要修改一些代码，那么你可能需要将上面创建的你自己的仓库 `git clone` 到本地。改完了 `git commit & push` 即可重新部署，vscode 上点几下就可以了。也可以用 vercel 的 cli，`vercel deploy --prod`。
 
 如果你需要在本地开发和调试，有点麻烦：
