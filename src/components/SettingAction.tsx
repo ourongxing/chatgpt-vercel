@@ -129,7 +129,11 @@ export default function SettingAction(props: {
               setIMGCopied(true)
               setTimeout(() => setIMGCopied(false), 1000)
             }}
-            icon="i-carbon:image"
+            icon={
+              imgCopied()
+                ? "i-ri:check-fill dark:text-yellow text-yellow-6"
+                : "i-carbon:image"
+            }
             label="导出图片"
           />
           <ActionItem
