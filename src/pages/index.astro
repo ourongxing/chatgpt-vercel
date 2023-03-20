@@ -1,7 +1,7 @@
 ---
 import Layout from "~/layouts/Layout.astro"
 import Header from "~/components/Header.astro"
-import Generator from "~/components/Generator"
+import Main from "~/components/Main"
 import "~/styles/global.css"
 import "@unocss/reset/tailwind.css"
 import "katex/dist/katex.min.css"
@@ -23,7 +23,7 @@ const _reset = import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION
 <Layout title="ChatGPT">
   <main class="before">
     <Header />
-    <Generator
+    <Main
       env={{
         defaultSetting,
         defaultMessage,
