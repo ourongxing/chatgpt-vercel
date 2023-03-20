@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config"
-import vercel from "@astrojs/vercel/edge"
+import vercel from "@astrojs/vercel/serverless"
 import node from "@astrojs/node"
-import netlify from "@astrojs/netlify/edge-functions"
+import netlify from "@astrojs/netlify/functions"
 import cloudflare from "@astrojs/cloudflare"
 import unocss from "unocss/astro"
 import {
