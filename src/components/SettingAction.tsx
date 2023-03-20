@@ -193,10 +193,11 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
 }
 
 async function exportJpg() {
+  const messageContainer = document.querySelector(
+    "#message-container"
+  ) as HTMLElement
   async function downloadIMG() {
-    const url = await toJpeg(
-      document.querySelector("#message-container") as HTMLElement
-    )
+    const url = await toJpeg(messageContainer)
     const a = document.createElement("a")
     a.href = url
     a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
@@ -204,9 +205,7 @@ async function exportJpg() {
   }
   if (!isMobile() && navigator.clipboard) {
     try {
-      const blob = await toBlob(
-        document.querySelector("#message-container") as HTMLElement
-      )
+      const blob = await toBlob(messageContainer)
       blob &&
         (await navigator.clipboard.write([
           new ClipboardItem({

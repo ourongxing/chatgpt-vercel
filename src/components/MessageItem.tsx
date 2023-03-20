@@ -6,10 +6,10 @@ import mdKatex from "markdown-it-katex"
 import mdHighlight from "markdown-it-highlightjs"
 import mdKbd from "markdown-it-kbd"
 import MessageAction from "./MessageAction"
-import { preWrapperPlugin } from "../markdown"
+import { preWrapperPlugin } from "~/markdown-it"
 import "../styles/message.css"
 import "../styles/clipboard.css"
-import { useCopyCode } from "../hooks"
+import { useCopyCode } from "~/hooks"
 import { copyToClipboard } from "~/utils"
 import vercel from "/assets/vercel.svg?raw"
 import openai from "/assets/openai.svg?raw"
@@ -72,7 +72,7 @@ export default (props: Props) => {
 
   return (
     <div
-      class="group flex py-2 gap-3 px-4 rounded-lg transition-colors md:hover:bg-slate/5 dark:md:hover:bg-slate/2 relative message-item"
+      class="group flex gap-3 sm:px-4 px-0 rounded-lg transition-colors sm:hover:bg-slate/5 dark:sm:hover:bg-slate/2 relative message-item"
       classList={{
         temporary: props.index === undefined
       }}
@@ -81,17 +81,17 @@ export default (props: Props) => {
         class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 ${
           roleClass[props.role]
         }`}
-      ></div>
+      />
       <div
         class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
         innerHTML={md
           .render(props.message)
           .replace(
-            /Vercel/,
+            /Vercel/g,
             `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0">${vercel}</a>`
           )
           .replace(
-            /OpenAI/,
+            /OpenAI/g,
             `<a href="https://www.openai.com" style="border-bottom:0">${openai}</a>`
           )}
       />

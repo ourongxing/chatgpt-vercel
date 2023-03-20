@@ -256,7 +256,7 @@ export default function (props: {
     while (!done) {
       const { value, done: readerDone } = await reader.read()
       if (value) {
-        let char = decoder.decode(value)
+        const char = decoder.decode(value)
         if (char === "\n" && currentAssistantMessage().endsWith("\n")) {
           continue
         }
@@ -333,13 +333,13 @@ export default function (props: {
       }px`
     )
     if (!compositionend()) return
-    let { value } = inputRef
+    const { value } = inputRef
     setInputContent(value)
     find(value)
   }
 
   return (
-    <div ref={containerRef!} class="md:mt-0 mt-2">
+    <div ref={containerRef!} class="sm:mt-0 mt-2">
       <div
         id="message-container"
         style={{
