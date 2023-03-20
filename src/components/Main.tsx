@@ -1,4 +1,11 @@
-import { createEffect, createSignal, For, onMount, Show } from "solid-js"
+import {
+  createEffect,
+  createSignal,
+  For,
+  onMount,
+  onCleanup,
+  Show
+} from "solid-js"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import MessageItem from "./MessageItem"
 import type { ChatMessage } from "~/types"
@@ -106,6 +113,10 @@ export default function (props: {
     } catch {
       console.log("Setting parse error")
     }
+  })
+
+  onCleanup(() => {
+    localStorage.removeItem("setting")
   })
 
   createEffect((prev: number | undefined) => {
