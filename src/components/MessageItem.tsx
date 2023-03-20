@@ -1,4 +1,4 @@
-import type { Accessor, Setter } from "solid-js"
+import type { Setter } from "solid-js"
 import type { ChatMessage } from "../types"
 import MarkdownIt from "markdown-it"
 // @ts-ignore
@@ -11,6 +11,8 @@ import "../styles/message.css"
 import "../styles/clipboard.css"
 import { useCopyCode } from "../hooks"
 import { copyToClipboard } from "~/utils"
+import vercel from "/assets/vercel.svg?raw"
+import openai from "/assets/openai.svg?raw"
 
 interface Props {
   role: ChatMessage["role"]
@@ -82,7 +84,16 @@ export default (props: Props) => {
       ></div>
       <div
         class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
-        innerHTML={md.render(props.message)}
+        innerHTML={md
+          .render(props.message)
+          .replace(
+            /Vercel/,
+            `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0">${vercel}</a>`
+          )
+          .replace(
+            /OpenAI/,
+            `<a href="https://www.openai.com" style="border-bottom:0">${openai}</a>`
+          )}
       />
       <MessageAction
         del={del}
