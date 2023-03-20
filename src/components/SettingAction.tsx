@@ -1,6 +1,7 @@
-import { Accessor, createSignal, JSXElement, Setter, Show } from "solid-js"
-import { toJpeg } from "html-to-image"
-import { copyToClipboard, dateFormat } from "~/utils"
+import type { Accessor, Setter } from "solid-js"
+import { createSignal, type JSXElement, Show } from "solid-js"
+import { toBlob, toJpeg } from "html-to-image"
+import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage } from "~/types"
 import type { Setting } from "~/system"
 
@@ -13,6 +14,7 @@ export default function SettingAction(props: {
 }) {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
+  const [imgCopied, setIMGCopied] = createSignal(false)
   return (
     <div class="text-sm text-slate-7 dark:text-slate mb-2">
       <Show when={shown()}>
@@ -122,7 +124,11 @@ export default function SettingAction(props: {
         />
         <div class="flex">
           <ActionItem
-            onClick={exportJpg}
+            onClick={async () => {
+              await exportJpg()
+              setIMGCopied(true)
+              setTimeout(() => setIMGCopied(false), 1000)
+            }}
             icon="i-carbon:image"
             label="导出图片"
           />
@@ -182,15 +188,33 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
   )
 }
 
-function exportJpg() {
-  toJpeg(document.querySelector("#message-container") as HTMLElement, {}).then(
-    url => {
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
-      a.click()
+async function exportJpg() {
+  async function downloadIMG() {
+    const url = await toJpeg(
+      document.querySelector("#message-container") as HTMLElement
+    )
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
+    a.click()
+  }
+  if (!isMobile() && navigator.clipboard) {
+    try {
+      const blob = await toBlob(
+        document.querySelector("#message-container") as HTMLElement
+      )
+      blob &&
+        (await navigator.clipboard.write([
+          new ClipboardItem({
+            [blob.type]: blob
+          })
+        ]))
+    } catch (e) {
+      await downloadIMG()
     }
-  )
+  } else {
+    await downloadIMG()
+  }
 }
 
 async function exportMD(messages: ChatMessage[]) {
