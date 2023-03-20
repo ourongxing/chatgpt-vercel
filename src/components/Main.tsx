@@ -340,7 +340,7 @@ export default function (props: {
 
   return (
     <div ref={containerRef!} class="mt-2">
-      <div class="px-1em">
+      <div class="px-1em mb-6em">
         <div
           id="message-container"
           class="px-1em"
