@@ -10,11 +10,16 @@ import { parsePrompts } from "~/utils/parse"
 import { setting, message, resetContinuousDialogue } from "~/system"
 const prompts = parsePrompts()
 const defaultMessage = import.meta.env.DEFAULT_MESSAGE || message
-let defaultSetting
-try {
-  defaultSetting = JSON.parse(import.meta.env.DEFAULT_SETTING)
-} catch {
-  defaultSetting = setting
+let defaultSetting = setting
+if (import.meta.env.DEFAULT_SETTING) {
+  try {
+    defaultSetting = {
+      ...setting,
+      ...JSON.parse(import.meta.env.DEFAULT_SETTING)
+    }
+  } catch (e) {
+    console.error("Error parsing DEFAULT_SETTING:", e)
+  }
 }
 
 const _reset = import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION
