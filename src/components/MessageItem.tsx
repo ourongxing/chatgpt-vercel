@@ -1,5 +1,5 @@
 import type { Setter } from "solid-js"
-import type { ChatMessage } from "../types"
+import type { ChatMessage, Role } from "../types"
 import MarkdownIt from "markdown-it"
 // @ts-ignore
 import mdKatex from "markdown-it-katex"
@@ -15,7 +15,7 @@ import vercel from "/assets/vercel.svg?raw"
 import openai from "/assets/openai.svg?raw"
 
 interface Props {
-  role: ChatMessage["role"]
+  role: Role
   message: string
   index?: number
   setInputContent?: Setter<string>
@@ -25,6 +25,7 @@ interface Props {
 export default (props: Props) => {
   useCopyCode()
   const roleClass = {
+    error: "bg-gradient-to-r from-red-400 to-red-700",
     system: "bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300",
     user: "bg-gradient-to-r from-red-300 to-blue-700 ",
     assistant: "bg-gradient-to-r from-yellow-300 to-red-700 "
@@ -55,7 +56,7 @@ export default (props: Props) => {
         if (list[props.index!]?.role === "user") {
           const arr = list.reduce(
             (acc, cur, i) => {
-              if (cur.role === "assistant" && i === acc.at(-1)! + 1) acc.push(i)
+              if (cur.role !== "user" && i === acc.at(-1)! + 1) acc.push(i)
               return acc
             },
             [props.index] as number[]
