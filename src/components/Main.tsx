@@ -98,7 +98,13 @@ export default function (props: {
         const parsed = JSON.parse(session)
         if (parsed.length > 1) {
           setMessageList(parsed)
-        }
+        } else
+          setMessageList([
+            {
+              role: "assistant",
+              content: defaultMessage
+            }
+          ])
       } else
         setMessageList([
           {
