@@ -81,12 +81,12 @@ export default function (props: {
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
-    const storage = localStorage.getItem("setting")
+    const setting = localStorage.getItem("setting")
     const session = localStorage.getItem("session")
     try {
       let archiveSession = false
-      if (storage) {
-        const parsed = JSON.parse(storage)
+      if (setting) {
+        const parsed = JSON.parse(setting)
         archiveSession = parsed.archiveSession
         setSetting({
           ...defaultSetting,
@@ -95,7 +95,10 @@ export default function (props: {
         })
       }
       if (session && archiveSession) {
-        setMessageList(JSON.parse(session))
+        const parsed = JSON.parse(session)
+        if (parsed.length > 1) {
+          setMessageList(parsed)
+        }
       } else
         setMessageList([
           {
