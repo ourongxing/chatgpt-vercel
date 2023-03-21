@@ -454,7 +454,7 @@ export default function (props: {
             />
             <Show when={inputContent()}>
               <button
-                class="i-carbon:add-filled absolute right-3.5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
+                class="i-carbon:add-filled absolute right-5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
                 onClick={() => {
                   setInputContent("")
                   inputRef.focus()
