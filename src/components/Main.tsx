@@ -9,7 +9,6 @@ import throttle from "just-throttle"
 import { isMobile } from "~/utils"
 import type { Setting } from "~/system"
 import { makeEventListener } from "@solid-primitives/event-listener"
-// import { mdMessage } from "~/temp"
 
 export interface PromptItem {
   desc: string
@@ -28,12 +27,7 @@ export default function (props: {
   let containerRef: HTMLDivElement
 
   const { defaultMessage, defaultSetting, resetContinuousDialogue } = props.env
-  const [messageList, setMessageList] = createSignal<ChatMessage[]>([
-    // {
-    //   role: "assistant",
-    //   content: mdMessage
-    // }
-  ])
+  const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [inputContent, setInputContent] = createSignal("")
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
@@ -220,11 +214,15 @@ export default function (props: {
     } catch (error: any) {
       setLoading(false)
       setController()
-      setCurrentAssistantMessage(
-        error.message.includes("The user aborted a request")
-          ? ""
-          : error.message.replace(/(sk-\w{5})\w+/g, "$1")
-      )
+      setMessageList([
+        ...messageList(),
+        {
+          role: "error",
+          content: error.message.includes("aborted a request")
+            ? ""
+            : error.message.replace(/(sk-\w{5})\w+/g, "$1")
+        }
+      ])
     }
     archiveCurrentMessage()
   }
@@ -234,16 +232,25 @@ export default function (props: {
     const controller = new AbortController()
     setController(controller)
     const systemRule = setting().systemRule.trim()
-    const message = {
-      role: "user",
-      content: systemRule ? systemRule + "\n" + inputValue : inputValue
-    }
+    const message = [
+      {
+        role: "user",
+        content: inputValue
+      }
+    ]
+    if (systemRule)
+      message.push({
+        role: "system",
+        content: systemRule
+      })
     const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
-          ? [...messageList().slice(0, -1), message]
-          : [message],
+          ? [...messageList().slice(0, -1), ...message].filter(
+              k => k.role !== "error"
+            )
+          : message,
         key: setting().openaiAPIKey || undefined,
         temperature: setting().openaiAPITemperature / 100,
         password: setting().password

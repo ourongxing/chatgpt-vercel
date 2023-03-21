@@ -1,6 +1,7 @@
 import { createSignal, Show, Switch, Match } from "solid-js"
+import type { Role } from "~/types"
 export default function MessageAction(props: {
-  role: "system" | "user" | "assistant"
+  role: Role
   hidden: boolean
   edit: () => void
   del: () => void
