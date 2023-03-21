@@ -9,7 +9,6 @@ import throttle from "just-throttle"
 import { isMobile } from "~/utils"
 import type { Setting } from "~/system"
 import { makeEventListener } from "@solid-primitives/event-listener"
-// import { mdMessage } from "~/temp"
 
 export interface PromptItem {
   desc: string
@@ -28,12 +27,7 @@ export default function (props: {
   let containerRef: HTMLDivElement
 
   const { defaultMessage, defaultSetting, resetContinuousDialogue } = props.env
-  const [messageList, setMessageList] = createSignal<ChatMessage[]>([
-    // {
-    //   role: "assistant",
-    //   content: mdMessage
-    // }
-  ])
+  const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [inputContent, setInputContent] = createSignal("")
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
@@ -81,12 +75,12 @@ export default function (props: {
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
-    const storage = localStorage.getItem("setting")
+    const setting = localStorage.getItem("setting")
     const session = localStorage.getItem("session")
     try {
       let archiveSession = false
-      if (storage) {
-        const parsed = JSON.parse(storage)
+      if (setting) {
+        const parsed = JSON.parse(setting)
         archiveSession = parsed.archiveSession
         setSetting({
           ...defaultSetting,
@@ -95,7 +89,16 @@ export default function (props: {
         })
       }
       if (session && archiveSession) {
-        setMessageList(JSON.parse(session))
+        const parsed = JSON.parse(session)
+        if (parsed.length > 1) {
+          setMessageList(parsed)
+        } else
+          setMessageList([
+            {
+              role: "assistant",
+              content: defaultMessage
+            }
+          ])
       } else
         setMessageList([
           {
@@ -211,11 +214,15 @@ export default function (props: {
     } catch (error: any) {
       setLoading(false)
       setController()
-      setCurrentAssistantMessage(
-        error.message.includes("The user aborted a request")
-          ? ""
-          : error.message.replace(/(sk-\w{5})\w+/g, "$1")
-      )
+      setMessageList([
+        ...messageList(),
+        {
+          role: "error",
+          content: error.message.includes("aborted a request")
+            ? ""
+            : error.message.replace(/(sk-\w{5})\w+/g, "$1")
+        }
+      ])
     }
     archiveCurrentMessage()
   }
@@ -225,16 +232,25 @@ export default function (props: {
     const controller = new AbortController()
     setController(controller)
     const systemRule = setting().systemRule.trim()
-    const message = {
-      role: "user",
-      content: systemRule ? systemRule + "\n" + inputValue : inputValue
-    }
+    const message = [
+      {
+        role: "user",
+        content: inputValue
+      }
+    ]
+    if (systemRule)
+      message.push({
+        role: "system",
+        content: systemRule
+      })
     const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
-          ? [...messageList().slice(0, -1), message]
-          : [message],
+          ? [...messageList().slice(0, -1), ...message].filter(
+              k => k.role !== "error"
+            )
+          : message,
         key: setting().openaiAPIKey || undefined,
         temperature: setting().openaiAPITemperature / 100,
         password: setting().password
@@ -256,7 +272,7 @@ export default function (props: {
     while (!done) {
       const { value, done: readerDone } = await reader.read()
       if (value) {
-        let char = decoder.decode(value)
+        const char = decoder.decode(value)
         if (char === "\n" && currentAssistantMessage().endsWith("\n")) {
           continue
         }
@@ -333,36 +349,39 @@ export default function (props: {
       }px`
     )
     if (!compositionend()) return
-    let { value } = inputRef
+    const { value } = inputRef
     setInputContent(value)
     find(value)
   }
 
   return (
-    <div ref={containerRef!} class="md:mt-0 mt-2">
-      <div
-        id="message-container"
-        style={{
-          "background-color": "var(--c-bg)"
-        }}
-      >
-        <For each={messageList()}>
-          {(message, index) => (
-            <MessageItem
-              role={message.role}
-              message={message.content}
-              index={index()}
-              setInputContent={setInputContent}
-              setMessageList={setMessageList}
-            />
+    <div ref={containerRef!} class="mt-2">
+      <div class="px-1em mb-6em">
+        <div
+          id="message-container"
+          class="px-1em"
+          style={{
+            "background-color": "var(--c-bg)"
+          }}
+        >
+          <For each={messageList()}>
+            {(message, index) => (
+              <MessageItem
+                role={message.role}
+                message={message.content}
+                index={index()}
+                setInputContent={setInputContent}
+                setMessageList={setMessageList}
+              />
+            )}
+          </For>
+          {currentAssistantMessage() && (
+            <MessageItem role="assistant" message={currentAssistantMessage()} />
           )}
-        </For>
-        {currentAssistantMessage() && (
-          <MessageItem role="assistant" message={currentAssistantMessage()} />
-        )}
+        </div>
       </div>
       <div
-        class="pb-2em fixed bottom-0 z-100 op-0"
+        class="pb-2em px-2em fixed bottom-0 z-100 op-0"
         style={
           containerWidth() === "init"
             ? {}
@@ -451,7 +470,7 @@ export default function (props: {
             />
             <Show when={inputContent()}>
               <button
-                class="i-carbon:add-filled absolute right-3.5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
+                class="i-carbon:add-filled absolute right-5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
                 onClick={() => {
                   setInputContent("")
                   inputRef.focus()

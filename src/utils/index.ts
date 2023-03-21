@@ -1,6 +1,6 @@
 export async function copyToClipboard(text: string) {
   try {
-    return navigator.clipboard.writeText(text)
+    return await navigator.clipboard.writeText(text)
   } catch {
     const element = document.createElement("textarea")
     const previouslyFocusedElement = document.activeElement
@@ -77,4 +77,20 @@ export function splitKeys(keys: string) {
 
 export function randomKey(keys: string[]) {
   return keys.length ? keys[Math.floor(Math.random() * keys.length)] : ""
+}
+
+export async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init?: (RequestInit & { timeout?: number }) | undefined
+) {
+  const { timeout = 500 } = init ?? {}
+
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  const response = await fetch(input, {
+    ...init,
+    signal: controller.signal
+  })
+  clearTimeout(id)
+  return response
 }

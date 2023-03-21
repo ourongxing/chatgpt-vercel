@@ -1,7 +1,7 @@
 ---
 import Layout from "~/layouts/Layout.astro"
 import Header from "~/components/Header.astro"
-import Generator from "~/components/Generator"
+import Main from "~/components/Main"
 import "~/styles/global.css"
 import "@unocss/reset/tailwind.css"
 import "katex/dist/katex.min.css"
@@ -9,34 +9,33 @@ import "highlight.js/styles/atom-one-dark.css"
 import { parsePrompts } from "~/utils/parse"
 import { setting, message, resetContinuousDialogue } from "~/system"
 const prompts = parsePrompts()
-const defaultMessage =
-  import.meta.env.DEFAULT_MESSAGE || process.env.DEFAULT_MESSAGE || message
-let defaultSetting
-try {
-  defaultSetting = JSON.parse(
-    import.meta.env.DEFAULT_SETTING || process.env.DEFAULT_SETTING
-  )
-} catch {
-  defaultSetting = setting
+const defaultMessage = import.meta.env.DEFAULT_MESSAGE || message
+let defaultSetting = setting
+if (import.meta.env.DEFAULT_SETTING) {
+  try {
+    defaultSetting = {
+      ...setting,
+      ...JSON.parse(import.meta.env.DEFAULT_SETTING)
+    }
+  } catch (e) {
+    console.error("Error parsing DEFAULT_SETTING:", e)
+  }
 }
 
-const reset =
-  import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION ===
-    String(resetContinuousDialogue) ||
-  process.env.RESET_CONTINUOUS_DIALOGUE_OPTION ===
-    String(resetContinuousDialogue)
+const _reset = import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION
 ---
 
 <Layout title="ChatGPT">
-  <main class="before">
+  <main class="before sm:pt-8em py-2em">
     <Header />
-    <Generator
+    <Main
       env={{
         defaultSetting,
         defaultMessage,
-        resetContinuousDialogue: reset
-          ? resetContinuousDialogue
-          : !resetContinuousDialogue
+        resetContinuousDialogue:
+          _reset && _reset !== String(resetContinuousDialogue)
+            ? !resetContinuousDialogue
+            : resetContinuousDialogue
       }}
       prompts={prompts}
       client:visible

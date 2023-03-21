@@ -1,5 +1,5 @@
-import { createEffect, createSignal, For, onCleanup, onMount } from "solid-js"
-import type { PromptItem } from "./Generator"
+import { createEffect, createSignal, For, onMount } from "solid-js"
+import type { PromptItem } from "./Main"
 import { makeEventListener } from "@solid-primitives/event-listener"
 
 export default function PromptList(props: {
