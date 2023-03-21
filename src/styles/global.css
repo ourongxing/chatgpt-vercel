@@ -20,7 +20,8 @@
 }
 
 html {
-  font-family: system-ui, sans-serif;
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica,
+    "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
   background-color: var(--c-bg);
   color: var(--c-fg);
 }
