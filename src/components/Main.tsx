@@ -65,7 +65,7 @@ export default function (props: {
     initFromSession(getSessionKey())
   }
 
-  const initFromSession = sessionKey => {
+  const initFromSession = (sessionKey: string) => {
     const setting = localStorage.getItem("setting")
     const session = localStorage.getItem(sessionKey)
     try {
