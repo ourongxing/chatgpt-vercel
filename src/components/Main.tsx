@@ -52,31 +52,22 @@ export default function (props: {
     { leading: false, trailing: true }
   )
 
-  onMount(() => {
-    makeEventListener(
-      inputRef,
-      "compositionend",
-      () => {
-        setCompositionend(true)
-        handleInput()
-      },
-      { passive: true }
-    )
-    makeEventListener(
-      inputRef,
-      "compositionstart",
-      () => {
-        setCompositionend(false)
-      },
-      { passive: true }
-    )
-    document.querySelector("main")?.classList.remove("before")
-    document.querySelector("main")?.classList.add("after")
-    createResizeObserver(containerRef, ({ width, height }, el) => {
-      if (el === containerRef) setContainerWidth(`${width}px`)
-    })
+  const getSessionKey = () => {
+    const sessionHash = window.location.hash
+    if (sessionHash) {
+      return "session" + sessionHash
+    }
+    return "session"
+  }
+  const handleHashChange = () => {
+    // 处理 hash 变化的逻辑
+    console.log("URL Hash Changed:", window.location.hash)
+    initFromSession(getSessionKey())
+  }
+
+  const initFromSession = sessionKey => {
     const setting = localStorage.getItem("setting")
-    const session = localStorage.getItem("session")
+    const session = localStorage.getItem(sessionKey)
     try {
       let archiveSession = false
       if (setting) {
@@ -109,6 +100,33 @@ export default function (props: {
     } catch {
       console.log("Setting parse error")
     }
+  }
+
+  onMount(() => {
+    window.addEventListener("hashchange", handleHashChange)
+    makeEventListener(
+      inputRef,
+      "compositionend",
+      () => {
+        setCompositionend(true)
+        handleInput()
+      },
+      { passive: true }
+    )
+    makeEventListener(
+      inputRef,
+      "compositionstart",
+      () => {
+        setCompositionend(false)
+      },
+      { passive: true }
+    )
+    document.querySelector("main")?.classList.remove("before")
+    document.querySelector("main")?.classList.add("after")
+    createResizeObserver(containerRef, ({ width, height }, el) => {
+      if (el === containerRef) setContainerWidth(`${width}px`)
+    })
+    initFromSession(getSessionKey())
   })
 
   createEffect((prev: number | undefined) => {
@@ -139,7 +157,7 @@ export default function (props: {
         setMessageList(messageList().slice(1))
       }
       if (setting().archiveSession) {
-        localStorage.setItem("session", JSON.stringify(messageList()))
+        localStorage.setItem(getSessionKey(), JSON.stringify(messageList()))
       }
     }
     return true
