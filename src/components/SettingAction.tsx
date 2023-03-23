@@ -272,7 +272,7 @@ function handleDeleteClick(name:String){
 function handleChangeChat(name:String){
   const hashValue=name=="默认对话"?"":"#"+name;
   const sessionKey="session"+hashValue
-  if(sessionKey!=window.location.hash){
+  if(sessionKey!=decodeURIComponent(window.location.hash)){
     //切换
     window.location.hash=hashValue
   }

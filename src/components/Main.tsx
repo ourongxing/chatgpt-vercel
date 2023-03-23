@@ -53,7 +53,7 @@ export default function (props: {
   )
 
   const getSessionKey = () => {
-    const sessionHash = window.location.hash
+    const sessionHash = decodeURIComponent(window.location.hash)
     if (sessionHash) {
       return "session" + sessionHash
     }
