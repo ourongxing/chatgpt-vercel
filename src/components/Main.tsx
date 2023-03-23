@@ -418,6 +418,7 @@ export default function (props: {
             clear={clearSession}
             reAnswer={reAnswer}
             messaages={messageList()}
+            chatList={[]}
           />
         </Show>
         <Show
