@@ -43,7 +43,8 @@ export const baseURL = import.meta.env.NOGFW
       ""
     )
 
-const maxTokens = Number(import.meta.env.MAX_INPUT_TOKENS)
+let MAX_INPUT_TOKENS = Number(import.meta.env.MAX_INPUT_TOKENS)
+const maxTokens = Number.isInteger(MAX_INPUT_TOKENS) ? MAX_INPUT_TOKENS : 3072
 
 const pwd = import.meta.env.PASSWORD
 
@@ -91,17 +92,24 @@ export const post: APIRoute = async context => {
 
     if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
-    const tokens = messages.reduce((acc, cur) => {
-      const tokens = countTokens(cur.content)
-      return acc + tokens
-    }, 0)
+    let tokens = 0
+    let lastValidIndex = messages.length 
 
-    if (tokens > (Number.isInteger(maxTokens) ? maxTokens : 3072)) {
-      if (messages.length > 1)
-        throw new Error(
-          `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
-        )
-      else throw new Error("太长了，缩短一点吧。")
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const message = messages[i]
+      const messageTokens = countTokens(message.content)
+      tokens += messageTokens
+      if (tokens > maxTokens) {
+        break
+      }
+      lastValidIndex = i
+    }
+
+    if (lastValidIndex < messages.length) {
+      messages.splice(0,lastValidIndex)
+    }
+    else{
+      throw new Error("单次询问太长，超过上限")
     }
 
     const encoder = new TextEncoder()
