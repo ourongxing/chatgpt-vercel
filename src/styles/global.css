@@ -44,6 +44,10 @@ main {
   -webkit-tap-highlight-color: transparent;
 }
 
+.katex .vlist {
+  vertical-align: unset !important;
+}
+
 // https://www.zhangxinxu.com/wordpress/2015/01/css-page-scrollbar-toggle-center-no-jumping/
 /* html {
   overflow-y: scroll;
