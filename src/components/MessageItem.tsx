@@ -1,18 +1,13 @@
 import type { Setter } from "solid-js"
 import type { ChatMessage, Role } from "../types"
-import MarkdownIt from "markdown-it"
-// @ts-ignore
-import mdKatex from "markdown-it-katex"
-import mdHighlight from "markdown-it-highlightjs"
-import mdKbd from "markdown-it-kbd"
 import MessageAction from "./MessageAction"
-import { preWrapperPlugin } from "~/markdown-it"
 import "../styles/message.css"
 import "../styles/clipboard.css"
 import { useCopyCode } from "~/hooks"
 import { copyToClipboard } from "~/utils"
 import vercel from "/assets/vercel.svg?raw"
 import openai from "/assets/openai.svg?raw"
+import md from "~/markdown-it"
 
 interface Props {
   role: Role
@@ -30,17 +25,6 @@ export default (props: Props) => {
     user: "bg-gradient-to-r from-red-300 to-blue-700 ",
     assistant: "bg-gradient-to-r from-yellow-300 to-red-700 "
   }
-
-  const md = MarkdownIt({
-    linkify: true,
-    breaks: true
-  })
-    .use(mdKatex)
-    .use(mdHighlight, {
-      inline: true
-    })
-    .use(mdKbd)
-    .use(preWrapperPlugin)
 
   function copy() {
     copyToClipboard(props.message)
