@@ -11,10 +11,12 @@ export default function SettingAction(props: {
   clear: any
   reAnswer: any
   messaages: ChatMessage[]
+  chatList: String[]
 }) {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
+  const [showChats, setShowChats] = createSignal(false)
   return (
     <div class="text-sm text-slate-7 dark:text-slate mb-2">
       <Show when={shown()}>
@@ -114,6 +116,22 @@ export default function SettingAction(props: {
         </SettingItem>
         <hr class="mt-2 bg-slate-5 bg-op-15 border-none h-1px"></hr>
       </Show>
+      <Show when={showChats()}>
+        <ul>
+          {props.chatList.map((item, index) => (
+            <li onClick={() => handleChangeChat(item)} >
+              <div class="flex items-center p-1 justify-between hover:bg-slate hover:bg-op-10 rounded">
+                <span ml-1>{item}</span>
+                <div class="flex items-center">
+                  <button class={"i-carbon:edit"} onClick={() => handleEditClick(item)} /> 
+                  <button class={"i-carbon:delete"} onClick={() => handleDeleteClick(item)} />             
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <hr class="mt-2 bg-slate-5 bg-op-15 border-none h-1px"></hr>
+      </Show>
       <div class="mt-2 flex items-center justify-between">
         <ActionItem
           onClick={() => {
@@ -121,6 +139,14 @@ export default function SettingAction(props: {
           }}
           icon="i-carbon:settings"
           label="设置"
+        />
+        <ActionItem
+          onClick={() => {
+            props.chatList=getChatsList();
+            setShowChats(!showChats())
+          }}
+          icon="i-carbon:chat"
+          label="聊天列表"
         />
         <div class="flex">
           <ActionItem
@@ -233,4 +259,29 @@ async function exportMD(messages: ChatMessage[]) {
       })
       .join("\n\n\n\n")
   )
+}
+
+function handleEditClick(name:String){
+
+}
+
+function handleDeleteClick(name:String){
+
+}
+
+function handleChangeChat(name:String){
+  const hashValue=name=="默认对话"?"":"#"+name;
+  const sessionKey="session"+hashValue
+  if(sessionKey!=window.location.hash){
+    //切换
+    window.location.hash=hashValue
+  }
+}
+
+function getChatsList(){
+  const sessionKeys = Object.keys(localStorage)
+    .filter(key => key.startsWith("session#"))
+    .map(key=>key.slice("session#".length))
+  sessionKeys.push("默认对话")
+  return sessionKeys
 }
