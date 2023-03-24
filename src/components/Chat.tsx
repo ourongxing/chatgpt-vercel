@@ -90,6 +90,7 @@ export default function (props: {
         })
       }
       if (props.question) {
+        window.history.replaceState(undefined, "ChatGPT", "/")
         handleButtonClick(props.question)
       } else {
         if (session && archiveSession) {
