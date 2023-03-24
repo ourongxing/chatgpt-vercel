@@ -219,15 +219,14 @@ export default function (props: {
     } catch (error: any) {
       setLoading(false)
       setController()
-      setMessageList([
-        ...messageList(),
-        {
-          role: "error",
-          content: error.message.includes("aborted a request")
-            ? ""
-            : error.message.replace(/(sk-\w{5})\w+/g, "$1")
-        }
-      ])
+      if (!error.message.includes("aborted a request"))
+        setMessageList([
+          ...messageList(),
+          {
+            role: "error",
+            content: error.message.replace(/(sk-\w{5})\w+/g, "$1")
+          }
+        ])
     }
     archiveCurrentMessage()
   }
