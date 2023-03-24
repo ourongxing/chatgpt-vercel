@@ -156,7 +156,7 @@ export default function (props: {
       if (inputContent() === "") {
         setCompatiblePrompt([])
       } else {
-        const { scrollHeight } = inputRef
+        const scrollHeight = inputRef?.scrollHeight
         setHeight(
           `${
             scrollHeight > window.innerHeight - 64
@@ -307,7 +307,7 @@ export default function (props: {
   function selectPrompt(prompt: string) {
     setInputContent(prompt)
     setCompatiblePrompt([])
-    const { scrollHeight } = inputRef
+    const scrollHeight = inputRef?.scrollHeight
     setHeight(
       `${
         scrollHeight > window.innerHeight - 64
@@ -340,7 +340,7 @@ export default function (props: {
 
   async function handleInput() {
     setHeight("48px")
-    const { scrollHeight } = inputRef
+    const scrollHeight = inputRef?.scrollHeight
     setHeight(
       `${
         scrollHeight > window.innerHeight - 64
