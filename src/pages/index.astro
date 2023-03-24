@@ -1,7 +1,7 @@
 ---
 import Layout from "~/layouts/Layout.astro"
 import Header from "~/components/Header.astro"
-import Main from "~/components/Main"
+import Chat from "~/components/Chat"
 import "~/styles/global.css"
 import "@unocss/reset/tailwind.css"
 import "katex/dist/katex.min.css"
@@ -23,12 +23,13 @@ if (import.meta.env.DEFAULT_SETTING) {
 }
 
 const _reset = import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION
+const question = Astro.url.searchParams.get("q")
 ---
 
 <Layout title="ChatGPT">
   <main class="before sm:pt-8em py-2em">
     <Header />
-    <Main
+    <Chat
       env={{
         defaultSetting,
         defaultMessage,
@@ -37,6 +38,7 @@ const _reset = import.meta.env.RESET_CONTINUOUS_DIALOGUE_OPTION
             ? !resetContinuousDialogue
             : resetContinuousDialogue
       }}
+      question={question ?? undefined}
       prompts={prompts}
       client:visible
     />

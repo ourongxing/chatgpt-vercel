@@ -22,6 +22,7 @@ export default function (props: {
     defaultMessage: string
     resetContinuousDialogue: boolean
   }
+  question?: string
 }) {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
@@ -88,10 +89,20 @@ export default function (props: {
           ...(resetContinuousDialogue ? { continuousDialogue: false } : {})
         })
       }
-      if (session && archiveSession) {
-        const parsed = JSON.parse(session)
-        if (parsed.length > 1) {
-          setMessageList(parsed)
+      if (props.question) {
+        handleButtonClick(props.question)
+      } else {
+        if (session && archiveSession) {
+          const parsed = JSON.parse(session)
+          if (parsed.length > 1) {
+            setMessageList(parsed)
+          } else
+            setMessageList([
+              {
+                role: "assistant",
+                content: defaultMessage
+              }
+            ])
         } else
           setMessageList([
             {
@@ -99,13 +110,7 @@ export default function (props: {
               content: defaultMessage
             }
           ])
-      } else
-        setMessageList([
-          {
-            role: "assistant",
-            content: defaultMessage
-          }
-        ])
+      }
     } catch {
       console.log("Setting parse error")
     }
