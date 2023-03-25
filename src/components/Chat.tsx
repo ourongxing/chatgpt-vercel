@@ -162,13 +162,14 @@ export default function (props: {
       if (inputContent() === "") {
         setCompatiblePrompt([])
       } else {
-        const { scrollHeight } = inputRef
-        setHeight(
-          `${
-            scrollHeight > window.innerHeight - 64
-              ? window.innerHeight - 64
-              : scrollHeight
-          }px`
+        const scrollHeight = inputRef?.scrollHeight
+        if(scrollHeight)
+          setHeight(
+            `${
+              scrollHeight > window.innerHeight - 64
+                ? window.innerHeight - 64
+                : scrollHeight
+            }px`
         )
       }
       inputRef.focus()
@@ -312,14 +313,16 @@ export default function (props: {
   function selectPrompt(prompt: string) {
     setInputContent(prompt)
     setCompatiblePrompt([])
-    const { scrollHeight } = inputRef
-    setHeight(
-      `${
-        scrollHeight > window.innerHeight - 64
-          ? window.innerHeight - 64
-          : scrollHeight
-      }px`
-    )
+
+    const scrollHeight = inputRef?.scrollHeight
+    if(scrollHeight)
+      setHeight(
+        `${
+          scrollHeight > window.innerHeight - 64
+            ? window.innerHeight - 64
+            : scrollHeight
+        }px`
+      )
     inputRef.focus()
   }
 
@@ -345,14 +348,15 @@ export default function (props: {
 
   async function handleInput() {
     setHeight("48px")
-    const { scrollHeight } = inputRef
-    setHeight(
-      `${
-        scrollHeight > window.innerHeight - 64
-          ? window.innerHeight - 64
-          : scrollHeight
-      }px`
-    )
+    const scrollHeight = inputRef?.scrollHeight
+    if(scrollHeight)
+      setHeight(
+        `${
+          scrollHeight > window.innerHeight - 64
+            ? window.innerHeight - 64
+            : scrollHeight
+        }px`
+      )
     if (!compositionend()) return
     const { value } = inputRef
     setInputContent(value)
