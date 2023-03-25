@@ -18,8 +18,8 @@ export interface PromptItem {
 export default function (props: {
   prompts: PromptItem[]
   env: {
-    defaultSetting: Setting
-    defaultMessage: string
+    setting: Setting
+    message: string
     resetContinuousDialogue: boolean
   }
   question?: string
@@ -27,13 +27,17 @@ export default function (props: {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
 
-  const { defaultMessage, defaultSetting, resetContinuousDialogue } = props.env
+  const {
+    message: _message,
+    setting: _setting,
+    resetContinuousDialogue: _resetContinuousDialogue
+  } = props.env
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [inputContent, setInputContent] = createSignal("")
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
-  const [setting, setSetting] = createSignal(defaultSetting)
+  const [setting, setSetting] = createSignal(_setting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
   const fzf = new Fzf(props.prompts, {
@@ -84,9 +88,9 @@ export default function (props: {
         const parsed = JSON.parse(setting)
         archiveSession = parsed.archiveSession
         setSetting({
-          ...defaultSetting,
+          ..._setting,
           ...parsed,
-          ...(resetContinuousDialogue ? { continuousDialogue: false } : {})
+          ...(_resetContinuousDialogue ? { continuousDialogue: false } : {})
         })
       }
       if (props.question) {
@@ -101,14 +105,14 @@ export default function (props: {
             setMessageList([
               {
                 role: "assistant",
-                content: defaultMessage
+                content: _message
               }
             ])
         } else
           setMessageList([
             {
               role: "assistant",
-              content: defaultMessage
+              content: _message
             }
           ])
       }
@@ -135,12 +139,12 @@ export default function (props: {
         setMessageList([
           {
             role: "assistant",
-            content: defaultMessage
+            content: _message
           }
         ])
       } else if (
         messageList().length > 1 &&
-        messageList()[0].content === defaultMessage
+        messageList()[0].content === _message
       ) {
         setMessageList(messageList().slice(1))
       }

@@ -11,7 +11,7 @@
 2. ~~[aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供~~。（2022.03.22 壮烈牺牲，提醒大家不要过度分享自己的站点出去，指不定 ChatGPT 说出什么违禁词出来）。
 3. [vercel.app](https://vercel-chatgpt-github.vercel.app) 被墙。
 
-API Key 由我自己免费提供，请不要滥用，不提供长期服务，请自行部署。
+API Key 由我自己免费提供，请不要滥用，不提供长期服务，请自行部署。默认 key 不支持 `gpt-4`。
 
 ## 使用方法
 
@@ -22,8 +22,7 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
   - 思维发散程度：越高 ChatGPT 思维就越发散，开始乱答。根据不同的问题可以调节这个选项，创意性的就可以调高一点。
 
   - 开启连续对话：OpenAI 并没有提供 ChatGPT 那样的上下文功能，只能每次都把全部对话传过去，并且都要算 token，而且仍然有最大 4096 token 的限制。
-
-  - OpenAI 模型：我们提供了模型选择的方式, 目前提供 GPT3.5 和 GPT4 两种模型以供不同的调用需求. 需要注意的是, 只有获得了 GPT4 API 内测资格的用户才可以使用您的 API KEY 调用 GPT4
+  - OpenAI 模型：需要注意的是, 只有获得了 GPT4 API 内测资格的用户才可以使用您的 API KEY 调用 GPT4。不同的模型对应的 token 最大值不同，比如 `gpt-3.5-turbo` 的最大 token 为 4k(4096)，`gpt-4` 的最大 token 为 8k(8192)，`gpt-4-32k`  的最大 token 为 32k(32768)。不同模型的价格也不同，具体可以查看 [OpenAI 价格](https://openai.com/pricing/)。
 
 - token 是怎么算的：OpenAI 有它自己的算法，大多数时候是一个单词 1 token，一个汉字 2 token。
 - Open AI Key 要怎么获得：注册 OpenAI 的帐号，然后 [生成 Key](https://platform.openai.com/account/api-keys) 就行了。现在注册就送 5 美元，可以用一两个月。闲注册麻烦，可以直接去买号，自行搜索。注意不要被骗，一般 5 元以下可以入手，看到有 120 美元的 key，这种属于是绑了虚拟信用卡，可以透支 120 美元，只能用一个月，而且容易封号。
@@ -38,7 +37,7 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
   - <kbd>↑</kbd> 将最近的一次提问填到输入框里。
 - 点击顶部标题滚动到顶部，点击输入框滚动到底部。
 - 发送 sk- 开头的 key，可以直接查询余额。可以换行查询多个。也可以发送 `查询填写的 Key 的余额` 来直接查询你填的 key 的余额，这个 Prompt 预设第一个就是，直接用。作为站长，你可以通过设置环境变量来定时查询所有内置 key 的余额，并发送到微信上。
-- url 里使用 `q=你好啊` 这种方式可以直接打开网页并且直接回答 `你好啊`。
+- url 里使用 `url?q=你好啊` 这种方式可以直接打开网页并且直接回答 `你好啊`。
 
 ## 部署一个你自己的 ChatGPT 网站（免费）
 
@@ -70,17 +69,17 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 
 #### 环境变量
 
-| 环境变量                           | 说明                                                                                                                                                                                                                    | 默认值                                                                                                                                                                       |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OPENAI_API_KEY`                   | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。                                                                        | 无                                                                                                                                                                           |
-| `DEFAULT_MESSAGE`                  | 默认提示信息                                                                                                                                                                                                            | - xx xx                                                                                                                                                                      |
-| `DEFAULT_SETTING`                  | 默认设置                                                                                                                                                                                                                | {<br/> "continuousDialogue": true,<br/> "archiveSession": false,<br/> "openaiAPIKey": "",<br /> "openaiAPITemperature": 60,<br/> "systemRule": ""<br/> "password": ""<br />} |
-| `RESET_CONTINUOUS_DIALOGUE_OPTION` | 刷新时重置 `开启连续对话` 选项，在分享给很多人用的时候可以有效避免大量消耗。                                                                                                                                            | false                                                                                                                                                                        |
-| `OPENAI_API_BASE_URL`              | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。                                                                                                                                                            | api.openai.com                                                                                                                                                               |
-| `PASSWORD`                         | 网站密码                                                                                                                                                                                                                | 无                                                                                                                                                                           |
-| `MAX_INPUT_TOKENS`                 | 输入的 token 最大值，如果开启 `连续对话`，将计算之前的所有对话内容。OpenAI 限制 token 最大值为 4096，但这是输入和输出之和，所以可以将这个值设置为 3072， 留 1024 作为输出。如果不想被滥用，可以将这个值设置的再小一点。 | 3072                                                                                                                                                                         |
-| `SENDKEY`                          | 使用 [Server 酱](https://sct.ftqq.com/sendkey) 推送帐号余额以及可用状态到微信，如果需要自行获取。推送时间为早上 8 点和晚上 8 点，在 vercel.json 文件中修改。如果 key 太多，超过 20 个，有可能失败。                     | 无                                                                                                                                                                           |
-| `SENDCHANNEL`                      | [Server 酱](https://sct.ftqq.com/sendkey) 的推送通道，默认微信服务号。                                                                                                                                                  | 9                                                                                                                                                                            |
+| 环境变量                           | 说明                                                         | 默认值                                                       |
+| ---------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `OPENAI_API_KEY`                   | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。 | 无                                                           |
+| `DEFAULT_MESSAGE`                  | 默认提示信息                                                 | - xx xx                                                      |
+| `DEFAULT_SETTING`                  | 默认设置                                                     | {<br/>  "continuousDialogue": true,<br/>  "archiveSession": false,<br/>  "openaiAPIKey": "",<br/>"openaiAPITemperature": 60,<br/>  "password": "",<br/>  "systemRule": "",<br/>  "model": "gpt-3.5-turbo"<br/>} |
+| `RESET_CONTINUOUS_DIALOGUE_OPTION` | 刷新时重置 `开启连续对话` 选项，在分享给很多人用的时候可以有效避免大量消耗。 | false                                                        |
+| `OPENAI_API_BASE_URL`              | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。 | api.openai.com                                               |
+| `PASSWORD`                         | 网站密码                                                     | 无                                                           |
+| `MAX_INPUT_TOKENS`                 | 输入的 token 最大值，如果开启 `连续对话`，将计算之前的所有对话内容。OpenAI 限制 token 最大值为 4096，但这是输入和输出之和，所以可以将这个值设置为 3072， 留 1024 作为输出。如果不想被滥用，可以将这个值设置的再小一点。 | {<br/>  "gpt-3.5-turbo": 3072,<br/>  "gpt-4": 6144,<br/>  "gpt-4-32k": 24576<br/>} |
+| `SENDKEY`                          | 使用 [Server 酱](https://sct.ftqq.com/sendkey) 推送帐号余额以及可用状态到微信，如果需要自行获取。推送时间为早上 8 点和晚上 8 点，在 vercel.json 文件中修改。如果 key 太多，超过 20 个，有可能失败。 | 无                                                           |
+| `SENDCHANNEL`                      | [Server 酱](https://sct.ftqq.com/sendkey) 的推送通道，默认微信服务号。 | 9                                                            |
 
 有两种设置方式
 
@@ -94,12 +93,13 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 
 ```json5
 {
-  continuousDialogue: true, // 开启连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
-  archiveSession: false, // 记录对话内容，刷新后不会清空对话
-  openaiAPIKey: "", // 默认填写的 key，不需要填写，否则其他人看得到。
-  password: "", // 默认填写的密码，不需要填写，否则其他人看得到。
-  openaiAPITemperature: 60, // 0-100 越高 ChatGPT 思维就越发散，开始乱答
-  systemRule: "" // 系统角色指令，会在每次提问时添加。主要用于对 ChatGPT 的语气，口头禅这些进行定制。
+  "continuousDialogue": true, // 开启连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
+  "archiveSession": false, // 记录对话内容，刷新后不会清空对话
+  "openaiAPIKey": "", // 默认填写的 key，不需要填写，否则其他人看得到。
+  "password": "", // 默认填写的密码，不需要填写，否则其他人看得到。
+  "openaiAPITemperature": 60, // 0-100 越高 ChatGPT 思维就越发散，开始乱答
+  "systemRule": "", // 系统角色指令，会在每次提问时添加。主要用于对 ChatGPT 的语气，口头禅这些进行定制。
+  "model": "gpt-3.5-turbo"
 }
 ```
 

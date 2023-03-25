@@ -2,7 +2,7 @@ import type { Accessor, Setter } from "solid-js"
 import { createSignal, type JSXElement, Show } from "solid-js"
 import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
-import type { ChatMessage } from "~/types"
+import type { ChatMessage, Model } from "~/types"
 import type { Setting } from "~/system"
 
 export default function SettingAction(props: {
@@ -31,7 +31,7 @@ export default function SettingAction(props: {
             }}
           />
         </SettingItem>
-        <SettingItem icon="i-carbon:api" label="OpenAI API Key">
+        <SettingItem icon="i-carbon:api" label="OpenAI Key">
           <input
             type="password"
             value={props.setting().openaiAPIKey}
@@ -43,6 +43,23 @@ export default function SettingAction(props: {
               })
             }}
           />
+        </SettingItem>
+        <SettingItem icon="i-carbon:machine-learning-model" label="OpenAI 模型">
+          <select
+            name="model"
+            class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center  focus:bg-op-20 focus:ring-0 focus:outline-none"
+            value={props.setting().model}
+            onChange={e => {
+              props.setSetting({
+                ...props.setting(),
+                model: (e.target as HTMLSelectElement).value as Model
+              })
+            }}
+          >
+            <option value="gpt-3.5-turbo">gpt-3.5-turbo(4k)</option>
+            <option value="gpt-4">gpt-4(8k)</option>
+            <option value="gpt-4-32k">gpt-4(32k)</option>
+          </select>
         </SettingItem>
         <SettingItem icon="i-carbon:user-online" label="系统角色指令">
           <input
@@ -73,23 +90,6 @@ export default function SettingAction(props: {
               })
             }}
           />
-        </SettingItem>
-        <SettingItem icon="i-carbon:cut-in-half" label="OpenAI模型">
-          <select
-            name="models"
-            id="pet-select"
-            class="max-w-150px w-full bg-slate bg-op-15 rounded-lg appearance-none accent-slate text-center"
-            value={props.setting().model}
-            onChange={e => {
-              props.setSetting({
-                ...props.setting(),
-                model: (e.target as HTMLSelectElement).value
-              })
-            }}
-          >
-            <option value="gpt-3.5-turbo">GPT3.5</option>
-            <option value="gpt-4.0">GPT4</option>
-          </select>
         </SettingItem>
         <SettingItem
           icon="i-carbon:save-image"
