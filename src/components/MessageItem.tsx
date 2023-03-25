@@ -1,4 +1,4 @@
-import type { Setter } from "solid-js"
+import { type Setter, Show } from "solid-js"
 import type { ChatMessage, Role } from "../types"
 import MessageAction from "./MessageAction"
 import "../styles/message.css"
@@ -10,8 +10,8 @@ import openai from "/assets/openai.svg?raw"
 import md from "~/markdown-it"
 
 interface Props {
-  role: Role
-  message: string
+  message: ChatMessage
+  hiddenAction: boolean
   index?: number
   sendMessage?: (message?: string) => void
   setInputContent?: Setter<string>
@@ -28,11 +28,11 @@ export default (props: Props) => {
   }
 
   function copy() {
-    copyToClipboard(props.message)
+    copyToClipboard(props.message.content)
   }
 
   function edit() {
-    props.setInputContent && props.setInputContent(props.message)
+    props.setInputContent && props.setInputContent(props.message.content)
   }
 
   function del() {
@@ -77,22 +77,61 @@ export default (props: Props) => {
     }
   }
 
+  function lockMessage() {
+    if (
+      !props.hiddenAction &&
+      props.setMessageList &&
+      props.index !== undefined
+    ) {
+      props.setMessageList(messages => {
+        if (messages[props.index!]?.role === "user") {
+          return messages.map((k, i) => {
+            if (
+              i === props.index ||
+              (i === props.index! + 1 && k.role !== "user")
+            )
+              return {
+                ...k,
+                special: k.special === "locked" ? undefined : "locked"
+              }
+            return k
+          })
+        } else {
+          return messages.map((k, i) => {
+            if (i === props.index || i === props.index! - 1) {
+              return {
+                ...k,
+                special: k.special === "locked" ? undefined : "locked"
+              }
+            }
+            return k
+          })
+        }
+      })
+    }
+  }
+
   return (
     <div
       class="group flex gap-3 px-4 mx--4 rounded-lg transition-colors sm:hover:bg-slate/6 dark:sm:hover:bg-slate/5 relative message-item"
       classList={{
-        temporary: props.index === undefined
+        temporary: props.message.special === "temporary"
       }}
     >
       <div
-        class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 ${
-          roleClass[props.role]
+        class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 flex items-center justify-center cursor-pointer ${
+          roleClass[props.message.role]
         }`}
-      />
+        onClick={lockMessage}
+      >
+        <Show when={props.message.special === "locked"}>
+          <div class="i-carbon:locked text-white" />
+        </Show>
+      </div>
       <div
         class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
         innerHTML={md
-          .render(props.message)
+          .render(props.message.content)
           .replace(
             /Vercel/g,
             `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0">${vercel}</a>`
@@ -107,8 +146,8 @@ export default (props: Props) => {
         copy={copy}
         edit={edit}
         reAnswer={reAnswer}
-        role={props.role}
-        hidden={props.index === undefined}
+        role={props.message.role}
+        hidden={props.hiddenAction}
       />
     </div>
   )

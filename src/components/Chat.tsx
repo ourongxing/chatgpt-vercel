@@ -40,6 +40,11 @@ export default function (props: {
   const [setting, setSetting] = createSignal(_setting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
+  const defaultMessage: ChatMessage = {
+    role: "assistant",
+    content: _message,
+    special: "default"
+  }
   const fzf = new Fzf(props.prompts, {
     selector: k => `${k.desc} (${k.prompt})`
   })
@@ -98,23 +103,11 @@ export default function (props: {
         sendMessage(props.question)
       } else {
         if (session && archiveSession) {
-          const parsed = JSON.parse(session)
-          if (parsed.length > 1) {
-            setMessageList(parsed)
-          } else
-            setMessageList([
-              {
-                role: "assistant",
-                content: _message
-              }
-            ])
-        } else
-          setMessageList([
-            {
-              role: "assistant",
-              content: _message
-            }
-          ])
+          const parsed = JSON.parse(session) as ChatMessage[]
+          if (parsed.length === 1 && parsed[0].special === "default") {
+            setMessageList([defaultMessage])
+          } else setMessageList(parsed)
+        } else setMessageList([defaultMessage])
       }
     } catch {
       console.log("Setting parse error")
@@ -136,15 +129,10 @@ export default function (props: {
     messageList()
     if (prev) {
       if (messageList().length === 0) {
-        setMessageList([
-          {
-            role: "assistant",
-            content: _message
-          }
-        ])
+        setMessageList([defaultMessage])
       } else if (
         messageList().length > 1 &&
-        messageList()[0].content === _message
+        messageList()[0].special === "default"
       ) {
         setMessageList(messageList().slice(1))
       }
@@ -187,7 +175,8 @@ export default function (props: {
         ...messageList(),
         {
           role: "assistant",
-          content: currentAssistantMessage().trim()
+          content: currentAssistantMessage().trim(),
+          id: Date.now()
         }
       ])
       setCurrentAssistantMessage("")
@@ -216,7 +205,8 @@ export default function (props: {
         ...messageList(),
         {
           role: "user",
-          content: inputValue
+          content: inputValue,
+          id: Date.now()
         }
       ])
     }
@@ -230,7 +220,8 @@ export default function (props: {
           ...messageList(),
           {
             role: "error",
-            content: error.message.replace(/(sk-\w{5})\w+/g, "$1")
+            content: error.message.replace(/(sk-\w{5})\w+/g, "$1"),
+            id: Date.now()
           }
         ])
     }
@@ -242,25 +233,19 @@ export default function (props: {
     const controller = new AbortController()
     setController(controller)
     const systemRule = setting().systemRule.trim()
-    const message = [
-      {
-        role: "user",
-        content: inputValue
-      }
-    ]
-    if (systemRule)
-      message.push({
-        role: "system",
-        content: systemRule
-      })
+    const message = {
+      role: "user",
+      content: inputValue
+    }
+    if (systemRule) message.content += "。\n\n" + systemRule
     const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
         messages: setting().continuousDialogue
-          ? [...messageList().slice(0, -1), ...message].filter(
+          ? [...messageList().slice(0, -1), message].filter(
               k => k.role !== "error"
             )
-          : message,
+          : [...messageList().filter(k => k.special === "locked"), message],
         key: setting().openaiAPIKey || undefined,
         temperature: setting().openaiAPITemperature / 100,
         password: setting().password,
@@ -296,7 +281,7 @@ export default function (props: {
   }
 
   function clearSession() {
-    setMessageList([])
+    setMessageList(messages => messages.filter(k => k.special === "locked"))
     setCurrentAssistantMessage("")
   }
 
@@ -373,13 +358,9 @@ export default function (props: {
           <For each={messageList()}>
             {(message, index) => (
               <MessageItem
-                role={message.role}
-                message={message.content}
-                index={
-                  loading() || message.content === _message
-                    ? undefined
-                    : index()
-                }
+                message={message}
+                hiddenAction={loading() || message.special === "default"}
+                index={index()}
                 setInputContent={setInputContent}
                 sendMessage={sendMessage}
                 setMessageList={setMessageList}
@@ -387,7 +368,14 @@ export default function (props: {
             )}
           </For>
           {currentAssistantMessage() && (
-            <MessageItem role="assistant" message={currentAssistantMessage()} />
+            <MessageItem
+              hiddenAction={true}
+              message={{
+                role: "assistant",
+                content: currentAssistantMessage(),
+                special: "temporary"
+              }}
+            />
           )}
         </div>
       </div>

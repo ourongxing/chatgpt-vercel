@@ -1,6 +1,7 @@
 export interface ChatMessage {
   role: Role
   content: string
+  special?: "default" | "locked" | "temporary"
 }
 
 export type Role = "system" | "user" | "assistant" | "error"
