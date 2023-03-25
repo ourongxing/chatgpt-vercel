@@ -36,8 +36,8 @@
 button.copy {
   direction: ltr;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 1em;
+  right: 1em;
   z-index: 3;
   display: block;
   justify-content: center;

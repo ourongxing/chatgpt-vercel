@@ -361,7 +361,7 @@ export default function (props: {
   }
 
   return (
-    <div ref={containerRef!} class="mt-2">
+    <div ref={containerRef!} class="mt-4">
       <div class="px-1em mb-6em">
         <div
           id="message-container"
@@ -375,7 +375,11 @@ export default function (props: {
               <MessageItem
                 role={message.role}
                 message={message.content}
-                index={loading() ? undefined : index()}
+                index={
+                  loading() || message.content === _message
+                    ? undefined
+                    : index()
+                }
                 setInputContent={setInputContent}
                 sendMessage={sendMessage}
                 setMessageList={setMessageList}
