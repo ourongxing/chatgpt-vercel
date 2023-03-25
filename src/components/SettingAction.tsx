@@ -224,7 +224,8 @@ async function exportMD(messages: ChatMessage[]) {
   const role = {
     system: "系统",
     user: "我",
-    assistant: "ChatGPT"
+    assistant: "ChatGPT",
+    error: "错误"
   }
   await copyToClipboard(
     messages
