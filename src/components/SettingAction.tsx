@@ -134,6 +134,7 @@ export default function SettingAction(props: {
             </label>
           </SettingItem>
         </div>
+        <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
       </Show>
       <div class="flex items-center justify-between">
         <ActionItem
