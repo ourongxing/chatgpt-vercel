@@ -45,9 +45,9 @@ export const baseURL = import.meta.env.NOGFW
     )
 
 let maxInputTokens = defaultMaxInputTokens
-if (import.meta.env.MAX_INPUT_TOKEN) {
+if (import.meta.env.MAX_INPUT_TOKENS) {
   try {
-    const _ = import.meta.env.MAX_INPUT_TOKEN
+    const _ = import.meta.env.MAX_INPUT_TOKENS
     if (_ && Number.isInteger(Number(_))) {
       maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
         acc[k as Model] = Number(_)
