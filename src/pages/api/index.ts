@@ -54,12 +54,14 @@ export const post: APIRoute = async context => {
       messages,
       key = localKey,
       temperature = 0.6,
-      password
+      password,
+      model
     } = body as {
       messages?: ChatMessage[]
       key?: string
       temperature?: number
       password?: string
+      model?: string
     }
 
     if (pwd && pwd !== password) {
@@ -117,7 +119,7 @@ export const post: APIRoute = async context => {
         timeout: 10000,
         method: "POST",
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
+          model: model || "gpt-3.5-turbo",
           messages,
           temperature,
           // max_tokens: 4096 - tokens,

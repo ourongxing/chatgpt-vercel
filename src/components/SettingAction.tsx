@@ -74,6 +74,23 @@ export default function SettingAction(props: {
             }}
           />
         </SettingItem>
+        <SettingItem icon="i-carbon:cut-in-half" label="OpenAI模型">
+          <select
+            name="models"
+            id="pet-select"
+            class="max-w-150px w-full bg-slate bg-op-15 rounded-lg appearance-none accent-slate text-center"
+            value={props.setting().model}
+            onChange={e => {
+              props.setSetting({
+                ...props.setting(),
+                model: (e.target as HTMLSelectElement).value
+              })
+            }}
+          >
+            <option value="gpt-3.5-turbo">GPT3.5</option>
+            <option value="gpt-4.0">GPT4</option>
+          </select>
+        </SettingItem>
         <SettingItem
           icon="i-carbon:save-image"
           label="记录对话内容，刷新不会消失"

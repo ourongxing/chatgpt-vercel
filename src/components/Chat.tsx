@@ -163,14 +163,14 @@ export default function (props: {
         setCompatiblePrompt([])
       } else {
         const scrollHeight = inputRef?.scrollHeight
-        if(scrollHeight)
+        if (scrollHeight)
           setHeight(
             `${
               scrollHeight > window.innerHeight - 64
                 ? window.innerHeight - 64
                 : scrollHeight
             }px`
-        )
+          )
       }
       inputRef.focus()
     }
@@ -259,7 +259,8 @@ export default function (props: {
           : message,
         key: setting().openaiAPIKey || undefined,
         temperature: setting().openaiAPITemperature / 100,
-        password: setting().password
+        password: setting().password,
+        model: setting().model
       }),
       signal: controller.signal
     })
@@ -315,7 +316,7 @@ export default function (props: {
     setCompatiblePrompt([])
 
     const scrollHeight = inputRef?.scrollHeight
-    if(scrollHeight)
+    if (scrollHeight)
       setHeight(
         `${
           scrollHeight > window.innerHeight - 64
@@ -349,7 +350,7 @@ export default function (props: {
   async function handleInput() {
     setHeight("48px")
     const scrollHeight = inputRef?.scrollHeight
-    if(scrollHeight)
+    if (scrollHeight)
       setHeight(
         `${
           scrollHeight > window.innerHeight - 64
