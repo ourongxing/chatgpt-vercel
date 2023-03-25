@@ -22,6 +22,7 @@ export default function (props: {
     defaultMessage: string
     resetContinuousDialogue: boolean
   }
+  question?: string
 }) {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
@@ -88,10 +89,21 @@ export default function (props: {
           ...(resetContinuousDialogue ? { continuousDialogue: false } : {})
         })
       }
-      if (session && archiveSession) {
-        const parsed = JSON.parse(session)
-        if (parsed.length > 1) {
-          setMessageList(parsed)
+      if (props.question) {
+        window.history.replaceState(undefined, "ChatGPT", "/")
+        handleButtonClick(props.question)
+      } else {
+        if (session && archiveSession) {
+          const parsed = JSON.parse(session)
+          if (parsed.length > 1) {
+            setMessageList(parsed)
+          } else
+            setMessageList([
+              {
+                role: "assistant",
+                content: defaultMessage
+              }
+            ])
         } else
           setMessageList([
             {
@@ -99,13 +111,7 @@ export default function (props: {
               content: defaultMessage
             }
           ])
-      } else
-        setMessageList([
-          {
-            role: "assistant",
-            content: defaultMessage
-          }
-        ])
+      }
     } catch {
       console.log("Setting parse error")
     }
@@ -215,15 +221,14 @@ export default function (props: {
     } catch (error: any) {
       setLoading(false)
       setController()
-      setMessageList([
-        ...messageList(),
-        {
-          role: "error",
-          content: error.message.includes("aborted a request")
-            ? ""
-            : error.message.replace(/(sk-\w{5})\w+/g, "$1")
-        }
-      ])
+      if (!error.message.includes("aborted a request"))
+        setMessageList([
+          ...messageList(),
+          {
+            role: "error",
+            content: error.message.replace(/(sk-\w{5})\w+/g, "$1")
+          }
+        ])
     }
     archiveCurrentMessage()
   }
@@ -308,14 +313,16 @@ export default function (props: {
   function selectPrompt(prompt: string) {
     setInputContent(prompt)
     setCompatiblePrompt([])
+
     const scrollHeight = inputRef?.scrollHeight
-    setHeight(
-      `${
-        scrollHeight > window.innerHeight - 64
-          ? window.innerHeight - 64
-          : scrollHeight
-      }px`
-    )
+    if(scrollHeight)
+      setHeight(
+        `${
+          scrollHeight > window.innerHeight - 64
+            ? window.innerHeight - 64
+            : scrollHeight
+        }px`
+      )
     inputRef.focus()
   }
 
