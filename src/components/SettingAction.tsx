@@ -9,7 +9,6 @@ export default function SettingAction(props: {
   setting: Accessor<Setting>
   setSetting: Setter<Setting>
   clear: any
-  reAnswer: any
   messaages: ChatMessage[]
 }) {
   const [shown, setShown] = createSignal(false)
@@ -170,11 +169,6 @@ export default function SettingAction(props: {
                 ? "i-ri:check-fill dark:text-yellow text-yellow-6"
                 : "i-ri:markdown-line"
             }
-          />
-          <ActionItem
-            onClick={props.reAnswer}
-            icon="i-carbon:reset"
-            label="重新回答"
           />
           <ActionItem
             onClick={props.clear}

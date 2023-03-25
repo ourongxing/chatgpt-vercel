@@ -13,6 +13,7 @@ interface Props {
   role: Role
   message: string
   index?: number
+  sendMessage?: (message?: string) => void
   setInputContent?: Setter<string>
   setMessageList?: Setter<ChatMessage[]>
 }
@@ -35,23 +36,44 @@ export default (props: Props) => {
   }
 
   function del() {
-    if (props.setMessageList && props.index !== undefined) {
-      props.setMessageList(list => {
-        if (list[props.index!]?.role === "user") {
-          const arr = list.reduce(
-            (acc, cur, i) => {
-              if (cur.role !== "user" && i === acc.at(-1)! + 1) acc.push(i)
-              return acc
-            },
-            [props.index] as number[]
+    if (props.setMessageList) {
+      props.setMessageList(messages => {
+        if (messages[props.index!]?.role === "user") {
+          return messages.filter(
+            (_, i) =>
+              !(
+                i === props.index ||
+                (i === props.index! + 1 && _.role !== "user")
+              )
           )
-
-          return list.filter((_, i) => {
-            return !arr.includes(i)
-          })
         }
-        return list.filter((_, i) => i !== props.index)
+        return messages.filter((_, i) => i !== props.index)
       })
+    }
+  }
+
+  function reAnswer() {
+    if (props.setMessageList && props.sendMessage) {
+      let question = ""
+      props.setMessageList(messages => {
+        if (messages[props.index!]?.role === "user") {
+          question = messages[props.index!].content
+          return messages.filter(
+            (_, i) =>
+              !(
+                i === props.index ||
+                (i === props.index! + 1 && _.role !== "user")
+              )
+          )
+        } else {
+          // 回答的前一条消息一定是提问
+          question = messages[props.index! - 1].content
+          return messages.filter(
+            (_, i) => !(i === props.index || i === props.index! - 1)
+          )
+        }
+      })
+      props.sendMessage(question)
     }
   }
 
@@ -84,6 +106,7 @@ export default (props: Props) => {
         del={del}
         copy={copy}
         edit={edit}
+        reAnswer={reAnswer}
         role={props.role}
         hidden={props.index === undefined}
       />

@@ -95,7 +95,7 @@ export default function (props: {
       }
       if (props.question) {
         window.history.replaceState(undefined, "ChatGPT", "/")
-        handleButtonClick(props.question)
+        sendMessage(props.question)
       } else {
         if (session && archiveSession) {
           const parsed = JSON.parse(session)
@@ -197,7 +197,7 @@ export default function (props: {
     }
   }
 
-  async function handleButtonClick(value?: string) {
+  async function sendMessage(value?: string) {
     const inputValue = value ?? inputContent()
     if (!inputValue) {
       return
@@ -307,14 +307,6 @@ export default function (props: {
     }
   }
 
-  function reAnswer() {
-    handleButtonClick(
-      messageList()
-        .filter(k => k.role === "user")
-        .at(-1)?.content
-    )
-  }
-
   function selectPrompt(prompt: string) {
     setInputContent(prompt)
     setCompatiblePrompt([])
@@ -331,7 +323,7 @@ export default function (props: {
     inputRef.focus()
   }
 
-  const find = throttle(
+  const findPrompts = throttle(
     (value: string) => {
       if (value === "/" || value === " ")
         return setCompatiblePrompt(props.prompts.slice(0, 20))
@@ -365,7 +357,7 @@ export default function (props: {
     if (!compositionend()) return
     const { value } = inputRef
     setInputContent(value)
-    find(value)
+    findPrompts(value)
   }
 
   return (
@@ -383,8 +375,9 @@ export default function (props: {
               <MessageItem
                 role={message.role}
                 message={message.content}
-                index={index()}
+                index={loading() ? undefined : index()}
                 setInputContent={setInputContent}
+                sendMessage={sendMessage}
                 setMessageList={setMessageList}
               />
             )}
@@ -407,12 +400,15 @@ export default function (props: {
             opacity: containerWidth() === "init" ? 0 : 100
           }}
         >
-          <Show when={!compatiblePrompt().length && height() === "48px"}>
+          <Show
+            when={
+              !loading() && !compatiblePrompt().length && height() === "48px"
+            }
+          >
             <SettingAction
               setting={setting}
               setSetting={setSetting}
               clear={clearSession}
-              reAnswer={reAnswer}
               messaages={messageList()}
             />
           </Show>
@@ -458,7 +454,7 @@ export default function (props: {
                   } else if (e.key === "Enter") {
                     if (!e.shiftKey) {
                       e.preventDefault()
-                      handleButtonClick()
+                      sendMessage()
                     }
                   } else if (e.key === "ArrowUp") {
                     const userMessages = messageList()
@@ -501,7 +497,7 @@ export default function (props: {
               >
                 <button
                   title="发送"
-                  onClick={() => handleButtonClick()}
+                  onClick={() => sendMessage()}
                   class="i-carbon:send-filled text-5 mx-3"
                 />
               </div>
