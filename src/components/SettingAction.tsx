@@ -4,6 +4,7 @@ import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage, Model } from "~/types"
 import type { Setting } from "~/system"
+import { clickOutside } from "~/hooks"
 
 export default function SettingAction(props: {
   setting: Accessor<Setting>
@@ -14,8 +15,12 @@ export default function SettingAction(props: {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
+  0 && clickOutside
   return (
-    <div class="text-sm text-slate-7 dark:text-slate my-2">
+    <div
+      class="text-sm text-slate-7 dark:text-slate my-2"
+      use:clickOutside={() => setShown(false)}
+    >
       <Show when={shown()}>
         <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
           <SettingItem icon="i-ri:lock-password-line" label="网站密码">
