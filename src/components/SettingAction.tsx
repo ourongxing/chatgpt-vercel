@@ -15,6 +15,7 @@ export default function SettingAction(props: {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
+  // tree shaking
   clickOutside
   return (
     <div
