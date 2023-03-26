@@ -15,7 +15,7 @@ export default function SettingAction(props: {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
-  0 && clickOutside
+  clickOutside
   return (
     <div
       class="text-sm text-slate-7 dark:text-slate my-2"
