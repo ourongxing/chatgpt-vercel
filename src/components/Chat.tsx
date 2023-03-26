@@ -135,8 +135,7 @@ export default function (props: {
         messageList()[0].special === "default"
       ) {
         setMessageList(messageList().slice(1))
-      }
-      if (setting().archiveSession) {
+      } else if (setting().archiveSession) {
         localStorage.setItem("session", JSON.stringify(messageList()))
       }
     }
@@ -311,15 +310,9 @@ export default function (props: {
   const findPrompts = throttle(
     (value: string) => {
       if (value === "/" || value === " ")
-        return setCompatiblePrompt(props.prompts.slice(0, 20))
+        return setCompatiblePrompt(props.prompts)
       const query = value.replace(/^[\/ ](.*)/, "$1")
-      if (query !== value)
-        setCompatiblePrompt(
-          fzf
-            .find(query)
-            .map(k => k.item)
-            .slice(0, 20)
-        )
+      if (query !== value) setCompatiblePrompt(fzf.find(query).map(k => k.item))
     },
     250,
     {
