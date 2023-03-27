@@ -45,43 +45,41 @@ export const baseURL = import.meta.env.NOGFW
     )
 
 let maxInputTokens = defaultMaxInputTokens
-if (import.meta.env.MAX_INPUT_TOKENS) {
-  try {
-    const _ = import.meta.env.MAX_INPUT_TOKENS
-    if (_ && Number.isInteger(Number(_))) {
-      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
-        acc[k as Model] = Number(_)
-        return acc
-      }, {} as typeof maxInputTokens)
-    } else {
-      maxInputTokens = {
-        ...maxInputTokens,
-        ...JSON.parse(_)
-      }
+const _ = import.meta.env.MAX_INPUT_TOKENS
+try {
+  if (_ && Number.isInteger(Number(_))) {
+    maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
+      acc[k as Model] = Number(_)
+      return acc
+    }, {} as typeof maxInputTokens)
+  } else {
+    maxInputTokens = {
+      ...maxInputTokens,
+      ...JSON.parse(_)
     }
-  } catch (e) {
-    console.error("Error parsing MAX_INPUT_TOKEN:", e)
   }
+} catch (e) {
+  console.error("Error parsing MAX_INPUT_TOKEN:", e)
 }
 
 const pwd = import.meta.env.PASSWORD
 
 export const post: APIRoute = async context => {
   try {
-    const body = await context.request.json()
+    const body: {
+      messages?: ChatMessage[]
+      key?: string
+      temperature: number
+      password?: string
+      model: Model
+    } = await context.request.json()
     const {
       messages,
       key = localKey,
       temperature = 0.6,
       password,
       model = defaultModel
-    } = body as {
-      messages?: ChatMessage[]
-      key?: string
-      temperature: number
-      password?: string
-      model: Model
-    }
+    } = body
 
     if (pwd && pwd !== password) {
       throw new Error("密码错误，请联系网站管理员。")
@@ -117,7 +115,9 @@ export const post: APIRoute = async context => {
       return acc + tokens
     }, 0)
 
-    if (tokens > maxInputTokens[model]) {
+    if (
+      tokens > (body.key ? defaultMaxInputTokens[model] : maxInputTokens[model])
+    ) {
       if (messages.length > 1)
         throw new Error(
           `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
