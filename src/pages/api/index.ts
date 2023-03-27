@@ -46,20 +46,22 @@ export const baseURL = import.meta.env.NOGFW
 
 let maxInputTokens = defaultMaxInputTokens
 const _ = import.meta.env.MAX_INPUT_TOKENS
-try {
-  if (_ && Number.isInteger(Number(_))) {
-    maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
-      acc[k as Model] = Number(_)
-      return acc
-    }, {} as typeof maxInputTokens)
-  } else {
-    maxInputTokens = {
-      ...maxInputTokens,
-      ...JSON.parse(_)
+if (_) {
+  try {
+    if (Number.isInteger(Number(_))) {
+      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
+        acc[k as Model] = Number(_)
+        return acc
+      }, {} as typeof maxInputTokens)
+    } else {
+      maxInputTokens = {
+        ...maxInputTokens,
+        ...JSON.parse(_)
+      }
     }
+  } catch (e) {
+    console.error("Error parsing MAX_INPUT_TOKEN:", e)
   }
-} catch (e) {
-  console.error("Error parsing MAX_INPUT_TOKEN:", e)
 }
 
 const pwd = import.meta.env.PASSWORD
