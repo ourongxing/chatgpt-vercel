@@ -121,7 +121,6 @@ export default (props: Props) => {
       <div
         class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 flex items-center justify-center cursor-pointer ${
           roleClass[props.message.role]
-          props.role === "user" ? "bg-user" : roleClass[props.role]
         }`}
         onClick={lockMessage}
       >
