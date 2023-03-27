@@ -475,7 +475,7 @@ export default function (props: {
                 />
               </Show>
               <div
-                class="flex text-slate-7 dark:text-slate bg-slate bg-op-15 text-op-80! hover:text-op-100! h-3em items-center rounded-r"
+                class="absolute right-2em bottom-2em text-slate-7 h-12 flex dark:text-slate text-op-80! hover:text-op-100! items-center rounded-r"
                 style={{
                   "border-top-right-radius":
                     compatiblePrompt().length === 0 ? "0.25rem" : 0
