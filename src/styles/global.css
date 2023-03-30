@@ -20,7 +20,8 @@
 }
 
 html {
-  font-family: system-ui, sans-serif;
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica,
+    "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
   background-color: var(--c-bg);
   color: var(--c-fg);
 }
@@ -41,6 +42,10 @@ main {
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+.katex .vlist {
+  vertical-align: unset !important;
 }
 
 // https://www.zhangxinxu.com/wordpress/2015/01/css-page-scrollbar-toggle-center-no-jumping/
