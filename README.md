@@ -7,8 +7,8 @@
 
 在线预览:
 
-1. [chatsverse.xyz](https://www.chatsverse.xyz)，由 [@Airyland](https://m.okjike.com/users/C6C8DE3A-E89D-4978-9E7D-B2E167D835A9) 免费提供。
-2. ~~[aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供~~。（2022.03.22 壮烈牺牲，提醒大家不要过度分享自己的站点出去，指不定 ChatGPT 说出什么违禁词出来）。
+1. ~~[chatsverse.xyz](https://www.chatsverse.xyz)，由 [@Airyland](https://m.okjike.com/users/C6C8DE3A-E89D-4978-9E7D-B2E167D835A9) 免费提供。~~（2023.03.31 被墙）
+2. ~~[aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供~~。（2023.03.22 壮烈牺牲，提醒大家不要过度分享自己的站点出去，指不定 ChatGPT 说出什么违禁词出来）。
 3. [vercel.app](https://vercel-chatgpt-github.vercel.app) 被墙。
 
 API Key 由我自己免费提供，请不要滥用，不提供长期服务，请自行部署。默认 key 不支持 `gpt-4`。演示站点密码为 `ourongxing`，每次刷新会关闭 `连续对话`。
