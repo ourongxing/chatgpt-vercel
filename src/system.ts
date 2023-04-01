@@ -3,7 +3,7 @@ import type { Model } from "./types"
 export const defaultSetting = {
   continuousDialogue: true,
   archiveSession: false,
-  openaiAPIKey: "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",
+  openaiAPIKey: "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",
   openaiAPITemperature: 60,
   password: "123456",
   systemRule: "",
