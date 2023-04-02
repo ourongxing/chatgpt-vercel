@@ -12,8 +12,8 @@
 3. [vercel.app](https://vercel-chatgpt-github.vercel.app) 被墙。
 
 > **Warning**
-
-API Key 已经被封完了，请自行部署。现在 OpenAI 的 5$ 免费账号巨容易封，不建议再部署到 Vercel 或者其他平台上了，要部署请直接国外 VPS。切记一个 IP 一个 Key，不要搞轮询。18$ 或者绑卡账号目前还没有这些问题。
+>
+> API Key 已经被封完了，请自行部署。现在 OpenAI 的 5$ 免费账号巨容易封，不建议再部署到 Vercel 或者其他平台上了，要部署请直接国外 VPS。切记一个 IP 一个 Key，不要搞轮询。18$ 或者绑卡账号目前还没有这些问题。
 
 
 
@@ -47,6 +47,10 @@ API Key 已经被封完了，请自行部署。现在 OpenAI 的 5$ 免费账号
 - url 里使用 `url?q=你好啊` 这种方式可以打开网页直接回答 `你好啊`，当作搜索引擎使用。
 
 ## 部署一个你自己的 ChatGPT 网站（免费）
+
+> **Warning**
+>
+> 现在 OpenAI 的 5$ 免费账号巨容易封，不建议再部署到 Vercel 或者其他平台上了，要部署请直接国外 VPS。切记一个 IP 一个 Key，不要搞轮询。18$ 或者绑卡账号目前还没有这些问题。
 
 [![](assets/powered-by-vercel.svg)](http://vercel.com/?utm_source=busiyi&utm_campaign=oss)
 
