@@ -209,7 +209,7 @@ export default function (props: {
     } catch (error: any) {
       setLoading(false)
       setController()
-      if (!error.message.includes("aborted a request"))
+      if (!error.message.includes("abort"))
         setMessageList([
           ...messageList(),
           {
