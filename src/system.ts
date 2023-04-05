@@ -10,10 +10,13 @@ export const defaultSetting = {
   model: "gpt-3.5-turbo" as Model
 }
 
-export const defaultMessage = `Powered by OpenAI Vercel
-- 如果本项目对你有所帮助，可以给小猫 [买点零食](https://cdn.jsdelivr.net/gh/ourongxing/chatgpt-vercel/assets/reward.gif)，但不接受任何付费功能请求。
-- 本网站仅作为项目演示，不提供服务，请填入自己的 Key，长期使用请 [自行部署](https://github.com/ourongxing/chatgpt-vercel#%E9%83%A8%E7%BD%B2%E4%B8%80%E4%B8%AA%E4%BD%A0%E8%87%AA%E5%B7%B1%E7%9A%84-chatgpt-%E7%BD%91%E7%AB%99%E5%85%8D%E8%B4%B9)，简单成本低。
-- [[Shift]] + [[Enter]] 换行。开头输入 [[/]] 或者 [[空格]] 搜索 Prompt 预设。[[↑]] 可编辑最近一次提问。点击顶部名称滚动到顶部，点击输入框滚动到底部。`
+export const defaultMessage = `Powered by OpenAI
+- 点击左下角齿轮自由更换 GPT 模型。
+- 使用 chatgpt 并非很简单，要学会提问，好的提问才会有好的回答，可在对话框中输入 [[/]] 参考下已有的提问。
+- 仅供学习和交流使用，但不能保证长期服务。
+- 已经在程序环境变量内置自己的 API 了，也可以点左下角齿轮替换为你自己的使用。
+- 有时候会卡死，刷新下或清除对话重新开始即可，若慢可设置换成自己Key。
+- [[Shift]] + [[Enter]] 换行。开头输入 [[/]] 或者 [[空格]] Prompt 预设。[[↑]] 可编辑最近一次提问。点击顶部名称滚动到顶部，点击输入框滚动到底部。``
 
 export type Setting = typeof defaultSetting
 
