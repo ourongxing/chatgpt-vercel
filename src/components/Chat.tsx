@@ -433,11 +433,11 @@ export default function (props: {
                     if (
                       e.key === "ArrowUp" ||
                       e.key === "ArrowDown" ||
-                      e.key === "Enter"
+                      e.keyCode === 13
                     ) {
                       e.preventDefault()
                     }
-                  } else if (e.key === "Enter") {
+                  } else if (e.keyCode === 13) {
                     if (!e.shiftKey) {
                       e.preventDefault()
                       sendMessage()
