@@ -213,6 +213,12 @@ type Billing = {
 }
 
 export async function fetchBilling(key: string): Promise<Billing> {
+  function formatDate(date: any) {
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, "0")
+    const day = date.getDate().toString().padStart(2, "0")
+    return `${year}-${month}-${day}`
+  }
   try {
     const now = new Date()
     const startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
@@ -230,25 +236,17 @@ export async function fetchBilling(key: string): Promise<Billing> {
     }
 
     // 获取API限额
-    let response = await fetch(urlSubscription, { headers })
-    const subscriptionData = await response.json()
-
+    const subscriptionData = await fetch(urlSubscription, { headers }).then(r =>
+      r.json()
+    )
+    if (subscriptionData.error?.message)
+      throw new Error(subscriptionData.error.message)
     const totalGranted = subscriptionData.hard_limit_usd
-
     // 获取已使用量
-    response = await fetch(urlUsage, { headers })
-    const usageData = await response.json()
+    const usageData = await fetch(urlUsage, { headers }).then(r => r.json())
     const totalUsed = usageData.total_usage / 100
-
     // 计算剩余额度
     const totalAvailable = totalGranted - totalUsed
-
-    // 输出总用量、总额及余额信息
-    // console.log(`Total Amount: ${totalGranted.toFixed(2)}`)
-    // console.log(`Used: ${totalUsed.toFixed(2)}`)
-    // console.log(`totalAvailable: ${totalAvailable.toFixed(2)}`)
-
-    // your function logic here
     return {
       totalGranted,
       totalUsed,
@@ -256,14 +254,8 @@ export async function fetchBilling(key: string): Promise<Billing> {
       key,
       rate: totalAvailable / totalGranted
     }
-
-    function formatDate(date: any) {
-      const year = date.getFullYear()
-      const month = (date.getMonth() + 1).toString().padStart(2, "0")
-      const day = date.getDate().toString().padStart(2, "0")
-      return `${year}-${month}-${day}`
-    }
-  } catch {
+  } catch (e) {
+    console.error(e)
     return {
       key,
       rate: 0,
@@ -276,12 +268,14 @@ export async function fetchBilling(key: string): Promise<Billing> {
 
 export async function genBillingsTable(billings: Billing[]) {
   const table = billings
-    .map(
-      (k, i) =>
-        `| ${k.key.slice(0, 8)} | ${k.totalAvailable.toFixed(4)}(${(
-          k.rate * 100
-        ).toFixed(1)}%) | ${k.totalUsed.toFixed(4)} | ${k.totalGranted} |`
-    )
+    .sort((m, n) => (m.totalGranted === 0 ? -1 : n.rate - m.rate))
+    .map((k, i) => {
+      if (k.totalGranted === 0)
+        return `| ${k.key.slice(0, 8)} | 不可用 | —— | —— |`
+      return `| ${k.key.slice(0, 8)} | ${k.totalAvailable.toFixed(4)}(${(
+        k.rate * 100
+      ).toFixed(1)}%) | ${k.totalUsed.toFixed(4)} | ${k.totalGranted} |`
+    })
     .join("\n")
 
   return `| Key  | 剩余 | 已用 | 总额度 |
