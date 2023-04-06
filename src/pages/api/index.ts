@@ -1,53 +1,94 @@
 import type { APIRoute } from "astro"
-import {
-  createParser,
-  ParsedEvent,
-  ReconnectInterval
-} from "eventsource-parser"
-import type { ChatMessage } from "~/types"
-import GPT3Tokenizer from "gpt3-tokenizer"
-import { splitKeys, randomKey } from "~/utils"
+import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
+import { createParser } from "eventsource-parser"
+import type { ChatMessage, Model } from "~/types"
+import { countTokens } from "~/utils/tokens"
+import { splitKeys, randomKey, fetchWithTimeout } from "~/utils"
+import { defaultMaxInputTokens, defaultModel } from "~/system"
 
-const tokenizer = new GPT3Tokenizer({ type: "gpt3" })
+export const config = {
+  runtime: "edge",
+  /**
+   * https://vercel.com/docs/concepts/edge-network/regions#region-list
+   * disable hongkong
+   * only for vercel
+   */
+  regions: [
+    "arn1",
+    "bom1",
+    "bru1",
+    "cdg1",
+    "cle1",
+    "cpt1a",
+    "dub1",
+    "fra1",
+    "gru1",
+    "hnd1",
+    "iad1",
+    "icn1",
+    "kix1",
+    "lhr1",
+    "pdx1",
+    "sfo1",
+    "sin1",
+    "syd1"
+  ]
+}
 
-export const localKey =
-  import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY || ""
+export const localKey = import.meta.env.OPENAI_API_KEY || ""
 
-export const baseURL = process.env.VERCEL
+export const baseURL = import.meta.env.NOGFW
   ? "api.openai.com"
-  : (
-      import.meta.env.OPENAI_API_BASE_URL ||
-      process.env.OPENAI_API_BASE_URL ||
-      "api.openai.com"
-    ).replace(/^https?:\/\//, "")
+  : (import.meta.env.OPENAI_API_BASE_URL || "api.openai.com").replace(
+      /^https?:\/\//,
+      ""
+    )
 
-const maxTokens = Number(
-  import.meta.env.MAX_INPUT_TOKENS || process.env.MAX_INPUT_TOKENS
-)
+let maxInputTokens = defaultMaxInputTokens
+const _ = import.meta.env.MAX_INPUT_TOKENS
+if (_) {
+  try {
+    if (Number.isInteger(Number(_))) {
+      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
+        acc[k as Model] = Number(_)
+        return acc
+      }, {} as typeof maxInputTokens)
+    } else {
+      maxInputTokens = {
+        ...maxInputTokens,
+        ...JSON.parse(_)
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing MAX_INPUT_TOKEN:", e)
+  }
+}
 
-const pwd = import.meta.env.PASSWORD || process.env.PASSWORD
+const pwd = import.meta.env.PASSWORD
 
 export const post: APIRoute = async context => {
   try {
-    const body = await context.request.json()
+    const body: {
+      messages?: ChatMessage[]
+      key?: string
+      temperature: number
+      password?: string
+      model: Model
+    } = await context.request.json()
     const {
       messages,
       key = localKey,
       temperature = 0.6,
-      password
-    } = body as {
-      messages?: ChatMessage[]
-      key?: string
-      temperature?: number
-      password?: string
-    }
+      password,
+      model = defaultModel
+    } = body
 
     if (pwd && pwd !== password) {
-      return new Response("密码错误，请联系网站管理员。")
+      throw new Error("密码错误，请联系网站管理员。")
     }
 
     if (!messages?.length) {
-      return new Response("没有输入任何文字。")
+      throw new Error("没有输入任何文字。")
     } else {
       const content = messages.at(-1)!.content.trim()
       if (content.startsWith("查询填写的 Key 的余额")) {
@@ -57,7 +98,7 @@ export const post: APIRoute = async context => {
           )
           return new Response(await genBillingsTable(billings))
         } else {
-          return new Response("没有填写 OpenAI API key，不会查询内置的 Key。")
+          throw new Error("没有填写 OpenAI API key，不会查询内置的 Key。")
         }
       } else if (content.startsWith("sk-")) {
         const billings = await Promise.all(
@@ -69,39 +110,60 @@ export const post: APIRoute = async context => {
 
     const apiKey = randomKey(splitKeys(key))
 
-    if (!apiKey)
-      return new Response("没有填写 OpenAI API key，或者 key 填写错误。")
+    if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
     const tokens = messages.reduce((acc, cur) => {
-      const tokens = tokenizer.encode(cur.content).bpe.length
+      const tokens = countTokens(cur.content)
       return acc + tokens
     }, 0)
 
-    if (tokens > (Number.isInteger(maxTokens) ? maxTokens : 3072)) {
+    if (
+      tokens > (body.key ? defaultMaxInputTokens[model] : maxInputTokens[model])
+    ) {
       if (messages.length > 1)
-        return new Response(
+        throw new Error(
           `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
         )
-      else return new Response("太长了，缩短一点吧。")
+      else throw new Error("太长了，缩短一点吧。")
     }
 
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
-    const completion = await fetch(`https://${baseURL}/v1/chat/completions`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      method: "POST",
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages,
-        temperature,
-        // max_tokens: 4096 - tokens,
-        stream: true
-      })
+    const rawRes = await fetchWithTimeout(
+      `https://${baseURL}/v1/chat/completions`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        timeout: 10000,
+        method: "POST",
+        body: JSON.stringify({
+          model: model || "gpt-3.5-turbo",
+          messages: messages.map(k => ({ role: k.role, content: k.content })),
+          temperature,
+          // max_tokens: 4096 - tokens,
+          stream: true
+        })
+      }
+    ).catch(err => {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: err.message
+          }
+        }),
+        { status: 500 }
+      )
     })
+
+    if (!rawRes.ok) {
+      return new Response(rawRes.body, {
+        status: rawRes.status,
+        statusText: rawRes.statusText
+      })
+    }
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -123,15 +185,22 @@ export const post: APIRoute = async context => {
           }
         }
         const parser = createParser(streamParser)
-        for await (const chunk of completion.body as any) {
+        for await (const chunk of rawRes.body as any) {
           parser.feed(decoder.decode(chunk))
         }
       }
     })
 
     return new Response(stream)
-  } catch (e) {
-    return new Response(String(e).replace(/sk-\w+/g, "sk-xxxxxxxx"))
+  } catch (err: any) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          message: err.message
+        }
+      }),
+      { status: 400 }
+    )
   }
 }
 

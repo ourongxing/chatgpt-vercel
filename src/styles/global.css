@@ -20,7 +20,8 @@
 }
 
 html {
-  font-family: system-ui, sans-serif;
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica,
+    "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
   background-color: var(--c-bg);
   color: var(--c-fg);
 }
@@ -37,17 +38,14 @@ html.dark {
 main {
   max-width: 72ch;
   margin: 0 auto;
-  padding: 8em 2em;
-}
-
-@media (max-width: 768px) {
-  main {
-    padding-top: 2em;
-  }
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+.katex .vlist {
+  vertical-align: unset !important;
 }
 
 // https://www.zhangxinxu.com/wordpress/2015/01/css-page-scrollbar-toggle-center-no-jumping/

@@ -1,4 +1,4 @@
-import { onCleanup, onMount } from "solid-js"
+import { type Accessor, onCleanup, onMount } from "solid-js"
 import { copyToClipboard } from "../utils"
 
 export function useCopyCode() {
@@ -12,7 +12,7 @@ export function useCopyCode() {
         return
       }
 
-      let text = sibling.innerText
+      const text = sibling.innerText
 
       copyToClipboard(text.trim()).then(() => {
         el.classList.add("copied")
@@ -32,4 +32,11 @@ export function useCopyCode() {
   onCleanup(() => {
     window.removeEventListener("click", listerner)
   })
+}
+
+export function clickOutside(el: Element, accessor: Accessor<any>) {
+  const onClick = (e: any) => !el.contains(e.target) && accessor()?.()
+  document.body.addEventListener("click", onClick)
+
+  onCleanup(() => document.body.removeEventListener("click", onClick))
 }

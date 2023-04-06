@@ -1,6 +1,6 @@
 import type MarkdownIt from "markdown-it"
 
-export function preWrapperPlugin(md: MarkdownIt) {
+export default function preWrapperPlugin(md: MarkdownIt) {
   const fence = md.renderer.rules.fence!
   md.renderer.rules.fence = (...args) => {
     const [tokens, idx] = args
