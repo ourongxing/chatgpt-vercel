@@ -244,9 +244,9 @@ export async function fetchBilling(key: string): Promise<Billing> {
     const totalAvailable = totalGranted - totalUsed
 
     // 输出总用量、总额及余额信息
-    console.log(`Total Amount: ${totalGranted.toFixed(2)}`)
-    console.log(`Used: ${totalUsed.toFixed(2)}`)
-    console.log(`totalAvailable: ${totalAvailable.toFixed(2)}`)
+    // console.log(`Total Amount: ${totalGranted.toFixed(2)}`)
+    // console.log(`Used: ${totalUsed.toFixed(2)}`)
+    // console.log(`totalAvailable: ${totalAvailable.toFixed(2)}`)
 
     // your function logic here
     return {
