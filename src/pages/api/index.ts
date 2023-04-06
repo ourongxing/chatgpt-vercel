@@ -84,7 +84,7 @@ export const post: APIRoute = async context => {
     } = body
 
     if (pwd && pwd !== password) {
-      throw new Error("密码错误，请联系网站管理员。")
+      throw new Error("密码错误，请加群获取。")
     }
 
     if (!messages?.length) {
@@ -207,34 +207,69 @@ export const post: APIRoute = async context => {
 type Billing = {
   key: string
   rate: number
-  total_granted: number
-  total_used: number
-  total_available: number
+  totalGranted: number
+  totalUsed: number
+  totalAvailable: number
 }
 
 export async function fetchBilling(key: string): Promise<Billing> {
   try {
-    const res = await fetch(
-      `https://${baseURL}/dashboard/billing/credit_grants`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`
-        }
-      }
-    ).then(res => res.json())
+    const now = new Date()
+    const startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+    const endDate = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+
+    // 设置API请求URL和请求头
+    const urlSubscription =
+      "https://api.openai.com/v1/dashboard/billing/subscription" // 查是否订阅
+    const urlUsage = `https://api.openai.com/v1/dashboard/billing/usage?start_date=${formatDate(
+      startDate
+    )}&end_date=${formatDate(endDate)}` // 查使用量
+    const headers = {
+      Authorization: "Bearer " + key,
+      "Content-Type": "application/json"
+    }
+
+    // 获取API限额
+    let response = await fetch(urlSubscription, { headers })
+    const subscriptionData = await response.json()
+
+    const totalGranted = subscriptionData.hard_limit_usd
+
+    // 获取已使用量
+    response = await fetch(urlUsage, { headers })
+    const usageData = await response.json()
+    const totalUsed = usageData.total_usage / 100
+
+    // 计算剩余额度
+    const totalAvailable = totalGranted - totalUsed
+
+    // 输出总用量、总额及余额信息
+    console.log(`Total Amount: ${totalGranted.toFixed(2)}`)
+    console.log(`Used: ${totalUsed.toFixed(2)}`)
+    console.log(`totalAvailable: ${totalAvailable.toFixed(2)}`)
+
+    // your function logic here
     return {
-      ...res,
+      totalGranted,
+      totalUsed,
+      totalAvailable,
       key,
-      rate: res.total_available / res.total_granted
+      rate: totalAvailable / totalGranted
+    }
+
+    function formatDate(date: any) {
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1).toString().padStart(2, "0")
+      const day = date.getDate().toString().padStart(2, "0")
+      return `${year}-${month}-${day}`
     }
   } catch {
     return {
       key,
       rate: 0,
-      total_granted: 0,
-      total_used: 0,
-      total_available: 0
+      totalGranted: 0,
+      totalUsed: 0,
+      totalAvailable: 0
     }
   }
 }
@@ -243,9 +278,9 @@ export async function genBillingsTable(billings: Billing[]) {
   const table = billings
     .map(
       (k, i) =>
-        `| ${k.key.slice(0, 8)} | ${k.total_available.toFixed(4)}(${(
+        `| ${k.key.slice(0, 8)} | ${k.totalAvailable.toFixed(4)}(${(
           k.rate * 100
-        ).toFixed(1)}%) | ${k.total_used.toFixed(4)} | ${k.total_granted} |`
+        ).toFixed(1)}%) | ${k.totalUsed.toFixed(4)} | ${k.totalGranted} |`
     )
     .join("\n")
 
