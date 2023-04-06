@@ -84,7 +84,7 @@ export const post: APIRoute = async context => {
     } = body
 
     if (pwd && pwd !== password) {
-      throw new Error("密码错误，请加群获取。")
+      throw new Error("密码错误，请联系网站管理员。")
     }
 
     if (!messages?.length) {
