@@ -44,6 +44,8 @@ export const baseURL = import.meta.env.NOGFW
       ""
     )
 
+const timeout = Number(import.meta.env.TIMEOUT)
+
 let maxInputTokens = defaultMaxInputTokens
 const _ = import.meta.env.MAX_INPUT_TOKENS
 if (_) {
@@ -137,7 +139,7 @@ export const post: APIRoute = async context => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`
         },
-        timeout: 10000,
+        timeout: Number.isNaN(timeout) ? 30000 : timeout,
         method: "POST",
         body: JSON.stringify({
           model: model || "gpt-3.5-turbo",
