@@ -44,6 +44,8 @@ export const baseURL = import.meta.env.NOGFW
       ""
     )
 
+const timeout = Number(import.meta.env.TIMEOUT)
+
 let maxInputTokens = defaultMaxInputTokens
 const _ = import.meta.env.MAX_INPUT_TOKENS
 if (_) {
@@ -137,7 +139,7 @@ export const post: APIRoute = async context => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`
         },
-        timeout: 10000,
+        timeout: !timeout || Number.isNaN(timeout) ? 30000 : timeout,
         method: "POST",
         body: JSON.stringify({
           model: model || "gpt-3.5-turbo",
@@ -207,46 +209,75 @@ export const post: APIRoute = async context => {
 type Billing = {
   key: string
   rate: number
-  total_granted: number
-  total_used: number
-  total_available: number
+  totalGranted: number
+  totalUsed: number
+  totalAvailable: number
 }
 
 export async function fetchBilling(key: string): Promise<Billing> {
+  function formatDate(date: any) {
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, "0")
+    const day = date.getDate().toString().padStart(2, "0")
+    return `${year}-${month}-${day}`
+  }
   try {
-    const res = await fetch(
-      `https://${baseURL}/dashboard/billing/credit_grants`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`
-        }
-      }
-    ).then(res => res.json())
-    return {
-      ...res,
-      key,
-      rate: res.total_available / res.total_granted
+    const now = new Date()
+    const startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+    const endDate = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+
+    // 设置API请求URL和请求头
+    const urlSubscription =
+      "https://api.openai.com/v1/dashboard/billing/subscription" // 查是否订阅
+    const urlUsage = `https://api.openai.com/v1/dashboard/billing/usage?start_date=${formatDate(
+      startDate
+    )}&end_date=${formatDate(endDate)}` // 查使用量
+    const headers = {
+      Authorization: "Bearer " + key,
+      "Content-Type": "application/json"
     }
-  } catch {
+
+    // 获取API限额
+    const subscriptionData = await fetch(urlSubscription, { headers }).then(r =>
+      r.json()
+    )
+    if (subscriptionData.error?.message)
+      throw new Error(subscriptionData.error.message)
+    const totalGranted = subscriptionData.hard_limit_usd
+    // 获取已使用量
+    const usageData = await fetch(urlUsage, { headers }).then(r => r.json())
+    const totalUsed = usageData.total_usage / 100
+    // 计算剩余额度
+    const totalAvailable = totalGranted - totalUsed
+    return {
+      totalGranted,
+      totalUsed,
+      totalAvailable,
+      key,
+      rate: totalAvailable / totalGranted
+    }
+  } catch (e) {
+    console.error(e)
     return {
       key,
       rate: 0,
-      total_granted: 0,
-      total_used: 0,
-      total_available: 0
+      totalGranted: 0,
+      totalUsed: 0,
+      totalAvailable: 0
     }
   }
 }
 
 export async function genBillingsTable(billings: Billing[]) {
   const table = billings
-    .map(
-      (k, i) =>
-        `| ${k.key.slice(0, 8)} | ${k.total_available.toFixed(4)}(${(
-          k.rate * 100
-        ).toFixed(1)}%) | ${k.total_used.toFixed(4)} | ${k.total_granted} |`
-    )
+    .sort((m, n) => (m.totalGranted === 0 ? -1 : n.rate - m.rate))
+    .map((k, i) => {
+      if (k.totalGranted === 0)
+        return `| ${k.key.slice(0, 8)} | 不可用 | —— | —— |`
+      return `| ${k.key.slice(0, 8)} | ${k.totalAvailable.toFixed(4)}(${(
+        k.rate * 100
+      ).toFixed(1)}%) | ${k.totalUsed.toFixed(4)} | ${k.totalGranted} |`
+    })
     .join("\n")
 
   return `| Key  | 剩余 | 已用 | 总额度 |

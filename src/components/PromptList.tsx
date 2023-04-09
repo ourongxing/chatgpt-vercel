@@ -44,7 +44,7 @@ export default function PromptList(props: {
           setHoverIndex(hoverIndex() + 1)
         } else if (e.key === "ArrowUp") {
           setHoverIndex(hoverIndex() - 1)
-        } else if (e.key === "Enter") {
+        } else if (e.keyCode === 13) {
           props.select(props.prompts[hoverIndex()].prompt)
         }
       },
