@@ -12,6 +12,8 @@ import {
   Scripts,
   Title
 } from "solid-start"
+// @ts-ignore
+import { pwaInfo } from "virtual:pwa-info"
 import "@unocss/reset/tailwind.css"
 import "~/styles/global.css"
 import "uno.css"
@@ -24,6 +26,13 @@ export default function Root() {
         <Meta charset="utf-8" />
         <Link rel="icon" type="image/svg+xml" href="favicon.svg" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Link
+          rel="apple-touch-icon"
+          href="/apple-touch-icon.png"
+          sizes="192x192"
+        />
+        <Meta name="theme-color" content="#f6f8fa" />
+        {pwaInfo && <Link href={pwaInfo.webManifest.href} />}
       </Head>
       <Body>
         <Suspense>

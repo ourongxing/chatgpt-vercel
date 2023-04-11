@@ -9,7 +9,7 @@
     "jsx": "preserve",
     "strict": true,
     "allowJs": true,
-    "types": ["solid-start/env", "vite/client"],
+    "types": ["solid-start/env", "vite/client", "vite-plugin-pwa/client"],
     "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*"]
