@@ -1,10 +1,9 @@
-import type { APIRoute } from "astro"
 import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { createParser } from "eventsource-parser"
 import type { ChatMessage, Model } from "~/types"
-import { countTokens } from "~/utils/tokens"
-import { splitKeys, randomKey } from "~/utils"
-import { defaultMaxInputTokens, defaultModel } from "~/system"
+import { countTokens, splitKeys, randomKey } from "~/utils"
+import { defaultEnv } from "~/env"
+import type { APIEvent } from "solid-start/api"
 
 export const config = {
   runtime: "edge",
@@ -38,39 +37,39 @@ export const config = {
 export const localKey = import.meta.env.OPENAI_API_KEY || ""
 
 export const baseURL = import.meta.env.NOGFW
-  ? "api.openai.com"
-  : (import.meta.env.OPENAI_API_BASE_URL || "api.openai.com").replace(
-      /^https?:\/\//,
-      ""
-    )
+  ? defaultEnv.OPENAI_API_BASE_URL
+  : (
+      import.meta.env.OPENAI_API_BASE_URL || defaultEnv.OPENAI_API_BASE_URL
+    ).replace(/^https?:\/\//, "")
 
-const timeout = isNaN(+import.meta.env.TIMEOUT)
-  ? 30 * 1000
-  : +import.meta.env.TIMEOUT
+// + 作用是将字符串转换为数字
+const timeout = isNaN(+import.meta.env.TIMEOUT!)
+  ? defaultEnv.TIMEOUT
+  : +import.meta.env.TIMEOUT!
 
-let maxInputTokens = defaultMaxInputTokens
+let maxInputTokens = defaultEnv.MAX_INPUT_TOKENS
 const _ = import.meta.env.MAX_INPUT_TOKENS
 if (_) {
   try {
-    if (Number.isInteger(Number(_))) {
-      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
-        acc[k as Model] = Number(_)
-        return acc
-      }, {} as typeof maxInputTokens)
-    } else {
+    if (Number.isNaN(+_)) {
       maxInputTokens = {
         ...maxInputTokens,
         ...JSON.parse(_)
       }
+    } else {
+      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
+        acc[k as Model] = +_
+        return acc
+      }, {} as typeof maxInputTokens)
     }
   } catch (e) {
     console.error("Error parsing MAX_INPUT_TOKEN:", e)
   }
 }
 
-const pwd = import.meta.env.PASSWORD
+const passwordSet = import.meta.env.PASSWORD || defaultEnv.PASSWORD
 
-export const post: APIRoute = async context => {
+export async function POST({ request }: APIEvent) {
   try {
     const body: {
       messages?: ChatMessage[]
@@ -78,16 +77,16 @@ export const post: APIRoute = async context => {
       temperature: number
       password?: string
       model: Model
-    } = await context.request.json()
+    } = await request.json()
     const {
       messages,
       key = localKey,
       temperature = 0.6,
       password,
-      model = defaultModel
+      model
     } = body
 
-    if (pwd && pwd !== password) {
+    if (password && password !== passwordSet) {
       throw new Error("密码错误，请联系网站管理员。")
     }
 
@@ -122,7 +121,8 @@ export const post: APIRoute = async context => {
     }, 0)
 
     if (
-      tokens > (body.key ? defaultMaxInputTokens[model] : maxInputTokens[model])
+      tokens >
+      (body.key ? defaultEnv.MAX_INPUT_TOKENS[model] : maxInputTokens[model])
     ) {
       if (messages.length > 1)
         throw new Error(
@@ -142,13 +142,13 @@ export const post: APIRoute = async context => {
       signal: AbortSignal.timeout(timeout),
       method: "POST",
       body: JSON.stringify({
-        model: model || "gpt-3.5-turbo",
+        model: model,
         messages: messages.map(k => ({ role: k.role, content: k.content })),
         temperature,
         // max_tokens: 4096 - tokens,
         stream: true
       })
-    }).catch(err => {
+    }).catch((err: { message: any }) => {
       return new Response(
         JSON.stringify({
           error: {

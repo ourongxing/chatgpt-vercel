@@ -1,14 +1,11 @@
-import type { Accessor, Setter } from "solid-js"
 import { createSignal, type JSXElement, Show } from "solid-js"
 import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage, Model } from "~/types"
-import type { Setting } from "~/system"
 import { clickOutside } from "~/hooks"
+import { store, setStore } from "~/store"
 
 export default function SettingAction(props: {
-  setting: Accessor<Setting>
-  setSetting: Setter<Setting>
   clear: any
   messaages: ChatMessage[]
 }) {
@@ -20,6 +17,7 @@ export default function SettingAction(props: {
   return (
     <div
       class="text-sm text-slate-7 dark:text-slate my-2"
+      // @ts-ignore
       use:clickOutside={() => setShown(false)}
     >
       <Show when={shown()}>
@@ -27,26 +25,26 @@ export default function SettingAction(props: {
           <SettingItem icon="i-ri:lock-password-line" label="网站密码">
             <input
               type="password"
-              value={props.setting().password}
+              value={store.setting.password}
               class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
               onInput={e => {
-                props.setSetting({
-                  ...props.setting(),
+                setStore("setting", t => ({
+                  ...t,
                   password: (e.target as HTMLInputElement).value
-                })
+                }))
               }}
             />
           </SettingItem>
           <SettingItem icon="i-carbon:api" label="OpenAI Key">
             <input
               type="password"
-              value={props.setting().openaiAPIKey}
+              value={store.setting.openaiAPIKey}
               class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
               onInput={e => {
-                props.setSetting({
-                  ...props.setting(),
+                setStore("setting", t => ({
+                  ...t,
                   openaiAPIKey: (e.target as HTMLInputElement).value
-                })
+                }))
               }}
             />
           </SettingItem>
@@ -57,12 +55,12 @@ export default function SettingAction(props: {
             <select
               name="model"
               class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center  focus:bg-op-20 focus:ring-0 focus:outline-none"
-              value={props.setting().model}
+              value={store.setting.model}
               onChange={e => {
-                props.setSetting({
-                  ...props.setting(),
+                setStore("setting", t => ({
+                  ...t,
                   model: (e.target as HTMLSelectElement).value as Model
-                })
+                }))
               }}
             >
               <option value="gpt-3.5-turbo">gpt-3.5-turbo(4k)</option>
@@ -73,13 +71,13 @@ export default function SettingAction(props: {
           <SettingItem icon="i-carbon:user-online" label="系统角色指令">
             <input
               type="text"
-              value={props.setting().systemRule}
+              value={store.setting.systemRule}
               class="text-ellipsis max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
               onInput={e => {
-                props.setSetting({
-                  ...props.setting(),
+                setStore("setting", t => ({
+                  ...t,
                   systemRule: (e.target as HTMLInputElement).value
-                })
+                }))
               }}
             />
           </SettingItem>
@@ -88,15 +86,15 @@ export default function SettingAction(props: {
               type="range"
               min={0}
               max={100}
-              value={String(props.setting().openaiAPITemperature)}
+              value={String(store.setting.openaiAPITemperature)}
               class="max-w-150px w-full h-2 bg-slate bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
               onInput={e => {
-                props.setSetting({
-                  ...props.setting(),
+                setStore("setting", t => ({
+                  ...t,
                   openaiAPITemperature: Number(
                     (e.target as HTMLInputElement).value
                   )
-                })
+                }))
               }}
             />
           </SettingItem>
@@ -107,13 +105,13 @@ export default function SettingAction(props: {
             <label class="relative inline-flex items-center cursor-pointer ml-1">
               <input
                 type="checkbox"
-                checked={props.setting().archiveSession}
+                checked={store.setting.archiveSession}
                 class="sr-only peer"
                 onChange={e => {
-                  props.setSetting({
-                    ...props.setting(),
+                  setStore("setting", t => ({
+                    ...t,
                     archiveSession: (e.target as HTMLInputElement).checked
-                  })
+                  }))
                 }}
               />
               <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
@@ -126,13 +124,13 @@ export default function SettingAction(props: {
             <label class="relative inline-flex items-center cursor-pointer ml-1">
               <input
                 type="checkbox"
-                checked={props.setting().continuousDialogue}
+                checked={store.setting.continuousDialogue}
                 class="sr-only peer"
                 onChange={e => {
-                  props.setSetting({
-                    ...props.setting(),
+                  setStore("setting", t => ({
+                    ...t,
                     continuousDialogue: (e.target as HTMLInputElement).checked
-                  })
+                  }))
                 }}
               />
               <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
@@ -196,7 +194,7 @@ function SettingItem(props: {
     <div class="flex items-center p-1 justify-between hover:bg-slate hover:bg-op-10 rounded">
       <div class="flex items-center">
         <button class={props.icon} />
-        <span ml-1>{props.label}</span>
+        <span class="ml-1">{props.label}</span>
       </div>
       {props.children}
     </div>

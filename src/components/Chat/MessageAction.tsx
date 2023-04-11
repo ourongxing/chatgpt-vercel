@@ -1,4 +1,4 @@
-import { createSignal, Show, Switch } from "solid-js"
+import { createSignal, Show } from "solid-js"
 import type { Role } from "~/types"
 export default function MessageAction(props: {
   role: Role

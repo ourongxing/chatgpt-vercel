@@ -1,21 +1,20 @@
-import { type Setter, Show } from "solid-js"
-import type { ChatMessage, Role } from "../types"
-import MessageAction from "./MessageAction"
-import "../styles/message.css"
-import "../styles/clipboard.css"
+import { Show } from "solid-js"
 import { useCopyCode } from "~/hooks"
-import { copyToClipboard } from "~/utils"
-import vercel from "/assets/vercel.svg?raw"
-import openai from "/assets/openai.svg?raw"
 import md from "~/markdown-it"
+import { setStore, store } from "~/store"
+import "~/styles/clipboard.css"
+import "~/styles/message.css"
+import type { ChatMessage } from "~/types"
+import { copyToClipboard } from "~/utils"
+import MessageAction from "./MessageAction"
+import openai from "/assets/openai.svg?raw"
+import vercel from "/assets/vercel.svg?raw"
 
 interface Props {
   message: ChatMessage
   hiddenAction: boolean
   index?: number
   sendMessage?: (message?: string) => void
-  setInputContent?: Setter<string>
-  setMessageList?: Setter<ChatMessage[]>
 }
 
 export default (props: Props) => {
@@ -32,31 +31,33 @@ export default (props: Props) => {
   }
 
   function edit() {
-    props.setInputContent && props.setInputContent(props.message.content)
+    setStore("inputContent", props.message.content)
   }
 
   function del() {
-    if (props.setMessageList) {
-      props.setMessageList(messages => {
-        if (messages[props.index!]?.role === "user") {
-          return messages.filter(
-            (_, i) =>
-              !(
-                i === props.index ||
-                (i === props.index! + 1 && _.role !== "user")
-              )
-          )
-        }
-        return messages.filter((_, i) => i !== props.index)
-      })
-    }
+    setStore("messageList", messages => {
+      if (messages[props.index!]?.role === "user") {
+        return messages.filter(
+          (_, i) =>
+            !(
+              i === props.index ||
+              (i === props.index! + 1 && _.role !== "user")
+            )
+        )
+      }
+      return messages.filter((_, i) => i !== props.index)
+    })
   }
 
   function reAnswer() {
-    if (props.setMessageList && props.sendMessage) {
+    if (
+      props.sendMessage &&
+      props.index !== undefined &&
+      props.index < store.messageList.length
+    ) {
       let question = ""
-      props.setMessageList(messages => {
-        if (messages[props.index!]?.role === "user") {
+      setStore("messageList", messages => {
+        if (messages[props.index!].role === "user") {
           question = messages[props.index!].content
           return messages.filter(
             (_, i) =>
@@ -66,7 +67,6 @@ export default (props: Props) => {
               )
           )
         } else {
-          // 回答的前一条消息一定是提问
           question = messages[props.index! - 1].content
           return messages.filter(
             (_, i) => !(i === props.index || i === props.index! - 1)
@@ -80,34 +80,25 @@ export default (props: Props) => {
   function lockMessage() {
     if (
       !props.hiddenAction &&
-      props.setMessageList &&
-      props.index !== undefined
+      props.index !== undefined &&
+      props.index < store.messageList.length
     ) {
-      props.setMessageList(messages => {
-        if (messages[props.index!]?.role === "user") {
-          return messages.map((k, i) => {
-            if (
-              i === props.index ||
-              (i === props.index! + 1 && k.role !== "user")
-            )
-              return {
-                ...k,
-                special: k.special === "locked" ? undefined : "locked"
-              }
-            return k
-          })
-        } else {
-          return messages.map((k, i) => {
-            if (i === props.index || i === props.index! - 1) {
-              return {
-                ...k,
-                special: k.special === "locked" ? undefined : "locked"
-              }
-            }
-            return k
-          })
-        }
-      })
+      if (store.messageList[props.index].role === "user") {
+        setStore(
+          "messageList",
+          (k, i) =>
+            i === props.index || (i === props.index! + 1 && k.role !== "user"),
+          "special",
+          special => (special === "locked" ? undefined : "locked")
+        )
+      } else {
+        setStore(
+          "messageList",
+          [props.index - 1, props.index],
+          "special",
+          special => (special === "locked" ? undefined : "locked")
+        )
+      }
     }
   }
 

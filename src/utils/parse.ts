@@ -1,8 +1,7 @@
-import * as md from "../../prompts.md"
+import md from "/prompts.md?raw"
 
 export function parsePrompts() {
   return md
-    .rawContent()
     .split(/^## (.+)$/m)
     .filter(k => k.trim())
     .reduce(

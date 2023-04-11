@@ -1,3 +1,7 @@
+import throttle from "just-throttle"
+export * from "./parse"
+export * from "./tokens"
+
 export async function copyToClipboard(text: string) {
   try {
     return await navigator.clipboard.writeText(text)
@@ -78,3 +82,14 @@ export function splitKeys(keys: string) {
 export function randomKey(keys: string[]) {
   return keys.length ? keys[Math.floor(Math.random() * keys.length)] : ""
 }
+
+export const scrollToBottom = throttle(
+  () => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    })
+  },
+  250,
+  { leading: false, trailing: true }
+)

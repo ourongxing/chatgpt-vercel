@@ -1,38 +1,45 @@
-import { createEffect, createSignal, For, onMount, Show } from "solid-js"
+import { makeEventListener } from "@solid-primitives/event-listener"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
-import MessageItem from "./MessageItem"
-import type { ChatMessage, PromptItem } from "~/types"
-import SettingAction from "./SettingAction"
-import PromptList from "./PromptList"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
-import { isMobile } from "~/utils"
-import type { Setting } from "~/system"
-import { makeEventListener } from "@solid-primitives/event-listener"
+import { createEffect, createSignal, For, onMount, Show } from "solid-js"
+import { useSearchParams } from "solid-start"
+import { defaultEnv } from "~/env"
+import { setStore, store } from "~/store"
+import type { ChatMessage, PromptItem } from "~/types"
+import { parsePrompts, isMobile, scrollToBottom } from "~/utils"
+import MessageItem from "./MessageItem"
+import PromptList from "./PromptList"
+import SettingAction from "./SettingAction"
 
-export default function (props: {
-  prompts: PromptItem[]
-  env: {
-    setting: Setting
-    message: string
-    resetContinuousDialogue: boolean
+const prompts = parsePrompts()
+const fzf = new Fzf(prompts, {
+  selector: k => `${k.desc}||${k.prompt}`
+})
+const _message =
+  import.meta.env.CLIENT_DEFAULT_MESSAGE || defaultEnv.CLIENT_DEFAULT_MESSAGE
+let _setting = defaultEnv.CLIENT_DEFAULT_SETTING
+if (import.meta.env.CLIENT_DEFAULT_SETTING) {
+  try {
+    _setting = {
+      ..._setting,
+      ...JSON.parse(import.meta.env.CLIENT_DEFAULT_SETTING)
+    }
+  } catch (e) {
+    console.error("Error parsing DEFAULT_SETTING:", e)
   }
-  question?: string
-}) {
+}
+
+const _ = import.meta.env.CLIENT_AUTO_RESET_CONTINUOUS_DIALOGUE
+const __ = import.meta.env.CLIENT_AUTO_RESET_CONTINUOUS_DIALOGUE
+const _reset = _ && _ !== String(__) ? !__ : __
+
+export default function (props: { sessionID?: string }) {
   let inputRef: HTMLTextAreaElement
   let containerRef: HTMLDivElement
-
-  const {
-    message: _message,
-    setting: _setting,
-    resetContinuousDialogue: _resetContinuousDialogue
-  } = props.env
-  const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
-  const [inputContent, setInputContent] = createSignal("")
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal("")
   const [loading, setLoading] = createSignal(false)
   const [controller, setController] = createSignal<AbortController>()
-  const [setting, setSetting] = createSignal(_setting)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [containerWidth, setContainerWidth] = createSignal("init")
   const defaultMessage: ChatMessage = {
@@ -40,22 +47,9 @@ export default function (props: {
     content: _message,
     special: "default"
   }
-  const fzf = new Fzf(props.prompts, {
-    selector: k => `${k.desc}||${k.prompt}`
-  })
   const [height, setHeight] = createSignal("48px")
   const [compositionend, setCompositionend] = createSignal(true)
-
-  const scrollToBottom = throttle(
-    () => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-      })
-    },
-    250,
-    { leading: false, trailing: true }
-  )
+  const [searchParams] = useSearchParams()
 
   onMount(() => {
     makeEventListener(
@@ -75,8 +69,6 @@ export default function (props: {
       },
       { passive: true }
     )
-    document.querySelector("main")?.classList.remove("before")
-    document.querySelector("main")?.classList.add("after")
     createResizeObserver(containerRef, ({ width, height }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
@@ -87,22 +79,22 @@ export default function (props: {
       if (setting) {
         const parsed = JSON.parse(setting)
         archiveSession = parsed.archiveSession
-        setSetting({
-          ..._setting,
+        setStore("setting", t => ({
+          ...t,
           ...parsed,
-          ...(_resetContinuousDialogue ? { continuousDialogue: false } : {})
-        })
+          ...(_reset ? { continuousDialogue: false } : {})
+        }))
       }
-      if (props.question) {
+      if (searchParams.q) {
         window.history.replaceState(undefined, "ChatGPT", "/")
-        sendMessage(props.question)
+        sendMessage(searchParams.q)
       } else {
         if (session && archiveSession) {
           const parsed = JSON.parse(session) as ChatMessage[]
           if (parsed.length === 1 && parsed[0].special === "default") {
-            setMessageList([defaultMessage])
-          } else setMessageList(parsed)
-        } else setMessageList([defaultMessage])
+            setStore("messageList", [defaultMessage])
+          } else setStore("messageList", parsed)
+        } else setStore("messageList", [defaultMessage])
       }
     } catch {
       console.log("Setting parse error")
@@ -110,10 +102,10 @@ export default function (props: {
   })
 
   createEffect((prev: number | undefined) => {
-    if (prev !== undefined && messageList().length > prev) {
+    if (prev !== undefined && store.messageList.length > prev) {
       scrollToBottom()
     }
-    return messageList().length
+    return store.messageList.length
   })
 
   createEffect(() => {
@@ -121,31 +113,31 @@ export default function (props: {
   })
 
   createEffect(prev => {
-    messageList()
+    store.messageList
     if (prev) {
-      if (messageList().length === 0) {
-        setMessageList([defaultMessage])
+      if (store.messageList.length === 0) {
+        setStore("messageList", [defaultMessage])
       } else if (
-        messageList().length > 1 &&
-        messageList()[0].special === "default"
+        store.messageList.length > 1 &&
+        store.messageList[0].special === "default"
       ) {
-        setMessageList(messageList().slice(1))
-      } else if (setting().archiveSession) {
-        localStorage.setItem("session", JSON.stringify(messageList()))
+        setStore("messageList", store.messageList.slice(1))
+      } else if (store.setting.archiveSession) {
+        localStorage.setItem("session", JSON.stringify(store.messageList))
       }
     }
     return true
   })
 
   createEffect(() => {
-    localStorage.setItem("setting", JSON.stringify(setting()))
+    localStorage.setItem("setting", JSON.stringify(store.setting))
   })
 
   createEffect(prev => {
-    inputContent()
+    store.inputContent
     if (prev) {
       setHeight("48px")
-      if (inputContent() === "") {
+      if (store.inputContent === "") {
         setCompatiblePrompt([])
       } else {
         const scrollHeight = inputRef?.scrollHeight
@@ -165,12 +157,11 @@ export default function (props: {
 
   function archiveCurrentMessage() {
     if (currentAssistantMessage()) {
-      setMessageList([
-        ...messageList(),
+      setStore("messageList", [
+        ...store.messageList,
         {
           role: "assistant",
-          content: currentAssistantMessage().trim(),
-          id: Date.now()
+          content: currentAssistantMessage().trim()
         }
       ])
       setCurrentAssistantMessage("")
@@ -181,26 +172,22 @@ export default function (props: {
   }
 
   async function sendMessage(value?: string) {
-    const inputValue = value ?? inputContent()
+    const inputValue = value ?? store.inputContent
     if (!inputValue) {
       return
     }
     // @ts-ignore
     if (window?.umami) umami.trackEvent("chat_generate")
-    setInputContent("")
+    setStore("inputContent", "")
     if (
       !value ||
-      value !==
-        messageList()
-          .filter(k => k.role === "user")
-          .at(-1)?.content
+      value !== store.messageList.filter(k => k.role === "user").at(-1)?.content
     ) {
-      setMessageList([
-        ...messageList(),
+      setStore("messageList", [
+        ...store.messageList,
         {
           role: "user",
-          content: inputValue,
-          id: Date.now()
+          content: inputValue
         }
       ])
     }
@@ -210,12 +197,11 @@ export default function (props: {
       setLoading(false)
       setController()
       if (!error.message.includes("abort"))
-        setMessageList([
-          ...messageList(),
+        setStore("messageList", [
+          ...store.messageList,
           {
             role: "error",
-            content: error.message.replace(/(sk-\w{5})\w+/g, "$1"),
-            id: Date.now()
+            content: error.message.replace(/(sk-\w{5})\w+/g, "$1")
           }
         ])
     }
@@ -226,7 +212,7 @@ export default function (props: {
     setLoading(true)
     const controller = new AbortController()
     setController(controller)
-    const systemRule = setting().systemRule.trim()
+    const systemRule = store.setting.systemRule.trim()
     const message = {
       role: "user",
       content: inputValue
@@ -235,15 +221,15 @@ export default function (props: {
     const response = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({
-        messages: setting().continuousDialogue
-          ? [...messageList().slice(0, -1), message].filter(
+        messages: store.setting.continuousDialogue
+          ? [...store.messageList.slice(0, -1), message].filter(
               k => k.role !== "error"
             )
-          : [...messageList().filter(k => k.special === "locked"), message],
-        key: setting().openaiAPIKey || undefined,
-        temperature: setting().openaiAPITemperature / 100,
-        password: setting().password,
-        model: setting().model
+          : [...store.messageList.filter(k => k.special === "locked"), message],
+        key: store.setting.openaiAPIKey || undefined,
+        temperature: store.setting.openaiAPITemperature / 100,
+        password: store.setting.password,
+        model: store.setting.model
       }),
       signal: controller.signal
     })
@@ -275,7 +261,9 @@ export default function (props: {
   }
 
   function clearSession() {
-    setMessageList(messages => messages.filter(k => k.special === "locked"))
+    setStore("messageList", messages =>
+      messages.filter(k => k.special === "locked")
+    )
     setCurrentAssistantMessage("")
   }
 
@@ -287,7 +275,7 @@ export default function (props: {
   }
 
   function selectPrompt(prompt: string) {
-    setInputContent(prompt)
+    setStore("inputContent", prompt)
     setCompatiblePrompt([])
 
     const scrollHeight = inputRef?.scrollHeight
@@ -304,8 +292,7 @@ export default function (props: {
 
   const findPrompts = throttle(
     (value: string) => {
-      if (value === "/" || value === " ")
-        return setCompatiblePrompt(props.prompts)
+      if (value === "/" || value === " ") return setCompatiblePrompt(prompts)
       const query = value.replace(/^[\/ ](.*)/, "$1")
       if (query !== value)
         setCompatiblePrompt(
@@ -335,7 +322,7 @@ export default function (props: {
       )
     if (!compositionend()) return
     const { value } = inputRef
-    setInputContent(value)
+    setStore("inputContent", value)
     findPrompts(value)
   }
 
@@ -349,15 +336,13 @@ export default function (props: {
             "background-color": "var(--c-bg)"
           }}
         >
-          <For each={messageList()}>
+          <For each={store.messageList}>
             {(message, index) => (
               <MessageItem
                 message={message}
                 hiddenAction={loading() || message.special === "default"}
                 index={index()}
-                setInputContent={setInputContent}
                 sendMessage={sendMessage}
-                setMessageList={setMessageList}
               />
             )}
           </For>
@@ -391,16 +376,11 @@ export default function (props: {
               !loading() && !compatiblePrompt().length && height() === "48px"
             }
           >
-            <SettingAction
-              setting={setting}
-              setSetting={setSetting}
-              clear={clearSession}
-              messaages={messageList()}
-            />
+            <SettingAction clear={clearSession} messaages={store.messageList} />
           </Show>
           <Show
             when={!loading()}
-            fallback={() => (
+            fallback={
               <div class="h-12 flex items-center justify-center bg-slate bg-op-15 text-slate rounded">
                 <span>AI 正在思考...</span>
                 <div
@@ -410,7 +390,7 @@ export default function (props: {
                   不需要了
                 </div>
               </div>
-            )}
+            }
           >
             <Show when={compatiblePrompt().length}>
               <PromptList
@@ -424,7 +404,7 @@ export default function (props: {
                 id="input"
                 placeholder="与 ta 对话吧"
                 autocomplete="off"
-                value={inputContent()}
+                value={store.inputContent}
                 autofocus
                 onClick={scrollToBottom}
                 onKeyDown={e => {
@@ -443,13 +423,13 @@ export default function (props: {
                       sendMessage()
                     }
                   } else if (e.key === "ArrowUp") {
-                    const userMessages = messageList()
+                    const userMessages = store.messageList
                       .filter(k => k.role === "user")
                       .map(k => k.content)
                     const content = userMessages.at(-1)
-                    if (content && !inputContent()) {
+                    if (content && !store.inputContent) {
                       e.preventDefault()
-                      setInputContent(content)
+                      setStore("inputContent", content)
                     }
                   }
                 }}
@@ -462,14 +442,13 @@ export default function (props: {
                   "border-top-left-radius":
                     compatiblePrompt().length === 0 ? "0.25rem" : 0
                 }}
-                class="self-end py-3 resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:text-slate-400 placeholder:op-40"
-                rounded-l
+                class="self-end py-3 resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:text-slate-400 placeholder:op-40 rounded-l"
               />
-              <Show when={inputContent()}>
+              <Show when={store.inputContent}>
                 <button
-                  class="i-carbon:add-filled absolute right-5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
+                  class="i-carbon:add-filled absolute right-5.5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
                   onClick={() => {
-                    setInputContent("")
+                    setStore("inputContent", "")
                     inputRef.focus()
                   }}
                 />
