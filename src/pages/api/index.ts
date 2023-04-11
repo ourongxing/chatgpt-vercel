@@ -3,7 +3,7 @@ import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { createParser } from "eventsource-parser"
 import type { ChatMessage, Model } from "~/types"
 import { countTokens } from "~/utils/tokens"
-import { splitKeys, randomKey, fetchWithTimeout } from "~/utils"
+import { splitKeys, randomKey } from "~/utils"
 import { defaultMaxInputTokens, defaultModel } from "~/system"
 
 export const config = {
@@ -44,7 +44,9 @@ export const baseURL = import.meta.env.NOGFW
       ""
     )
 
-const timeout = Number(import.meta.env.TIMEOUT)
+const timeout = isNaN(+import.meta.env.TIMEOUT)
+  ? 30 * 1000
+  : +import.meta.env.TIMEOUT
 
 let maxInputTokens = defaultMaxInputTokens
 const _ = import.meta.env.MAX_INPUT_TOKENS
@@ -132,24 +134,21 @@ export const post: APIRoute = async context => {
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
-    const rawRes = await fetchWithTimeout(
-      `https://${baseURL}/v1/chat/completions`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`
-        },
-        timeout: !timeout || Number.isNaN(timeout) ? 30000 : timeout,
-        method: "POST",
-        body: JSON.stringify({
-          model: model || "gpt-3.5-turbo",
-          messages: messages.map(k => ({ role: k.role, content: k.content })),
-          temperature,
-          // max_tokens: 4096 - tokens,
-          stream: true
-        })
-      }
-    ).catch(err => {
+    const rawRes = await fetch(`https://${baseURL}/v1/chat/completions`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`
+      },
+      signal: AbortSignal.timeout(timeout),
+      method: "POST",
+      body: JSON.stringify({
+        model: model || "gpt-3.5-turbo",
+        messages: messages.map(k => ({ role: k.role, content: k.content })),
+        temperature,
+        // max_tokens: 4096 - tokens,
+        stream: true
+      })
+    }).catch(err => {
       return new Response(
         JSON.stringify({
           error: {
