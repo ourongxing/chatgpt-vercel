@@ -5,11 +5,9 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "start": "HOST=0.0.0.0 node ./dist/server/entry.mjs",
-    "preview": "astro preview",
-    "astro": "astro",
+    "dev": "tsx scripts/genEnv.ts && solid-start dev",
+    "build": "tsx scripts/genEnv.ts && solid-start build",
+    "start": "solid-start start",
     "lint:fix": "eslint . --fix --ext .ts",
     "lint": "eslint . --ext .ts",
     "prettier": "prettier --write ."
