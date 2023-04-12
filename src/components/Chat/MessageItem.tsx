@@ -88,15 +88,12 @@ export default (props: Props) => {
           "messageList",
           (k, i) =>
             i === props.index || (i === props.index! + 1 && k.role !== "user"),
-          "special",
-          special => (special === "locked" ? undefined : "locked")
+          "type",
+          type => (type === "locked" ? undefined : "locked")
         )
       } else {
-        setStore(
-          "messageList",
-          [props.index - 1, props.index],
-          "special",
-          special => (special === "locked" ? undefined : "locked")
+        setStore("messageList", [props.index - 1, props.index], "type", type =>
+          type === "locked" ? undefined : "locked"
         )
       }
     }
@@ -106,7 +103,7 @@ export default (props: Props) => {
     <div
       class="group flex gap-3 px-4 mx--4 rounded-lg transition-colors sm:hover:bg-slate/6 dark:sm:hover:bg-slate/5 relative message-item"
       classList={{
-        temporary: props.message.special === "temporary"
+        temporary: props.message.type === "temporary"
       }}
     >
       <div
@@ -115,7 +112,7 @@ export default (props: Props) => {
         }`}
         onClick={lockMessage}
       >
-        <Show when={props.message.special === "locked"}>
+        <Show when={props.message.type === "locked"}>
           <div class="i-carbon:locked text-white" />
         </Show>
       </div>

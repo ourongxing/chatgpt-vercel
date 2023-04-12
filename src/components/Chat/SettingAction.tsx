@@ -1,4 +1,4 @@
-import { createSignal, type JSXElement, Show } from "solid-js"
+import { createSignal, type JSXElement, Show, createEffect } from "solid-js"
 import { toBlob, toJpeg } from "html-to-image"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import type { ChatMessage, Model } from "~/types"
@@ -12,6 +12,10 @@ export default function SettingAction(props: {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
+  createEffect(() => {
+    localStorage.setItem("setting", JSON.stringify(store.setting))
+  })
+
   // tree shaking
   clickOutside
   return (

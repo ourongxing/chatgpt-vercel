@@ -17,5 +17,8 @@ if (import.meta.env.CLIENT_DEFAULT_SETTING) {
 export const [store, setStore] = createStore({
   setting,
   inputContent: "",
-  messageList: [] as ChatMessage[]
+  messageList: [] as ChatMessage[],
+  currentAssistantMessage: "",
+  loading: false,
+  inputRef: null as HTMLTextAreaElement | null
 })
