@@ -1,9 +1,10 @@
 import { For, createEffect } from "solid-js"
-import { store } from "~/store"
-import MessageItem from "./MessageItem"
-import type { ChatMessage } from "~/types"
 import { defaultEnv } from "~/env"
+import { store } from "~/store"
+import type { ChatMessage } from "~/types"
 import { scrollToBottom } from "~/utils"
+import MessageItem from "./MessageItem"
+
 export const defaultMessage: ChatMessage = {
   role: "assistant",
   content:

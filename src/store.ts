@@ -3,11 +3,12 @@ import { defaultEnv } from "./env"
 import type { ChatMessage } from "./types"
 
 let setting = defaultEnv.CLIENT_DEFAULT_SETTING
-if (import.meta.env.CLIENT_DEFAULT_SETTING) {
+const _ = import.meta.env.CLIENT_DEFAULT_SETTING
+if (_) {
   try {
     setting = {
       ...setting,
-      ...JSON.parse(import.meta.env.CLIENT_DEFAULT_SETTING)
+      ...JSON.parse(_)
     }
   } catch (e) {
     console.error("Error parsing DEFAULT_SETTING:", e)

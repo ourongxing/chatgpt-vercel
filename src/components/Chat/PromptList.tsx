@@ -1,11 +1,11 @@
+import { makeEventListener } from "@solid-primitives/event-listener"
 import {
+  For,
   createEffect,
   createSignal,
-  For,
-  type JSXElement,
-  onMount
+  onMount,
+  type JSXElement
 } from "solid-js"
-import { makeEventListener } from "@solid-primitives/event-listener"
 import type { PromptItem } from "~/types"
 
 export default function PromptList(props: {

@@ -1,14 +1,11 @@
-import { createSignal, type JSXElement, Show, createEffect } from "solid-js"
 import { toBlob, toJpeg } from "html-to-image"
-import { copyToClipboard, dateFormat, isMobile } from "~/utils"
-import type { ChatMessage, Model } from "~/types"
+import { Show, createEffect, createSignal, type JSXElement } from "solid-js"
 import { clickOutside } from "~/hooks"
-import { store, setStore } from "~/store"
+import { setStore, store } from "~/store"
+import type { ChatMessage, Model } from "~/types"
+import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 
-export default function SettingAction(props: {
-  clear: any
-  messaages: ChatMessage[]
-}) {
+export default function SettingAction(props: { clear: any }) {
   const [shown, setShown] = createSignal(false)
   const [copied, setCopied] = createSignal(false)
   const [imgCopied, setIMGCopied] = createSignal(false)
@@ -168,7 +165,7 @@ export default function SettingAction(props: {
           <ActionItem
             label="导出 Markdown"
             onClick={async () => {
-              await exportMD(props.messaages)
+              await exportMD(store.messageList)
               setCopied(true)
               setTimeout(() => setCopied(false), 1000)
             }}

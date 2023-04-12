@@ -1,13 +1,13 @@
+import { makeEventListener } from "@solid-primitives/event-listener"
+import { Fzf } from "fzf"
+import throttle from "just-throttle"
 import { Show, createEffect, createSignal, onMount } from "solid-js"
-import { store, setStore } from "~/store"
+import { setStore, store } from "~/store"
+import type { PromptItem } from "~/types"
 import { parsePrompts, scrollToBottom } from "~/utils"
+import { defaultMessage } from "./MessageBox"
 import PromptList from "./PromptList"
 import SettingAction from "./SettingAction"
-import { makeEventListener } from "@solid-primitives/event-listener"
-import type { PromptItem } from "~/types"
-import throttle from "just-throttle"
-import { Fzf } from "fzf"
-import { defaultMessage } from "./MessageBox"
 
 const prompts = parsePrompts()
 const fzf = new Fzf(prompts, {
@@ -145,7 +145,7 @@ export default function (props: {
             !store.loading && !compatiblePrompt().length && height() === "48px"
           }
         >
-          <SettingAction clear={clearSession} messaages={store.messageList} />
+          <SettingAction clear={clearSession} />
         </Show>
         <Show
           when={!store.loading}
