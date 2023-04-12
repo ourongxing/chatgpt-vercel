@@ -1,7 +1,7 @@
 import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { createParser } from "eventsource-parser"
 import type { ChatMessage, Model } from "~/types"
-import { countTokens, splitKeys, randomKey } from "~/utils"
+import { countTokens, splitKeys, randomKey, fetchWithTimeout } from "~/utils"
 import { defaultEnv } from "~/env"
 import type { APIEvent } from "solid-start/api"
 
@@ -134,21 +134,24 @@ export async function POST({ request }: APIEvent) {
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
-    const rawRes = await fetch(`https://${baseURL}/v1/chat/completions`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      signal: AbortSignal.timeout(timeout),
-      method: "POST",
-      body: JSON.stringify({
-        model: model,
-        messages: messages.map(k => ({ role: k.role, content: k.content })),
-        temperature,
-        // max_tokens: 4096 - tokens,
-        stream: true
-      })
-    }).catch((err: { message: any }) => {
+    const rawRes = await fetchWithTimeout(
+      `https://${baseURL}/v1/chat/completions`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        timeout,
+        method: "POST",
+        body: JSON.stringify({
+          model: model,
+          messages: messages.map(k => ({ role: k.role, content: k.content })),
+          temperature,
+          // max_tokens: 4096 - tokens,
+          stream: true
+        })
+      }
+    ).catch((err: { message: any }) => {
       return new Response(
         JSON.stringify({
           error: {

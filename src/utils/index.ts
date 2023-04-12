@@ -93,3 +93,19 @@ export const scrollToBottom = throttle(
   250,
   { leading: false, trailing: true }
 )
+
+export async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init?: (RequestInit & { timeout?: number }) | undefined
+) {
+  const { timeout = 500 } = init ?? {}
+
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  const response = await fetch(input, {
+    ...init,
+    signal: controller.signal
+  })
+  clearTimeout(id)
+  return response
+}
