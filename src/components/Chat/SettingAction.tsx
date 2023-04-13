@@ -23,7 +23,7 @@ export default function SettingAction(props: { clear: any }) {
     >
       <Show when={shown()}>
         <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
-          <SettingItem icon="i-ri:lock-password-line" label="网站密码">
+          <SettingItem icon="i-ri:lock-password-line" label="网站访问密码">
             <input
               type="password"
               value={store.setting.password}
@@ -99,10 +99,7 @@ export default function SettingAction(props: { clear: any }) {
               }}
             />
           </SettingItem>
-          <SettingItem
-            icon="i-carbon:save-image"
-            label="记录对话内容，刷新不会消失"
-          >
+          <SettingItem icon="i-carbon:save-image" label="保存对话内容">
             <label class="relative inline-flex items-center cursor-pointer ml-1">
               <input
                 type="checkbox"
@@ -118,10 +115,7 @@ export default function SettingAction(props: { clear: any }) {
               <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
             </label>
           </SettingItem>
-          <SettingItem
-            icon="i-carbon:3d-curve-auto-colon"
-            label="开启连续对话，将加倍消耗 Token"
-          >
+          <SettingItem icon="i-carbon:3d-curve-auto-colon" label="开启连续对话">
             <label class="relative inline-flex items-center cursor-pointer ml-1">
               <input
                 type="checkbox"

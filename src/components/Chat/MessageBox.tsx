@@ -16,13 +16,6 @@ export default function (props: { sendMessage: (content?: string) => void }) {
   createEffect(prev => {
     store.messageList
     if (prev) {
-      console.log("执行了几次")
-      // if (
-      //   store.messageList.length > 1 &&
-      //   store.messageList[0].type === "default"
-      // ) {
-      //   setStore("messageList", store.messageList.slice(1))
-      // }
       if (store.setting.archiveSession) {
         localStorage.setItem("session", JSON.stringify(store.messageList))
       }

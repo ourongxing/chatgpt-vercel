@@ -7,6 +7,7 @@ import type { ChatMessage } from "~/types"
 import { isMobile } from "~/utils"
 import MessageBox, { defaultMessage } from "./MessageBox"
 import InputBox from "./InputBox"
+import PrefixTitle from "../PrefixTitle"
 
 let _setting = defaultEnv.CLIENT_DEFAULT_SETTING
 if (import.meta.env.CLIENT_DEFAULT_SETTING) {
@@ -28,14 +29,19 @@ export default function (props: { sessionID?: string }) {
   let containerRef: HTMLDivElement
   let controller: AbortController | undefined = undefined
   const [containerWidth, setContainerWidth] = createSignal("init")
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   onMount(() => {
     createResizeObserver(containerRef, ({ width }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
+    setTimeout(() => {
+      document.querySelector("#root")?.classList.remove("before")
+    })
+    document.querySelector("#root")?.classList.add("after")
     const setting = localStorage.getItem("setting")
     const session = localStorage.getItem("session")
+    const allSession = localStorage.getItem("all-session")
     try {
       let archiveSession = false
       if (setting) {
@@ -48,7 +54,6 @@ export default function (props: { sessionID?: string }) {
         }))
       }
       if (searchParams.q) {
-        window.history.replaceState(undefined, "ChatGPT", "/")
         sendMessage(searchParams.q)
       } else {
         if (session && archiveSession) {
@@ -77,6 +82,7 @@ export default function (props: { sessionID?: string }) {
       controller = undefined
     }
     !isMobile() && store.inputRef?.focus()
+    searchParams.q && setSearchParams({ q: undefined })
   }
 
   function stopStreamFetch() {
@@ -186,13 +192,14 @@ export default function (props: { sessionID?: string }) {
   }
 
   return (
-    <div ref={containerRef!} class="mt-4">
+    <main ref={containerRef!} class="mt-4">
+      {searchParams.q && <PrefixTitle>{searchParams.q}</PrefixTitle>}
       <MessageBox sendMessage={sendMessage} />
       <InputBox
         width={containerWidth()}
         sendMessage={sendMessage}
         stopStreamFetch={stopStreamFetch}
       />
-    </div>
+    </main>
   )
 }
