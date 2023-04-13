@@ -113,7 +113,7 @@ export default (props: Props) => {
       }}
     >
       <div
-        class={`shrink-0 w-7 h-7 mt-4 rounded-full op-80 flex items-center justify-center cursor-pointer ${
+        class={`shadow-slate-5 shadow-sm dark:shadow-none shrink-0 w-7 h-7 mt-4 rounded-full op-80 flex items-center justify-center cursor-pointer ${
           roleClass[props.message.role]
         }`}
         onClick={lockMessage}

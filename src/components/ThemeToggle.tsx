@@ -27,7 +27,7 @@ export default function ThemeToggle() {
   return (
     <button
       id="theme-toggle"
-      class="flex items-center justify-center w-10 h-10 rounded-md border transition-colors hover:bg-slate/10 border-0"
+      class="flex items-center justify-center w-10 h-10 rounded-md border transition-colors border-0 hover:animate-rubber-band"
       onClick={handleToggleTheme}
     >
       <svg width="20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

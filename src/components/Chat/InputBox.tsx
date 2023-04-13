@@ -124,8 +124,12 @@ export default function (props: {
     if (value) {
       setStore("inputContent", value)
       findPrompts(value)
+    } else {
+      setStore("inputContent", "")
+      setCompatiblePrompt([])
     }
   }
+
   return (
     <div
       class="pb-2em px-2em fixed bottom-0 z-100"
@@ -167,7 +171,7 @@ export default function (props: {
               select={selectPrompt}
             ></PromptList>
           </Show>
-          <div class="flex items-end">
+          <div class="flex items-end relative">
             <textarea
               ref={el => setStore("inputRef", el)}
               id="input"
@@ -204,34 +208,36 @@ export default function (props: {
               }}
               onInput={handleInput}
               style={{
-                height: height(),
-                "border-bottom-right-radius": 0,
-                "border-top-right-radius": height() === "48px" ? 0 : "0.25rem",
-                "border-top-left-radius":
-                  compatiblePrompt().length === 0 ? "0.25rem" : 0
+                height: height()
               }}
-              class="self-end py-3 resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none placeholder:text-slate-400 placeholder:text-slate-400 placeholder:op-40 rounded-l"
+              class="self-end py-3 pr-2.2em resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-400 text-slate-400 op-40)"
+              classList={{
+                "rounded-t": compatiblePrompt().length === 0,
+                "rounded-b": true
+              }}
             />
             <Show when={store.inputContent}>
-              <button
-                class="i-carbon:add-filled absolute right-5.5em bottom-3em rotate-45 text-op-20! hover:text-op-80! text-slate-7 dark:text-slate"
-                onClick={() => {
-                  setStore("inputContent", "")
-                  store.inputRef?.focus()
+              <div
+                class="absolute flex text-1em items-center"
+                classList={{
+                  "right-3em bottom-1em": height() === "48px",
+                  "right-1em top-1em": height() !== "48px"
                 }}
-              />
+              >
+                <button
+                  class="i-carbon:add-filled rotate-45 text-slate-7 dark:text-slate text-op-20! hover:text-op-60!"
+                  onClick={() => {
+                    setStore("inputContent", "")
+                    store.inputRef?.focus()
+                  }}
+                />
+              </div>
             </Show>
-            <div
-              class="flex text-slate-7 dark:text-slate bg-slate bg-op-15 text-op-80! hover:text-op-100! h-3em items-center rounded-r"
-              style={{
-                "border-top-right-radius":
-                  compatiblePrompt().length === 0 ? "0.25rem" : 0
-              }}
-            >
+            <div class="absolute right-0.8em bottom-0.8em flex items-center">
               <button
                 title="发送"
                 onClick={() => props.sendMessage()}
-                class="i-carbon:send-filled text-5 mx-3"
+                class="i-carbon:send-filled text-1.5em text-slate-7 dark:text-slate text-op-80! hover:text-op-100!"
               />
             </div>
           </div>

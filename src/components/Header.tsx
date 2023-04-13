@@ -1,9 +1,18 @@
 import logo from "/assets/logo.svg?raw"
 import ThemeToggle from "./ThemeToggle"
+import { useNavigate } from "solid-start"
 export default function Header() {
+  const navigate = useNavigate()
   return (
-    <header class="sticky top--100px z-99 px-2em">
-      <div id="logo" class="w-100px h-100px" innerHTML={logo} />
+    <header class="sticky top--7em z-99 px-2em">
+      <div
+        id="logo"
+        class="w-7em h-7em cursor-pointer hover:animate-swing"
+        innerHTML={logo}
+        onClick={() => {
+          navigate("/")
+        }}
+      />
       <div class="flex justify-between items-center">
         <div
           id="title"

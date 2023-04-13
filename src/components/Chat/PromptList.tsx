@@ -55,7 +55,7 @@ export default function PromptList(props: {
   return (
     <ul
       ref={containerRef!}
-      class="bg-slate bg-op-15 dark:text-slate text-slate-7 overflow-y-auto rounded-t"
+      class="bg-slate bg-op-20 dark:text-slate text-slate-7 overflow-y-auto rounded-t"
       style={{
         "max-height": maxHeight()
       }}
@@ -135,7 +135,7 @@ function Item(props: {
       }}
     >
       <p>{DescComponent}</p>
-      <p class="text-0.4em">{PromptComponent}</p>
+      <p class="text-0.5em">{PromptComponent}</p>
     </li>
   )
 }

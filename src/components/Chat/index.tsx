@@ -103,7 +103,6 @@ export default function (props: { sessionID?: string }) {
     if (window?.umami) umami.trackEvent("chat_generate")
     setStore("inputContent", "")
     if (actionState.fakeRobot) {
-      setActionState("fakeRobot", false)
       if (
         store.messageList.at(-1)?.role !== "user" &&
         store.messageList.at(-2)?.role === "user"
@@ -123,6 +122,7 @@ export default function (props: { sessionID?: string }) {
         ])
         return
       }
+      setActionState("fakeRobot", false)
     }
 
     // 如果传入值为空，或者传入值与最后一条用户消息不相同，就新增一条用户消息
