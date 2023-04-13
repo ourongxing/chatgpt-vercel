@@ -1,0 +1,26 @@
+.before #logo {
+  transform: translate3D(25px, 150px, 0) scale(2);
+}
+
+.before #theme-toggle {
+  transform: translate3D(0, 200px, 0) rotate(540deg);
+}
+
+.before #title,
+.before #message-container {
+  transform: translate3D(0, 200px, 0);
+}
+
+.before #theme-toggle,
+.before #message-container {
+  opacity: 0;
+}
+
+.after #title,
+.after #theme-toggle,
+.after #logo,
+.after #message-container {
+  transition-property: transform, opacity;
+  transition-duration: 1s;
+  transition-timing-function: ease-in-out;
+}

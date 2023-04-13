@@ -3,9 +3,12 @@ import ThemeToggle from "./ThemeToggle"
 export default function Header() {
   return (
     <header class="sticky top--100px z-99 px-2em">
-      <div class="w-100px h-100px logo" innerHTML={logo} />
+      <div id="logo" class="w-100px h-100px" innerHTML={logo} />
       <div class="flex justify-between items-center">
-        <div class="flex items-center mt-2 pb-2 text-2xl title cursor-pointer">
+        <div
+          id="title"
+          class="flex items-center mt-2 pb-2 text-2xl cursor-pointer"
+        >
           <span class="text-transparent font-extrabold bg-clip-text bg-gradient-to-r dark:from-yellow-300 from-yellow-600 dark:to-red-700 to-red-700 mr-1">
             ChatGPT
           </span>

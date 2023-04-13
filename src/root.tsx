@@ -16,6 +16,7 @@ import {
 import { pwaInfo } from "virtual:pwa-info"
 import "@unocss/reset/tailwind.css"
 import "~/styles/global.css"
+import "~/styles/animation.css"
 import "uno.css"
 
 export default function Root() {
