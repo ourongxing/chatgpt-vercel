@@ -44,7 +44,7 @@ export default defineConfig({
       ],
       shortcuts: {
         "input-box":
-          "text-ellipsis max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none)"
+          "max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none)"
       }
     }),
     solid({ ssr: false, adapter: adapter() }),

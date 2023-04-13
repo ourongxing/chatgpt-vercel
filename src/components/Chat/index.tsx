@@ -120,15 +120,13 @@ export default function (props: { sessionID?: string }) {
       })
     }
 
-    const systemRule = store.setting.systemRule.trim()
     const message: ChatMessage = {
       role: "user",
       content: inputValue
     }
-    if (systemRule) message.content += "。\n\n" + systemRule
     const messages = store.setting.continuousDialogue
       ? [...store.messageList.slice(0, -1), message].filter(
-          k => k.role !== "error"
+          (k, i, _) => k.role !== "error" && _[i + 1]?.role !== "error"
         )
       : [...store.messageList.filter(k => k.type === "locked"), message]
 

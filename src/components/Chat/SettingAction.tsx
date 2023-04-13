@@ -82,19 +82,6 @@ export default function SettingAction(props: { clear: any }) {
               <option value="gpt-4-32k">gpt-4(32k)</option>
             </select>
           </SettingItem>
-          <SettingItem icon="i-carbon:user-online" label="系统角色指令">
-            <input
-              type="text"
-              value={store.setting.systemRule}
-              class="input-box"
-              onInput={e => {
-                setStore("setting", t => ({
-                  ...t,
-                  systemRule: (e.target as HTMLInputElement).value
-                }))
-              }}
-            />
-          </SettingItem>
           <SettingItem icon="i-carbon:data-enrichment" label="思维发散程度">
             <input
               type="range"
