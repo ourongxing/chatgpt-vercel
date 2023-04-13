@@ -6,7 +6,13 @@ import node from "solid-start-node"
 import vercel from "solid-start-vercel"
 import { defineConfig } from "vite"
 import unocss from "unocss/vite"
-import { presetUno, presetIcons, presetTypography } from "unocss"
+import {
+  presetUno,
+  presetIcons,
+  presetTypography,
+  transformerDirectives,
+  transformerVariantGroup
+} from "unocss"
 import { VitePWA } from "vite-plugin-pwa"
 
 const adapter = () => {
@@ -24,6 +30,7 @@ export default defineConfig({
   plugins: [
     unocss({
       mergeSelectors: false,
+      transformers: [transformerDirectives(), transformerVariantGroup()],
       presets: [
         presetUno(),
         presetTypography({
@@ -34,7 +41,11 @@ export default defineConfig({
           }
         }),
         presetIcons()
-      ]
+      ],
+      shortcuts: {
+        "input-box":
+          "text-ellipsis max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none)"
+      }
     }),
     solid({ ssr: false, adapter: adapter() }),
     VitePWA({

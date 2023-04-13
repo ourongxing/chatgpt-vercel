@@ -1,14 +1,27 @@
 import { toBlob, toJpeg } from "html-to-image"
-import { Show, createEffect, createSignal, type JSXElement } from "solid-js"
+import { Show, createEffect, type JSXElement } from "solid-js"
 import { clickOutside } from "~/hooks"
 import { setStore, store } from "~/store"
 import type { ChatMessage, Model } from "~/types"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
+import { Switch } from "../Common"
+import { createStore } from "solid-js/store"
+
+const [state, setState] = createStore({
+  shown: false,
+  copied: false,
+  genImg: "normal" as ImgStatusUnion
+})
+
+type ImgStatusUnion = "normal" | "loading" | "success" | "error"
+const imgIcon: Record<ImgStatusUnion, string> = {
+  success: "i-ri:check-fill dark:text-yellow text-yellow-6",
+  normal: "i-carbon:image",
+  loading: "i-ri:loader-2-line animate-spin",
+  error: "i-carbon:warning-alt text-red-6 dark:text-red"
+}
 
 export default function SettingAction(props: { clear: any }) {
-  const [shown, setShown] = createSignal(false)
-  const [copied, setCopied] = createSignal(false)
-  const [imgCopied, setIMGCopied] = createSignal(false)
   createEffect(() => {
     localStorage.setItem("setting", JSON.stringify(store.setting))
   })
@@ -19,15 +32,15 @@ export default function SettingAction(props: { clear: any }) {
     <div
       class="text-sm text-slate-7 dark:text-slate my-2"
       // @ts-ignore
-      use:clickOutside={() => setShown(false)}
+      use:clickOutside={() => setState("shown", false)}
     >
-      <Show when={shown()}>
+      <Show when={state.shown}>
         <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
           <SettingItem icon="i-ri:lock-password-line" label="网站访问密码">
             <input
               type="password"
               value={store.setting.password}
-              class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+              class="input-box"
               onInput={e => {
                 setStore("setting", t => ({
                   ...t,
@@ -40,7 +53,7 @@ export default function SettingAction(props: { clear: any }) {
             <input
               type="password"
               value={store.setting.openaiAPIKey}
-              class="max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+              class="input-box"
               onInput={e => {
                 setStore("setting", t => ({
                   ...t,
@@ -55,7 +68,7 @@ export default function SettingAction(props: { clear: any }) {
           >
             <select
               name="model"
-              class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center  focus:bg-op-20 focus:ring-0 focus:outline-none"
+              class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center focus:(bg-op-20 ring-0 outline-none)"
               value={store.setting.model}
               onChange={e => {
                 setStore("setting", t => ({
@@ -73,7 +86,7 @@ export default function SettingAction(props: { clear: any }) {
             <input
               type="text"
               value={store.setting.systemRule}
-              class="text-ellipsis max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:bg-op-20 focus:ring-0 focus:outline-none"
+              class="input-box"
               onInput={e => {
                 setStore("setting", t => ({
                   ...t,
@@ -116,20 +129,15 @@ export default function SettingAction(props: { clear: any }) {
             </label>
           </SettingItem>
           <SettingItem icon="i-carbon:3d-curve-auto-colon" label="开启连续对话">
-            <label class="relative inline-flex items-center cursor-pointer ml-1">
-              <input
-                type="checkbox"
-                checked={store.setting.continuousDialogue}
-                class="sr-only peer"
-                onChange={e => {
-                  setStore("setting", t => ({
-                    ...t,
-                    continuousDialogue: (e.target as HTMLInputElement).checked
-                  }))
-                }}
-              />
-              <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
-            </label>
+            <Switch
+              checked={store.setting.continuousDialogue}
+              onChange={e => {
+                setStore("setting", t => ({
+                  ...t,
+                  continuousDialogue: (e.target as HTMLInputElement).checked
+                }))
+              }}
+            />
           </SettingItem>
         </div>
         <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
@@ -137,7 +145,7 @@ export default function SettingAction(props: { clear: any }) {
       <div class="flex items-center justify-between">
         <ActionItem
           onClick={() => {
-            setShown(!shown())
+            setState("shown", k => !k)
           }}
           icon="i-carbon:settings"
           label="设置"
@@ -145,26 +153,22 @@ export default function SettingAction(props: { clear: any }) {
         <div class="flex">
           <ActionItem
             onClick={async () => {
+              setState("genImg", "loading")
               await exportJpg()
-              setIMGCopied(true)
-              setTimeout(() => setIMGCopied(false), 1000)
+              setTimeout(() => setState("genImg", "normal"), 1000)
             }}
-            icon={
-              imgCopied()
-                ? "i-ri:check-fill dark:text-yellow text-yellow-6"
-                : "i-carbon:image"
-            }
+            icon={imgIcon[state.genImg]}
             label="导出图片"
           />
           <ActionItem
             label="导出 Markdown"
             onClick={async () => {
               await exportMD(store.messageList)
-              setCopied(true)
-              setTimeout(() => setCopied(false), 1000)
+              setState("copied", true)
+              setTimeout(() => setState("copied", false), 1000)
             }}
             icon={
-              copied()
+              state.copied
                 ? "i-ri:check-fill dark:text-yellow text-yellow-6"
                 : "i-ri:markdown-line"
             }
@@ -208,30 +212,35 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
 }
 
 async function exportJpg() {
-  const messageContainer = document.querySelector(
-    "#message-container"
-  ) as HTMLElement
-  async function downloadIMG() {
-    const url = await toJpeg(messageContainer)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
-    a.click()
-  }
-  if (!isMobile() && navigator.clipboard) {
-    try {
-      const blob = await toBlob(messageContainer)
-      blob &&
-        (await navigator.clipboard.write([
-          new ClipboardItem({
-            [blob.type]: blob
-          })
-        ]))
-    } catch (e) {
+  try {
+    const messageContainer = document.querySelector(
+      "#message-container"
+    ) as HTMLElement
+    async function downloadIMG() {
+      const url = await toJpeg(messageContainer)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
+      a.click()
+    }
+    if (!isMobile() && navigator.clipboard) {
+      try {
+        const blob = await toBlob(messageContainer)
+        blob &&
+          (await navigator.clipboard.write([
+            new ClipboardItem({
+              [blob.type]: blob
+            })
+          ]))
+      } catch (e) {
+        await downloadIMG()
+      }
+    } else {
       await downloadIMG()
     }
-  } else {
-    await downloadIMG()
+    setState("genImg", "success")
+  } catch {
+    setState("genImg", "error")
   }
 }
 
