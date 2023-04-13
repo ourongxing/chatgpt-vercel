@@ -8,3 +8,4 @@ src/temp.ts
 dist
 .netlify/
 dev-dist/
+.eslintcache

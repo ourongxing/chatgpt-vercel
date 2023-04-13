@@ -11,7 +11,11 @@
 2. ~~[aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供~~。（2023.03.22 壮烈牺牲，提醒大家不要过度分享自己的站点出去，指不定 ChatGPT 说出什么违禁词出来）。
 3. [vercel.app](https://vercel-chatgpt-github.vercel.app) 被墙。
 
-API Key 由我自己免费提供，请不要滥用，不提供长期服务，请自行部署。默认 key 不支持 `gpt-4`。演示站点密码为 `ourongxing`，每次刷新会关闭 `连续对话`。
+> **Warning**
+>
+> API Key 已经被封完了，请自行部署。现在 OpenAI 的 5$ 免费账号巨容易封，不建议再部署到 Vercel 或者其他平台上了，要部署请直接国外 VPS。切记一个 IP 一个 Key，不要搞轮询。18$ 或者绑卡账号目前还没有这些问题。
+
+
 
 ## 使用方法
 
@@ -44,6 +48,10 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 
 ## 部署一个你自己的 ChatGPT 网站（免费）
 
+> **Warning**
+>
+> 现在 OpenAI 的 5$ 免费账号巨容易封，不建议再部署到 Vercel 或者其他平台上了，要部署请直接国外 VPS。切记一个 IP 一个 Key，不要搞轮询。18$ 或者绑卡账号目前还没有这些问题。
+
 [![](assets/powered-by-vercel.svg)](http://vercel.com/?utm_source=busiyi&utm_campaign=oss)
 
 如果你只需要部署一个你自己用的网站，而不需要定制，那么你完全不需要在本地跑起来，你可以直接点击下面的按钮，然后按照提示操作，然后在 Vercel 中填入环境变量即可。vercel.app 域名已经被墙，但 vercel 本身没有被墙，所以你绑定自己的域名就可以了。如果广泛分享，域名有被墙的风险。
@@ -72,17 +80,18 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 
 #### 环境变量
 
-| 环境变量                           | 说明                                                         | 默认值                                                       |
-| ---------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `OPENAI_API_KEY`                   | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。 | 无                                                           |
-| `DEFAULT_MESSAGE`                  | 默认提示信息                                                 | - xx xx                                                      |
-| `DEFAULT_SETTING`                  | 默认设置                                                     | {<br/>  "continuousDialogue": true,<br/>  "archiveSession": false,<br/>  "openaiAPIKey": "",<br/>"openaiAPITemperature": 60,<br/>  "password": "",<br/>  "systemRule": "",<br/>  "model": "gpt-3.5-turbo"<br/>} |
-| `RESET_CONTINUOUS_DIALOGUE_OPTION` | 刷新时重置 `开启连续对话` 选项，在分享给很多人用的时候可以有效避免大量消耗。 | false                                                        |
-| `OPENAI_API_BASE_URL`              | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。 | api.openai.com                                               |
-| `PASSWORD`                         | 网站密码                                                     | 无                                                           |
-| `MAX_INPUT_TOKENS`                 | 输入的 token 最大值，如果开启 `连续对话`，将计算之前的所有对话内容。OpenAI 限制 token 最大值为 4096，但这是输入和输出之和，所以可以将这个值设置为 3072， 留 1024 作为输出。如果不想被滥用，可以将这个值设置的再小一点。 | {<br/>  "gpt-3.5-turbo": 3072,<br/>  "gpt-4": 6144,<br/>  "gpt-4-32k": 24576<br/>} |
-| `SENDKEY`                          | 使用 [Server 酱](https://sct.ftqq.com/sendkey) 推送帐号余额以及可用状态到微信，如果需要自行获取。推送时间为早上 8 点和晚上 8 点，在 vercel.json 文件中修改。如果 key 太多，超过 20 个，有可能失败。 | 无                                                           |
-| `SENDCHANNEL`                      | [Server 酱](https://sct.ftqq.com/sendkey) 的推送通道，默认微信服务号。 | 9                                                            |
+| 环境变量                           | 说明                                                                                                                                                                                                                    | 默认值                                                                                                                                                                                                          |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OPENAI_API_KEY`                   | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。                                                                        | 无                                                                                                                                                                                                              |
+| `TIMEOUT`                          | OpenAI API 超时。单位为毫秒，Vercel Edge Function 最大超时为 30000。                                                                                                                                                    | 30000                                                                                                                                                                                                           |
+| `DEFAULT_MESSAGE`                  | 默认提示信息                                                                                                                                                                                                            | - xx xx                                                                                                                                                                                                         |
+| `DEFAULT_SETTING`                  | 默认设置                                                                                                                                                                                                                | {<br/>  "continuousDialogue": true,<br/>  "archiveSession": false,<br/>  "openaiAPIKey": "",<br/>"openaiAPITemperature": 60,<br/>  "password": "",<br/>  "systemRule": "",<br/>  "model": "gpt-3.5-turbo"<br/>} |
+| `RESET_CONTINUOUS_DIALOGUE_OPTION` | 刷新时重置 `开启连续对话` 选项，在分享给很多人用的时候可以有效避免大量消耗。                                                                                                                                            | false                                                                                                                                                                                                           |
+| `OPENAI_API_BASE_URL`              | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。                                                                                                                                                            | api.openai.com                                                                                                                                                                                                  |
+| `PASSWORD`                         | 网站密码                                                                                                                                                                                                                | 无                                                                                                                                                                                                              |
+| `MAX_INPUT_TOKENS`                 | 输入的 token 最大值，如果开启 `连续对话`，将计算之前的所有对话内容。OpenAI 限制 token 最大值为 4096，但这是输入和输出之和，所以可以将这个值设置为 3072， 留 1024 作为输出。如果不想被滥用，可以将这个值设置的再小一点。 | {<br/>  "gpt-3.5-turbo": 3072,<br/>  "gpt-4": 6144,<br/>  "gpt-4-32k": 24576<br/>}                                                                                                                              |
+| `SENDKEY`                          | 使用 [Server 酱](https://sct.ftqq.com/sendkey) 推送帐号余额以及可用状态到微信，如果需要自行获取。推送时间为早上 8 点和晚上 8 点，在 vercel.json 文件中修改。如果 key 太多，超过 20 个，有可能失败。                     | 无                                                                                                                                                                                                              |
+| `SENDCHANNEL`                      | [Server 酱](https://sct.ftqq.com/sendkey) 的推送通道，默认微信服务号。                                                                                                                                                  | 9                                                                                                                                                                                                               |
 
 有两种设置方式
 
