@@ -14,7 +14,7 @@ interface Props {
   message: ChatMessage
   hiddenAction: boolean
   index?: number
-  sendMessage?: (message?: string) => void
+  sendMessage?: (value?: string, fakeRobot?: boolean) => void
 }
 
 export default (props: Props) => {

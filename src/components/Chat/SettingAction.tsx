@@ -7,10 +7,11 @@ import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import { Switch } from "../Common"
 import { createStore } from "solid-js/store"
 
-const [state, setState] = createStore({
+export const [state, setState] = createStore({
   shown: false,
   copied: false,
-  genImg: "normal" as ImgStatusUnion
+  genImg: "normal" as ImgStatusUnion,
+  fakeRobot: false
 })
 
 type ImgStatusUnion = "normal" | "loading" | "success" | "error"
@@ -138,6 +139,17 @@ export default function SettingAction(props: { clear: any }) {
           label="设置"
         />
         <div class="flex">
+          <ActionItem
+            onClick={async () => {
+              setState("fakeRobot", k => !k)
+            }}
+            icon={`${
+              state.fakeRobot
+                ? "dark:text-yellow text-yellow-6 i-ri:android-fill"
+                : "i-ri:android-line"
+            }`}
+            label="伪装 GPT"
+          />
           <ActionItem
             onClick={async () => {
               setState("genImg", "loading")

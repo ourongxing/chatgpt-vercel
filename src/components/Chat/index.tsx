@@ -5,9 +5,13 @@ import { defaultEnv } from "~/env"
 import { setStore, store } from "~/store"
 import type { ChatMessage } from "~/types"
 import { isMobile } from "~/utils"
-import MessageBox, { defaultMessage } from "./MessageBox"
+import MessageContainer, { defaultMessage } from "./MessageContainer"
 import InputBox from "./InputBox"
 import PrefixTitle from "../PrefixTitle"
+import {
+  state as actionState,
+  setState as setActionState
+} from "./SettingAction"
 
 let _setting = defaultEnv.CLIENT_DEFAULT_SETTING
 if (import.meta.env.CLIENT_DEFAULT_SETTING) {
@@ -92,12 +96,36 @@ export default function (props: { sessionID?: string }) {
     }
   }
 
-  async function sendMessage(value?: string) {
+  async function sendMessage(value?: string, fakeRobot = false) {
     const inputValue = value ?? store.inputContent
     if (!inputValue) return
     // @ts-ignore
     if (window?.umami) umami.trackEvent("chat_generate")
     setStore("inputContent", "")
+    if (actionState.fakeRobot) {
+      setActionState("fakeRobot", false)
+      if (
+        store.messageList.at(-1)?.role !== "user" &&
+        store.messageList.at(-2)?.role === "user"
+      ) {
+        setStore("messageList", store.messageList.length - 1, {
+          role: "assistant",
+          content: inputValue
+        })
+        return
+      } else if (store.messageList.at(-1)?.role === "user") {
+        setStore("messageList", k => [
+          ...k,
+          {
+            role: "assistant",
+            content: inputValue
+          }
+        ])
+        return
+      }
+    }
+
+    // 如果传入值为空，或者传入值与最后一条用户消息不相同，就新增一条用户消息
     if (
       !value ||
       value !== store.messageList.filter(k => k.role === "user").at(-1)?.content
@@ -192,7 +220,7 @@ export default function (props: { sessionID?: string }) {
   return (
     <main ref={containerRef!} class="mt-4">
       {searchParams.q && <PrefixTitle>{searchParams.q}</PrefixTitle>}
-      <MessageBox sendMessage={sendMessage} />
+      <MessageContainer sendMessage={sendMessage} />
       <InputBox
         width={containerWidth()}
         sendMessage={sendMessage}

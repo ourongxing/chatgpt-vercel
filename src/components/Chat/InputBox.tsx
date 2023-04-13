@@ -5,7 +5,7 @@ import { Show, createEffect, createSignal, onMount } from "solid-js"
 import { setStore, store } from "~/store"
 import type { PromptItem } from "~/types"
 import { parsePrompts, scrollToBottom } from "~/utils"
-import { defaultMessage } from "./MessageBox"
+import { defaultMessage } from "./MessageContainer"
 import PromptList from "./PromptList"
 import SettingAction from "./SettingAction"
 

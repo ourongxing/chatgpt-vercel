@@ -12,7 +12,9 @@ export const defaultMessage: ChatMessage = {
   type: "default"
 }
 
-export default function (props: { sendMessage: (content?: string) => void }) {
+export default function (props: {
+  sendMessage: (value?: string, fakeRobot?: boolean) => void
+}) {
   createEffect(prev => {
     store.messageList
     if (prev) {
