@@ -245,17 +245,21 @@ async function exportJpg() {
 }
 
 async function exportMD(messages: ChatMessage[]) {
-  const role = {
-    system: "系统",
-    user: "我",
-    assistant: "ChatGPT",
-    error: "错误"
-  }
+  const _ = messages.reduce((acc, k) => {
+    if ((k.role === "assistant" && k.type !== "default") || k.role === "user") {
+      if (k.role === "user") {
+        acc.push([k])
+      } else {
+        acc[acc.length - 1].push(k)
+      }
+    }
+    return acc
+  }, [] as ChatMessage[][])
   await copyToClipboard(
-    messages
+    _.filter(k => k.length === 2)
       .map(k => {
-        return `### ${role[k.role]}\n\n${k.content.trim()}`
+        return `> ${k[0].content}\n\n${k[1].content}`
       })
-      .join("\n\n\n\n")
+      .join("\n---\n")
   )
 }

@@ -35,18 +35,24 @@ export default (props: Props) => {
   }
 
   function del() {
-    setStore("messageList", messages => {
-      if (messages[props.index!]?.role === "user") {
-        return messages.filter(
-          (_, i) =>
-            !(
-              i === props.index ||
-              (i === props.index! + 1 && _.role !== "user")
-            )
-        )
-      }
-      return messages.filter((_, i) => i !== props.index)
-    })
+    if (
+      !props.hiddenAction &&
+      props.index !== undefined &&
+      props.index < store.messageList.length
+    ) {
+      setStore("messageList", messages => {
+        if (messages[props.index!].role === "user") {
+          return messages.filter(
+            (_, i) =>
+              !(
+                i === props.index ||
+                (i === props.index! + 1 && _.role !== "user")
+              )
+          )
+        }
+        return messages.filter((_, i) => i !== props.index)
+      })
+    }
   }
 
   function reAnswer() {

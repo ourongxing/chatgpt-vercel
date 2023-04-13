@@ -3,6 +3,7 @@ export * from "./parse"
 export * from "./tokens"
 
 export async function copyToClipboard(text: string) {
+  if (!text) return
   try {
     return await navigator.clipboard.writeText(text)
   } catch {
