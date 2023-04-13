@@ -83,21 +83,26 @@ export default function SettingAction(props: { clear: any }) {
             </select>
           </SettingItem>
           <SettingItem icon="i-carbon:data-enrichment" label="思维发散程度">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={String(store.setting.openaiAPITemperature)}
-              class="max-w-150px w-full h-2 bg-slate bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
-              onInput={e => {
-                setStore("setting", t => ({
-                  ...t,
-                  openaiAPITemperature: Number(
-                    (e.target as HTMLInputElement).value
-                  )
-                }))
-              }}
-            />
+            <div class="flex items-center justify-between w-150px">
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={String(store.setting.openaiAPITemperature)}
+                class="bg-slate max-w-100px w-full h-2 bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
+                onInput={e => {
+                  setStore("setting", t => ({
+                    ...t,
+                    openaiAPITemperature: Number(
+                      (e.target as HTMLInputElement).value
+                    )
+                  }))
+                }}
+              />
+              <span class="bg-slate bg-op-15 rounded-sm px-1 text-10px">
+                {(store.setting.openaiAPITemperature / 100).toFixed(2)}
+              </span>
+            </div>
           </SettingItem>
           <SettingItem icon="i-carbon:save-image" label="保存对话内容">
             <label class="relative inline-flex items-center cursor-pointer ml-1">

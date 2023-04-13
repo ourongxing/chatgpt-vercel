@@ -1,10 +1,15 @@
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
-import { Show, createEffect, createSignal, onMount } from "solid-js"
+import { Show, createEffect, createMemo, createSignal, onMount } from "solid-js"
 import { setStore, store } from "~/store"
 import type { PromptItem } from "~/types"
-import { parsePrompts, scrollToBottom } from "~/utils"
+import {
+  countTokens,
+  countTokensDollar,
+  parsePrompts,
+  scrollToBottom
+} from "~/utils"
 import { defaultMessage } from "./MessageContainer"
 import PromptList from "./PromptList"
 import SettingAction from "./SettingAction"
@@ -23,23 +28,25 @@ export default function (props: {
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
   onMount(() => {
-    makeEventListener(
-      store.inputRef!,
-      "compositionend",
-      () => {
-        setCompositionend(true)
-        handleInput()
-      },
-      { passive: true }
-    )
-    makeEventListener(
-      store.inputRef!,
-      "compositionstart",
-      () => {
-        setCompositionend(false)
-      },
-      { passive: true }
-    )
+    if (store.inputRef) {
+      makeEventListener(
+        store.inputRef,
+        "compositionend",
+        () => {
+          setCompositionend(true)
+          handleInput()
+        },
+        { passive: true }
+      )
+      makeEventListener(
+        store.inputRef,
+        "compositionstart",
+        () => {
+          setCompositionend(false)
+        },
+        { passive: true }
+      )
+    }
   })
 
   createEffect(prev => {
@@ -130,6 +137,11 @@ export default function (props: {
     }
   }
 
+  const tokens = createMemo(() => countTokens(store.currentAssistantMessage))
+  const tokens$ = createMemo(() =>
+    countTokensDollar(tokens(), store.setting.model, true)
+  )
+
   return (
     <div
       class="pb-2em px-2em fixed bottom-0 z-100"
@@ -152,16 +164,22 @@ export default function (props: {
           <SettingAction clear={clearSession} />
         </Show>
         <Show
-          when={!store.loading}
+          when={store.loading}
           fallback={
-            <div class="h-12 flex items-center justify-center bg-slate bg-op-15 text-slate rounded">
-              <span>AI 正在思考...</span>
-              <div
-                class="ml-1em px-2 py-0.5 border border-slate text-slate rounded-md text-sm op-70 cursor-pointer hover:bg-slate/10"
+            <div class="h-12 flex items-center justify-center bg-slate bg-op-15 text-slate-400 dark:text-slate rounded">
+              <span>AI 正在思考</span>
+              <span class="animate-dotting">...</span>
+              <Show when={tokens()}>
+                <span class="rounded-md bg-slate">
+                  {tokens()}/${tokens$().toFixed(3)}
+                </span>
+              </Show>
+              <button
+                class="ml-1em px-2 py-0.5 border border-slate rounded-md text-sm hover:bg-slate/10"
                 onClick={props.stopStreamFetch}
               >
                 不需要了
-              </div>
+              </button>
             </div>
           }
         >
