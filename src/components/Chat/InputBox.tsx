@@ -210,7 +210,7 @@ export default function (props: {
               style={{
                 height: height()
               }}
-              class="self-end py-3 pr-2.2em resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-400 text-slate-400 op-40)"
+              class="self-end py-3 pr-2.2em resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-800 dark:text-slate-400 op-40)"
               classList={{
                 "rounded-t": compatiblePrompt().length === 0,
                 "rounded-b": true

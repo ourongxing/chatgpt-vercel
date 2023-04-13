@@ -62,7 +62,10 @@ export default function (props: { sessionID?: string }) {
       } else {
         if (session && archiveSession) {
           const parsed = JSON.parse(session) as ChatMessage[]
-          if (parsed.length === 1 && parsed[0].type === "default") {
+          if (
+            (parsed.length === 1 && parsed[0].type === "default") ||
+            parsed.length === 0
+          ) {
             setStore("messageList", [defaultMessage])
           } else setStore("messageList", parsed)
         } else setStore("messageList", [defaultMessage])
