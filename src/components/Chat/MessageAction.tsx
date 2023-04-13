@@ -51,6 +51,8 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
     <div
       class="flex items-center cursor-pointer p-2 hover:bg-slate/10 rounded text-1.2em"
       onClick={props.onClick}
+      attr:tooltip={props.label}
+      attr:position="top"
     >
       <button class={props.icon} title={props.label} />
     </div>

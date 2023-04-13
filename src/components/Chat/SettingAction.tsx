@@ -32,7 +32,6 @@ export default function SettingAction(props: { clear: any }) {
   return (
     <div
       class="text-sm text-slate-7 dark:text-slate my-2"
-      // @ts-ignore
       use:clickOutside={() => setState("shown", false)}
     >
       <Show when={state.shown}>
@@ -160,7 +159,7 @@ export default function SettingAction(props: { clear: any }) {
             label="导出图片"
           />
           <ActionItem
-            label="导出 Markdown"
+            label="导出MD"
             onClick={async () => {
               await exportMD(store.messageList)
               setState("copied", true)
@@ -204,6 +203,8 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
     <div
       class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
       onClick={props.onClick}
+      attr:tooltip={props.label}
+      attr:position="top"
     >
       <button class={props.icon} title={props.label} />
     </div>

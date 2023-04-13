@@ -1,0 +1,67 @@
+[tooltip] {
+  position: relative;
+}
+
+[tooltip]::after {
+  content: attr(tooltip);
+  position: absolute;
+  display: block;
+  background: inherit;
+  text-align: center;
+  color: inherit;
+  border-radius: 0.25rem;
+  padding: 2px;
+  font-size: 10px;
+  width: 100%;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0;
+
+  left: 50%;
+  top: -5px;
+  transform: translateX(-50%) translateY(-100%);
+}
+
+[tooltip]:hover::after,
+[tooltip]:hover::before {
+  opacity: 1;
+}
+/* 右侧 */
+[tooltip][position="right"]::before {
+  top: 50%;
+  left: 100%;
+  margin-left: -3px;
+  transform: translateY(-50%) rotate(90deg);
+}
+[tooltip][position="right"]::after {
+  top: 50%;
+  left: 100%;
+  margin-left: 5px;
+  transform: translateY(-50%);
+}
+/* 左侧 */
+[tooltip][position="left"]::before {
+  top: 50%;
+  left: 0;
+  margin-left: -9px;
+  transform: translateY(-50%) rotate(-90deg);
+}
+[tooltip][position="left"]::after {
+  top: 50%;
+  left: 0;
+  margin-left: -5px;
+  transform: translateY(-50%) translateX(-100%);
+}
+/* 底侧 */
+[tooltip][position="bottom"]::before {
+  top: 100%;
+  left: 50%;
+  margin-top: 1px;
+  transform: translatex(-50%) rotate(180deg);
+}
+[tooltip][position="bottom"]::after {
+  top: 100%;
+  left: 50%;
+  margin-top: 5px;
+  transform: translatex(-50%);
+}
