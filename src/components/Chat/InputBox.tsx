@@ -144,7 +144,7 @@ export default function (props: {
             >
               <span class="dark:text-slate text-slate-7">
                 AI 正在思考 | Tokens: {store.currentMessageToken}/$
-                {store.currentMessageToken$}
+                {store.currentMessageToken$.toFixed(4)}
               </span>
             </div>
           }

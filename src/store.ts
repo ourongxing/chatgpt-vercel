@@ -93,37 +93,22 @@ function Store() {
     store.validContext.reduce((acc, cur) => acc + countTokens(cur.content), 0)
   )
 
-  const contextToken$ = createMemo(
-    () =>
-      +countTokensDollar(
-        store.contextToken,
-        store.setting.APIModel,
-        false
-      ).toFixed(4)
+  const contextToken$ = createMemo(() =>
+    countTokensDollar(store.contextToken, store.setting.APIModel, false)
   )
 
   const currentMessageToken = createMemo(() =>
     countTokens(store.currentAssistantMessage)
   )
 
-  const currentMessageToken$ = createMemo(
-    () =>
-      +countTokensDollar(
-        store.currentMessageToken,
-        store.setting.APIModel,
-        true
-      ).toFixed(4)
+  const currentMessageToken$ = createMemo(() =>
+    countTokensDollar(store.currentMessageToken, store.setting.APIModel, true)
   )
 
   const inputContentToken = createMemo(() => countTokens(store.inputContent))
 
-  const inputContentToken$ = createMemo(
-    () =>
-      +countTokensDollar(
-        store.inputContentToken,
-        store.setting.APIModel,
-        true
-      ).toFixed(4)
+  const inputContentToken$ = createMemo(() =>
+    countTokensDollar(store.inputContentToken, store.setting.APIModel, true)
   )
 
   const remainingToken = createMemo(

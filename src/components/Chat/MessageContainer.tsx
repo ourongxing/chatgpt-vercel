@@ -68,7 +68,9 @@ export default function (props: { sendMessage(value?: string): void }) {
             when={store.inputContentToken}
             fallback={
               <span class="mx-1 text-slate/40">
-                {`有效上下文 Tokens : ${store.contextToken}/$${store.contextToken$}`}
+                {`有效上下文 Tokens : ${
+                  store.contextToken
+                }/$${store.contextToken$.toFixed(4)}`}
               </span>
             }
           >
@@ -83,7 +85,9 @@ export default function (props: { sendMessage(value?: string): void }) {
               >
                 {store.remainingToken}
               </span>
-              {`)/$${store.contextToken$ + store.inputContentToken$}`}
+              {`)/$${(store.contextToken$ + store.inputContentToken$).toFixed(
+                4
+              )}`}
             </span>
           </Show>
           <hr class="flex-1  border-slate/30" />
