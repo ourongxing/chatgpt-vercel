@@ -219,7 +219,7 @@ function ActionItem(props: { onClick: any; icon: string; label?: string }) {
 async function exportJpg() {
   try {
     const messageContainer = document.querySelector(
-      "#message-container"
+      "#message-container-img"
     ) as HTMLElement
     async function downloadIMG() {
       const url = await toJpeg(messageContainer)
@@ -265,6 +265,6 @@ async function exportMD(messages: ChatMessage[]) {
       .map(k => {
         return `> ${k[0].content}\n\n${k[1].content}`
       })
-      .join("\n---\n")
+      .join("\n\n---\n\n")
   )
 }
