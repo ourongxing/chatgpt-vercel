@@ -2,11 +2,12 @@ import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
 import { Show, createEffect, createSignal, onMount } from "solid-js"
-import { defaultMessage, setStore, store } from "~/store"
+import { RootStore, defaultMessage } from "~/store"
 import type { PromptItem } from "~/types"
 import { parsePrompts, scrollToBottom } from "~/utils"
 import PromptList from "./PromptList"
-import SettingAction from "./SettingAction"
+import SettingAction, { type FakeRoleUnion } from "./SettingAction"
+import { state as actionState } from "./SettingAction"
 
 const prompts = parsePrompts()
 const fzf = new Fzf(prompts, {
@@ -17,12 +18,13 @@ const fzf = new Fzf(prompts, {
 const defaultHeight = 48
 export default function (props: {
   width: string
-  sendMessage(content?: string): void
+  sendMessage(content?: string, fakeRole?: FakeRoleUnion): void
   stopStreamFetch(): void
 }) {
   const [height, setHeight] = createSignal(defaultHeight)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
+  const { store, setStore } = RootStore
 
   onMount(() => {
     if (store.inputRef) {
@@ -193,7 +195,7 @@ export default function (props: {
                 } else if (e.keyCode === 13) {
                   if (!e.shiftKey) {
                     e.preventDefault()
-                    props.sendMessage()
+                    props.sendMessage(undefined, actionState.fakeRole)
                   }
                 } else if (e.key === "ArrowUp") {
                   const userMessages = store.messageList
@@ -236,7 +238,9 @@ export default function (props: {
             <div class="absolute right-0.5em bottom-0.8em flex items-center">
               <button
                 title="发送"
-                onClick={() => props.sendMessage()}
+                onClick={() =>
+                  props.sendMessage(undefined, actionState.fakeRole)
+                }
                 class="i-carbon:send-filled text-1.5em text-slate-7 dark:text-slate text-op-80! hover:text-op-100!"
               />
             </div>

@@ -9,11 +9,11 @@ export const defaultEnv = {
   CLIENT_DEFAULT_SETTING: {
     continuousDialogue: true,
     archiveSession: false,
-    openaiAPIKey: "",
-    openaiAPITemperature: 60,
+    APIKey: "",
+    // 0-2
+    APITemperature: 0.6,
     password: "",
-    systemRule: "",
-    model: "gpt-3.5-turbo" as Model
+    APIModel: "gpt-3.5-turbo" as Model
   },
   CLIENT_DEFAULT_MESSAGE: `Powered by OpenAI Vercel
 - 如果本项目对你有所帮助，可以给小猫 [买点零食](https://cdn.jsdelivr.net/gh/ourongxing/chatgpt-vercel/assets/reward.gif)，但不接受任何付费功能请求。

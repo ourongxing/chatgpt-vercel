@@ -1,7 +1,7 @@
 import { toBlob, toJpeg } from "html-to-image"
 import { Show, createEffect, type JSXElement } from "solid-js"
 import { clickOutside } from "~/hooks"
-import { setStore, store } from "~/store"
+import { RootStore } from "~/store"
 import type { ChatMessage, Model } from "~/types"
 import { copyToClipboard, dateFormat, isMobile } from "~/utils"
 import { Switch } from "../Common"
@@ -11,18 +11,26 @@ export const [state, setState] = createStore({
   shown: false,
   copied: false,
   genImg: "normal" as ImgStatusUnion,
-  fakeRobot: false
+  fakeRole: "normal" as FakeRoleUnion
 })
 
 type ImgStatusUnion = "normal" | "loading" | "success" | "error"
-const imgIcon: Record<ImgStatusUnion, string> = {
+const imgIcons: Record<ImgStatusUnion, string> = {
   success: "i-ri:check-fill dark:text-yellow text-yellow-6",
   normal: "i-carbon:image",
   loading: "i-ri:loader-2-line animate-spin",
   error: "i-carbon:warning-alt text-red-6 dark:text-red"
 }
 
+export type FakeRoleUnion = "assistant" | "user" | "normal"
+const roleIcons: Record<FakeRoleUnion, string> = {
+  assistant: "i-ri:android-fill bg-gradient-to-r from-yellow-300 to-red-700 ",
+  normal: "i-ri:user-3-line",
+  user: "i-ri:user-3-fill bg-gradient-to-r from-red-300 to-blue-700 "
+}
+
 export default function SettingAction(props: { clear: any }) {
+  const { store, setStore } = RootStore
   createEffect(() => {
     localStorage.setItem("setting", JSON.stringify(store.setting))
   })
@@ -42,23 +50,25 @@ export default function SettingAction(props: { clear: any }) {
               value={store.setting.password}
               class="input-box"
               onInput={e => {
-                setStore("setting", t => ({
-                  ...t,
-                  password: (e.target as HTMLInputElement).value
-                }))
+                setStore(
+                  "setting",
+                  "password",
+                  (e.target as HTMLInputElement).value
+                )
               }}
             />
           </SettingItem>
           <SettingItem icon="i-carbon:api" label="OpenAI Key">
             <input
               type="password"
-              value={store.setting.openaiAPIKey}
+              value={store.setting.APIKey}
               class="input-box"
               onInput={e => {
-                setStore("setting", t => ({
-                  ...t,
-                  openaiAPIKey: (e.target as HTMLInputElement).value
-                }))
+                setStore(
+                  "setting",
+                  "APIKey",
+                  (e.target as HTMLInputElement).value
+                )
               }}
             />
           </SettingItem>
@@ -69,12 +79,13 @@ export default function SettingAction(props: { clear: any }) {
             <select
               name="model"
               class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center focus:(bg-op-20 ring-0 outline-none)"
-              value={store.setting.model}
+              value={store.setting.APIModel}
               onChange={e => {
-                setStore("setting", t => ({
-                  ...t,
-                  model: (e.target as HTMLSelectElement).value as Model
-                }))
+                setStore(
+                  "setting",
+                  "APIModel",
+                  (e.target as HTMLSelectElement).value as Model
+                )
               }}
             >
               <option value="gpt-3.5-turbo">gpt-3.5-turbo(4k)</option>
@@ -88,19 +99,18 @@ export default function SettingAction(props: { clear: any }) {
                 type="range"
                 min={0}
                 max={100}
-                value={String(store.setting.openaiAPITemperature)}
+                value={String(store.setting.APITemperature * 50)}
                 class="bg-slate max-w-100px w-full h-2 bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
                 onInput={e => {
-                  setStore("setting", t => ({
-                    ...t,
-                    openaiAPITemperature: Number(
-                      (e.target as HTMLInputElement).value
-                    )
-                  }))
+                  setStore(
+                    "setting",
+                    "APITemperature",
+                    Number((e.target as HTMLInputElement).value) / 50
+                  )
                 }}
               />
               <span class="bg-slate bg-op-15 rounded-sm px-1 text-10px">
-                {(store.setting.openaiAPITemperature / 100).toFixed(2)}
+                {store.setting.APITemperature.toFixed(2)}
               </span>
             </div>
           </SettingItem>
@@ -111,10 +121,11 @@ export default function SettingAction(props: { clear: any }) {
                 checked={store.setting.archiveSession}
                 class="sr-only peer"
                 onChange={e => {
-                  setStore("setting", t => ({
-                    ...t,
-                    archiveSession: (e.target as HTMLInputElement).checked
-                  }))
+                  setStore(
+                    "setting",
+                    "archiveSession",
+                    (e.target as HTMLInputElement).checked
+                  )
                 }}
               />
               <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
@@ -124,10 +135,11 @@ export default function SettingAction(props: { clear: any }) {
             <Switch
               checked={store.setting.continuousDialogue}
               onChange={e => {
-                setStore("setting", t => ({
-                  ...t,
-                  continuousDialogue: (e.target as HTMLInputElement).checked
-                }))
+                setStore(
+                  "setting",
+                  "continuousDialogue",
+                  (e.target as HTMLInputElement).checked
+                )
               }}
             />
           </SettingItem>
@@ -144,15 +156,14 @@ export default function SettingAction(props: { clear: any }) {
         />
         <div class="flex">
           <ActionItem
-            onClick={async () => {
-              setState("fakeRobot", k => !k)
+            onClick={() => {
+              setState("fakeRole", k => {
+                const _ = ["normal", "user", "assistant"] as FakeRoleUnion[]
+                return _[(_.indexOf(k) + 1) % _.length]
+              })
             }}
-            icon={`${
-              state.fakeRobot
-                ? "dark:text-yellow text-yellow-6 i-ri:android-fill"
-                : "i-ri:android-line"
-            }`}
-            label="伪装 GPT"
+            icon={roleIcons[state.fakeRole]}
+            label="伪装角色"
           />
           <ActionItem
             onClick={async () => {
@@ -160,7 +171,7 @@ export default function SettingAction(props: { clear: any }) {
               await exportJpg()
               setTimeout(() => setState("genImg", "normal"), 1000)
             }}
-            icon={imgIcon[state.genImg]}
+            icon={imgIcons[state.genImg]}
             label="导出图片"
           />
           <ActionItem
@@ -251,7 +262,7 @@ async function exportJpg() {
 
 async function exportMD(messages: ChatMessage[]) {
   const _ = messages.reduce((acc, k) => {
-    if ((k.role === "assistant" && k.type !== "default") || k.role === "user") {
+    if (k.role === "assistant" || k.role === "user") {
       if (k.role === "user") {
         acc.push([k])
       } else {

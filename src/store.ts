@@ -1,7 +1,7 @@
 import { createStore } from "solid-js/store"
 import { defaultEnv } from "./env"
 import type { ChatMessage } from "./types"
-import { createMemo } from "solid-js"
+import { createMemo, createRoot } from "solid-js"
 import { countTokens, countTokensDollar } from "./utils"
 
 let setting = defaultEnv.CLIENT_DEFAULT_SETTING
@@ -32,6 +32,12 @@ if (_) {
   }
 }
 
+export const LocalStorageKey = {
+  GlobalSettings: "gpt-global-settings",
+  Sessions: "gpt-sessions",
+  MainSession: "gpt-main-session",
+  Theme: "gpt-theme"
+}
 export const defaultMessage: ChatMessage = {
   role: "assistant",
   content:
@@ -39,82 +45,95 @@ export const defaultMessage: ChatMessage = {
   type: "default"
 }
 
-export const [store, setStore] = createStore({
-  setting,
-  inputContent: "",
-  messageList: [] as ChatMessage[],
-  currentAssistantMessage: "",
-  loading: false,
-  inputRef: null as HTMLTextAreaElement | null,
-  get validContext() {
-    return validContext()
-  },
-  get contextToken() {
-    return contextToken()
-  },
-  get contextToken$() {
-    return contextToken$()
-  },
-  get currentMessageToken() {
-    return currentMessageToken()
-  },
-  get currentMessageToken$() {
-    return currentMessageToken$()
-  },
-  get inputContentToken() {
-    return inputContentToken()
-  },
-  get inputContentToken$() {
-    return inputContentToken$()
-  },
-  get maxAllToken() {
-    return maxAllToken()
-  }
-})
+function Store() {
+  const [store, setStore] = createStore({
+    setting,
+    inputContent: "",
+    messageList: [] as ChatMessage[],
+    currentAssistantMessage: "",
+    loading: false,
+    inputRef: null as HTMLTextAreaElement | null,
+    get validContext() {
+      return validContext()
+    },
+    get contextToken() {
+      return contextToken()
+    },
+    get contextToken$() {
+      return contextToken$()
+    },
+    get currentMessageToken() {
+      return currentMessageToken()
+    },
+    get currentMessageToken$() {
+      return currentMessageToken$()
+    },
+    get inputContentToken() {
+      return inputContentToken()
+    },
+    get inputContentToken$() {
+      return inputContentToken$()
+    },
+    get remainingToken() {
+      return remainingToken()
+    }
+  })
 
-const maxAllToken = createMemo(() => maxInputTokens[store.setting.model])
-const validContext = createMemo(() =>
-  store.setting.continuousDialogue
-    ? store.messageList.filter(
-        (k, i, _) =>
-          k.role !== "error" &&
-          _[i + 1]?.role !== "error" &&
-          k.type !== "default"
-      )
-    : store.messageList.filter(k => k.type === "locked")
-)
+  const validContext = createMemo(() =>
+    store.setting.continuousDialogue
+      ? store.messageList.filter(
+          (k, i, _) =>
+            (k.role === "assistant" && _[i - 1]?.role === "user") ||
+            (k.role === "user" &&
+              (_[i + 1]?.role === "assistant" || k.type === "locked"))
+        )
+      : store.messageList.filter(k => k.type === "locked")
+  )
 
-const contextToken = createMemo(() =>
-  store.validContext.reduce((acc, cur) => acc + countTokens(cur.content), 0)
-)
+  const contextToken = createMemo(() =>
+    store.validContext.reduce((acc, cur) => acc + countTokens(cur.content), 0)
+  )
 
-const contextToken$ = createMemo(
-  () =>
-    +countTokensDollar(store.contextToken, store.setting.model, false).toFixed(
-      4
-    )
-)
+  const contextToken$ = createMemo(
+    () =>
+      +countTokensDollar(
+        store.contextToken,
+        store.setting.APIModel,
+        false
+      ).toFixed(4)
+  )
 
-const currentMessageToken = createMemo(() =>
-  countTokens(store.currentAssistantMessage)
-)
+  const currentMessageToken = createMemo(() =>
+    countTokens(store.currentAssistantMessage)
+  )
 
-const currentMessageToken$ = createMemo(
-  () =>
-    +countTokensDollar(
-      store.currentMessageToken,
-      store.setting.model,
-      true
-    ).toFixed(4)
-)
+  const currentMessageToken$ = createMemo(
+    () =>
+      +countTokensDollar(
+        store.currentMessageToken,
+        store.setting.APIModel,
+        true
+      ).toFixed(4)
+  )
 
-const inputContentToken = createMemo(() => countTokens(store.inputContent))
+  const inputContentToken = createMemo(() => countTokens(store.inputContent))
 
-const inputContentToken$ = createMemo(
-  () =>
-    +countTokensDollar(
-      store.inputContentToken,
-      store.setting.model,
-      true
-    ).toFixed(4)
-)
+  const inputContentToken$ = createMemo(
+    () =>
+      +countTokensDollar(
+        store.inputContentToken,
+        store.setting.APIModel,
+        true
+      ).toFixed(4)
+  )
+
+  const remainingToken = createMemo(
+    () =>
+      maxInputTokens[store.setting.APIModel] -
+      store.contextToken -
+      store.inputContentToken
+  )
+  return { store, setStore }
+}
+
+export const RootStore = createRoot(Store)

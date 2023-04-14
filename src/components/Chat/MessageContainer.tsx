@@ -1,11 +1,10 @@
 import { For, Show, createEffect } from "solid-js"
-import { store } from "~/store"
+import { RootStore, defaultMessage } from "~/store"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
 
-export default function (props: {
-  sendMessage(value?: string, fakeRobot?: boolean): void
-}) {
+export default function (props: { sendMessage(value?: string): void }) {
+  const { store } = RootStore
   createEffect(prev => {
     store.messageList
     if (prev) {
@@ -36,17 +35,20 @@ export default function (props: {
           "background-color": "var(--c-bg)"
         }}
       >
+        <Show when={!store.messageList.length}>
+          <MessageItem hiddenAction={true} message={defaultMessage} />
+        </Show>
         <For each={store.messageList}>
           {(message, index) => (
             <MessageItem
               message={message}
-              hiddenAction={store.loading || message.type === "default"}
+              hiddenAction={store.loading}
               index={index()}
               sendMessage={props.sendMessage}
             />
           )}
         </For>
-        {store.currentAssistantMessage && (
+        <Show when={store.currentAssistantMessage}>
           <MessageItem
             hiddenAction={true}
             message={{
@@ -55,27 +57,33 @@ export default function (props: {
               type: "temporary"
             }}
           />
-        )}
+        </Show>
       </div>
       <Show
         when={!store.loading && (store.contextToken || store.inputContentToken)}
       >
         <div class="flex items-center px-1em text-0.8em">
-          <hr class="flex-1 border-slate/30" />
+          <hr class="flex-1 border-slate/40" />
           <Show
             when={store.inputContentToken}
             fallback={
-              <span class="mx-1 text-slate/30">
+              <span class="mx-1 text-slate/40">
                 {`有效上下文 Tokens : ${store.contextToken}/$${store.contextToken$}`}
               </span>
             }
           >
-            <span class="mx-1 text-slate/30">
+            <span class="mx-1 text-slate/40">
               {`有效上下文+提问 Tokens : ${
                 store.contextToken + store.inputContentToken
-              }(${
-                store.maxAllToken - store.contextToken - store.inputContentToken
-              })/$${store.contextToken$ + store.inputContentToken$}`}
+              }(`}
+              <span
+                classList={{
+                  "text-red-500": store.remainingToken < 0
+                }}
+              >
+                {store.remainingToken}
+              </span>
+              {`)/$${store.contextToken$ + store.inputContentToken$}`}
             </span>
           </Show>
           <hr class="flex-1  border-slate/30" />

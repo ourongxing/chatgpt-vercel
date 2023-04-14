@@ -1,22 +1,24 @@
 import { Show } from "solid-js"
 import { useCopyCode } from "~/hooks"
 import md from "~/markdown-it"
-import { setStore, store } from "~/store"
+import { RootStore } from "~/store"
 import type { ChatMessage } from "~/types"
 import { copyToClipboard } from "~/utils"
 import MessageAction from "./MessageAction"
 import openai from "/assets/openai.svg?raw"
 import vercel from "/assets/vercel.svg?raw"
+import type { FakeRoleUnion } from "./SettingAction"
 
 interface Props {
   message: ChatMessage
   hiddenAction: boolean
   index?: number
-  sendMessage?: (value?: string, fakeRobot?: boolean) => void
+  sendMessage?: (value?: string, fakeRole?: FakeRoleUnion) => void
 }
 
 export default (props: Props) => {
   useCopyCode()
+  const { store, setStore } = RootStore
   const roleClass = {
     error: "bg-gradient-to-r from-red-400 to-red-700",
     system: "bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300",
@@ -91,7 +93,8 @@ export default (props: Props) => {
         setStore(
           "messageList",
           (k, i) =>
-            i === props.index || (i === props.index! + 1 && k.role !== "user"),
+            i === props.index ||
+            (i === props.index! + 1 && k.role === "assistant"),
           "type",
           type => (type === "locked" ? undefined : "locked")
         )

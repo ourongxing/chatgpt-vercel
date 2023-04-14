@@ -2,16 +2,13 @@ import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { createSignal, onMount } from "solid-js"
 import { useSearchParams } from "solid-start"
 import { defaultEnv } from "~/env"
-import { setStore, store, defaultMessage } from "~/store"
+import { RootStore } from "~/store"
 import type { ChatMessage } from "~/types"
 import { isMobile } from "~/utils"
 import MessageContainer from "./MessageContainer"
 import InputBox from "./InputBox"
 import PrefixTitle from "../PrefixTitle"
-import {
-  state as actionState,
-  setState as setActionState
-} from "./SettingAction"
+import { type FakeRoleUnion, setState as setActionState } from "./SettingAction"
 
 let _setting = defaultEnv.CLIENT_DEFAULT_SETTING
 if (import.meta.env.CLIENT_DEFAULT_SETTING) {
@@ -34,6 +31,7 @@ export default function (props: { sessionID?: string }) {
   let controller: AbortController | undefined = undefined
   const [containerWidth, setContainerWidth] = createSignal("init")
   const [searchParams, setSearchParams] = useSearchParams()
+  const { store, setStore } = RootStore
 
   onMount(() => {
     createResizeObserver(containerRef, ({ width }, el) => {
@@ -45,7 +43,6 @@ export default function (props: { sessionID?: string }) {
     document.querySelector("#root")?.classList.add("after")
     const setting = localStorage.getItem("setting")
     const session = localStorage.getItem("session")
-    const allSession = localStorage.getItem("all-session")
     try {
       let archiveSession = false
       if (setting) {
@@ -62,13 +59,10 @@ export default function (props: { sessionID?: string }) {
       } else {
         if (session && archiveSession) {
           const parsed = JSON.parse(session) as ChatMessage[]
-          if (
-            (parsed.length === 1 && parsed[0].type === "default") ||
-            parsed.length === 0
-          ) {
-            setStore("messageList", [defaultMessage])
-          } else setStore("messageList", parsed)
-        } else setStore("messageList", [defaultMessage])
+          if (parsed.length > 0) {
+            setStore("messageList", parsed)
+          }
+        }
       }
     } catch {
       console.log("Setting parse error")
@@ -99,13 +93,12 @@ export default function (props: { sessionID?: string }) {
     }
   }
 
-  async function sendMessage(value?: string, fakeRobot = false) {
+  async function sendMessage(value?: string, fakeRole?: FakeRoleUnion) {
     const inputValue = value ?? store.inputContent
     if (!inputValue) return
-    // @ts-ignore
-    if (window?.umami) umami.trackEvent("chat_generate")
     setStore("inputContent", "")
-    if (actionState.fakeRobot) {
+    if (fakeRole === "assistant") {
+      setActionState("fakeRole", "normal")
       if (
         store.messageList.at(-1)?.role !== "user" &&
         store.messageList.at(-2)?.role === "user"
@@ -125,7 +118,16 @@ export default function (props: { sessionID?: string }) {
         ])
         return
       }
-      setActionState("fakeRobot", false)
+    } else if (fakeRole === "user") {
+      setActionState("fakeRole", "normal")
+      setStore("messageList", k => [
+        ...k,
+        {
+          role: "user",
+          content: inputValue
+        }
+      ])
+      return
     }
 
     // 如果传入值为空，或者传入值与最后一条用户消息不相同，就新增一条用户消息
@@ -133,22 +135,13 @@ export default function (props: { sessionID?: string }) {
       !value ||
       value !== store.messageList.filter(k => k.role === "user").at(-1)?.content
     ) {
-      setStore("messageList", k => {
-        if (k.length === 1 && k[0].type === "default")
-          return [
-            {
-              role: "user",
-              content: inputValue
-            }
-          ]
-        return [
-          ...k,
-          {
-            role: "user",
-            content: inputValue
-          }
-        ]
-      })
+      setStore("messageList", k => [
+        ...k,
+        {
+          role: "user",
+          content: inputValue
+        }
+      ])
     }
 
     const message: ChatMessage = {
@@ -181,10 +174,10 @@ export default function (props: { sessionID?: string }) {
       method: "POST",
       body: JSON.stringify({
         messages,
-        key: store.setting.openaiAPIKey || undefined,
-        temperature: store.setting.openaiAPITemperature / 100,
+        key: store.setting.APIKey || undefined,
+        temperature: store.setting.APITemperature,
         password: store.setting.password,
-        model: store.setting.model
+        model: store.setting.APIModel
       }),
       signal: controller?.signal
     })
