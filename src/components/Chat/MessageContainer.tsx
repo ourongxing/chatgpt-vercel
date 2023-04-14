@@ -1,19 +1,10 @@
-import { For, createEffect } from "solid-js"
-import { defaultEnv } from "~/env"
+import { For, Show, createEffect } from "solid-js"
 import { store } from "~/store"
-import type { ChatMessage } from "~/types"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
 
-export const defaultMessage: ChatMessage = {
-  role: "assistant",
-  content:
-    import.meta.env.CLIENT_DEFAULT_MESSAGE || defaultEnv.CLIENT_DEFAULT_MESSAGE,
-  type: "default"
-}
-
 export default function (props: {
-  sendMessage: (value?: string, fakeRobot?: boolean) => void
+  sendMessage(value?: string, fakeRobot?: boolean): void
 }) {
   createEffect(prev => {
     store.messageList
@@ -37,9 +28,9 @@ export default function (props: {
   })
 
   return (
-    <div class="px-1em mb-6em">
+    <div class="px-1em mb-6em" id="message-container">
       <div
-        id="message-container"
+        id="message-container-img"
         class="px-1em"
         style={{
           "background-color": "var(--c-bg)"
@@ -66,6 +57,30 @@ export default function (props: {
           />
         )}
       </div>
+      <Show
+        when={!store.loading && (store.contextToken || store.inputContentToken)}
+      >
+        <div class="flex items-center px-1em text-0.8em">
+          <hr class="flex-1 border-slate/30" />
+          <Show
+            when={store.inputContentToken}
+            fallback={
+              <span class="mx-1 text-slate/30">
+                {`有效上下文 Tokens : ${store.contextToken}/$${store.contextToken$}`}
+              </span>
+            }
+          >
+            <span class="mx-1 text-slate/30">
+              {`有效上下文+提问 Tokens : ${
+                store.contextToken + store.inputContentToken
+              }(${
+                store.maxAllToken - store.contextToken - store.inputContentToken
+              })/$${store.contextToken$ + store.inputContentToken$}`}
+            </span>
+          </Show>
+          <hr class="flex-1  border-slate/30" />
+        </div>
+      </Show>
     </div>
   )
 }

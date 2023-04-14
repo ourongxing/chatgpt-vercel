@@ -2,10 +2,10 @@ import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { createSignal, onMount } from "solid-js"
 import { useSearchParams } from "solid-start"
 import { defaultEnv } from "~/env"
-import { setStore, store } from "~/store"
+import { setStore, store, defaultMessage } from "~/store"
 import type { ChatMessage } from "~/types"
 import { isMobile } from "~/utils"
-import MessageContainer, { defaultMessage } from "./MessageContainer"
+import MessageContainer from "./MessageContainer"
 import InputBox from "./InputBox"
 import PrefixTitle from "../PrefixTitle"
 import {
@@ -155,12 +155,7 @@ export default function (props: { sessionID?: string }) {
       role: "user",
       content: inputValue
     }
-    const messages = store.setting.continuousDialogue
-      ? [...store.messageList.slice(0, -1), message].filter(
-          (k, i, _) => k.role !== "error" && _[i + 1]?.role !== "error"
-        )
-      : [...store.messageList.filter(k => k.type === "locked"), message]
-
+    const messages = [...store.validContext, message]
     try {
       setStore("loading", true)
       controller = new AbortController()

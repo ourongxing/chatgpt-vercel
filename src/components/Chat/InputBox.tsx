@@ -1,16 +1,10 @@
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
-import { Show, createEffect, createMemo, createSignal, onMount } from "solid-js"
-import { setStore, store } from "~/store"
+import { Show, createEffect, createSignal, onMount } from "solid-js"
+import { defaultMessage, setStore, store } from "~/store"
 import type { PromptItem } from "~/types"
-import {
-  countTokens,
-  countTokensDollar,
-  parsePrompts,
-  scrollToBottom
-} from "~/utils"
-import { defaultMessage } from "./MessageContainer"
+import { parsePrompts, scrollToBottom } from "~/utils"
 import PromptList from "./PromptList"
 import SettingAction from "./SettingAction"
 
@@ -19,14 +13,17 @@ const fzf = new Fzf(prompts, {
   selector: k => `${k.desc}||${k.prompt}`
 })
 
+// 3em
+const defaultHeight = 48
 export default function (props: {
   width: string
   sendMessage(content?: string): void
   stopStreamFetch(): void
 }) {
-  const [height, setHeight] = createSignal("48px")
+  const [height, setHeight] = createSignal(defaultHeight)
   const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
+
   onMount(() => {
     if (store.inputRef) {
       makeEventListener(
@@ -52,18 +49,16 @@ export default function (props: {
   createEffect(prev => {
     store.inputContent
     if (prev) {
-      setHeight("48px")
+      setHeight(defaultHeight)
       if (store.inputContent === "") {
         setCompatiblePrompt([])
       } else {
         const scrollHeight = store.inputRef?.scrollHeight
         if (scrollHeight)
           setHeight(
-            `${
-              scrollHeight > window.innerHeight - 64
-                ? window.innerHeight - 64
-                : scrollHeight
-            }px`
+            scrollHeight > window.innerHeight - 64
+              ? window.innerHeight - 64
+              : scrollHeight
           )
       }
       store.inputRef?.focus()
@@ -87,11 +82,9 @@ export default function (props: {
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
-        `${
-          scrollHeight > window.innerHeight - 64
-            ? window.innerHeight - 64
-            : scrollHeight
-        }px`
+        scrollHeight > window.innerHeight - 64
+          ? window.innerHeight - 64
+          : scrollHeight
       )
     store.inputRef?.focus()
   }
@@ -116,15 +109,13 @@ export default function (props: {
   )
 
   async function handleInput() {
-    setHeight("48px")
+    setHeight(defaultHeight)
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
-        `${
-          scrollHeight > window.innerHeight - 64
-            ? window.innerHeight - 64
-            : scrollHeight
-        }px`
+        scrollHeight > window.innerHeight - 64
+          ? window.innerHeight - 64
+          : scrollHeight
       )
     if (!compositionend()) return
     const value = store.inputRef?.value
@@ -136,11 +127,6 @@ export default function (props: {
       setCompatiblePrompt([])
     }
   }
-
-  const tokens = createMemo(() => countTokens(store.currentAssistantMessage))
-  const tokens$ = createMemo(() =>
-    countTokensDollar(tokens(), store.setting.model, true)
-  )
 
   return (
     <div
@@ -158,28 +144,24 @@ export default function (props: {
       >
         <Show
           when={
-            !store.loading && !compatiblePrompt().length && height() === "48px"
+            !store.loading &&
+            !compatiblePrompt().length &&
+            height() === defaultHeight
           }
         >
           <SettingAction clear={clearSession} />
         </Show>
         <Show
-          when={store.loading}
+          when={!store.loading}
           fallback={
-            <div class="h-12 flex items-center justify-center bg-slate bg-op-15 text-slate-400 dark:text-slate rounded">
-              <span>AI 正在思考</span>
-              <span class="animate-dotting">...</span>
-              <Show when={tokens()}>
-                <span class="rounded-md bg-slate">
-                  {tokens()}/${tokens$().toFixed(3)}
-                </span>
-              </Show>
-              <button
-                class="ml-1em px-2 py-0.5 border border-slate rounded-md text-sm hover:bg-slate/10"
-                onClick={props.stopStreamFetch}
-              >
-                不需要了
-              </button>
+            <div
+              class="px-2em animate-gradient-border cursor-pointer hover:bg-op-90 dark:bg-#292B31 bg-#E7EBF0 h-3em flex items-center justify-center"
+              onClick={props.stopStreamFetch}
+            >
+              <span class="dark:text-slate text-slate-7">
+                AI 正在思考 | Tokens: {store.currentMessageToken}/$
+                {store.currentMessageToken$}
+              </span>
             </div>
           }
         >
@@ -226,9 +208,9 @@ export default function (props: {
               }}
               onInput={handleInput}
               style={{
-                height: height()
+                height: height() + "px"
               }}
-              class="self-end py-3 pr-2.2em resize-none w-full px-3 text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-800 dark:text-slate-400 op-40)"
+              class="self-end p-3 pr-2.2em resize-none w-full text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-800 dark:text-slate-400 op-40)"
               classList={{
                 "rounded-t": compatiblePrompt().length === 0,
                 "rounded-b": true
@@ -238,8 +220,8 @@ export default function (props: {
               <div
                 class="absolute flex text-1em items-center"
                 classList={{
-                  "right-3em bottom-1em": height() === "48px",
-                  "right-1em top-1em": height() !== "48px"
+                  "right-2.5em bottom-1em": height() === defaultHeight,
+                  "right-0.8em top-0.8em": height() !== defaultHeight
                 }}
               >
                 <button
@@ -251,7 +233,7 @@ export default function (props: {
                 />
               </div>
             </Show>
-            <div class="absolute right-0.8em bottom-0.8em flex items-center">
+            <div class="absolute right-0.5em bottom-0.8em flex items-center">
               <button
                 title="发送"
                 onClick={() => props.sendMessage()}
