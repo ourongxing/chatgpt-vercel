@@ -2,7 +2,7 @@ import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
 import { Show, createEffect, createSignal, onMount } from "solid-js"
-import { RootStore, defaultMessage } from "~/store"
+import { RootStore } from "~/store"
 import type { PromptItem } from "~/types"
 import { parsePrompts, scrollToBottom } from "~/utils"
 import PromptList from "./PromptList"
@@ -22,7 +22,7 @@ export default function (props: {
   stopStreamFetch(): void
 }) {
   const [height, setHeight] = createSignal(defaultHeight)
-  const [compatiblePrompt, setCompatiblePrompt] = createSignal<PromptItem[]>([])
+  const [candidatePrompts, setCandidatePrompts] = createSignal<PromptItem[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
   const { store, setStore } = RootStore
 
@@ -48,39 +48,7 @@ export default function (props: {
     }
   })
 
-  createEffect(prev => {
-    store.inputContent
-    if (prev) {
-      setHeight(defaultHeight)
-      if (store.inputContent === "") {
-        setCompatiblePrompt([])
-      } else {
-        const scrollHeight = store.inputRef?.scrollHeight
-        if (scrollHeight)
-          setHeight(
-            scrollHeight > window.innerHeight - 64
-              ? window.innerHeight - 64
-              : scrollHeight
-          )
-      }
-      store.inputRef?.focus()
-    }
-    return true
-  })
-
-  function clearSession() {
-    setStore("messageList", messages => {
-      const locked = messages.filter(k => k.type === "locked")
-      if (locked.length) return locked
-      else return [defaultMessage]
-    })
-    setStore("currentAssistantMessage", "")
-  }
-
-  function selectPrompt(prompt: string) {
-    setStore("inputContent", prompt)
-    setCompatiblePrompt([])
-
+  function setSuitableheight() {
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
@@ -88,15 +56,35 @@ export default function (props: {
           ? window.innerHeight - 64
           : scrollHeight
       )
+  }
+
+  createEffect(prev => {
+    store.inputContent
+    if (prev) {
+      setHeight(defaultHeight)
+      if (store.inputContent === "") {
+        setCandidatePrompts([])
+      } else {
+        setSuitableheight()
+      }
+      store.inputRef?.focus()
+    }
+    return true
+  })
+
+  function selectPrompt(prompt: string) {
+    setStore("inputContent", prompt)
+    setCandidatePrompts([])
+    setSuitableheight()
     store.inputRef?.focus()
   }
 
   const findPrompts = throttle(
     (value: string) => {
-      if (value === "/" || value === " ") return setCompatiblePrompt(prompts)
+      if (value === "/" || value === " ") return setCandidatePrompts(prompts)
       const query = value.replace(/^[\/ ](.*)/, "$1")
       if (query !== value)
-        setCompatiblePrompt(
+        setCandidatePrompts(
           fzf.find(query).map(k => ({
             ...k.item,
             positions: k.positions
@@ -112,13 +100,7 @@ export default function (props: {
 
   async function handleInput() {
     setHeight(defaultHeight)
-    const scrollHeight = store.inputRef?.scrollHeight
-    if (scrollHeight)
-      setHeight(
-        scrollHeight > window.innerHeight - 64
-          ? window.innerHeight - 64
-          : scrollHeight
-      )
+    setSuitableheight()
     if (!compositionend()) return
     const value = store.inputRef?.value
     if (value) {
@@ -126,7 +108,7 @@ export default function (props: {
       findPrompts(value)
     } else {
       setStore("inputContent", "")
-      setCompatiblePrompt([])
+      setCandidatePrompts([])
     }
   }
 
@@ -147,11 +129,11 @@ export default function (props: {
         <Show
           when={
             !store.loading &&
-            !compatiblePrompt().length &&
+            !candidatePrompts().length &&
             height() === defaultHeight
           }
         >
-          <SettingAction clear={clearSession} />
+          <SettingAction />
         </Show>
         <Show
           when={!store.loading}
@@ -167,9 +149,9 @@ export default function (props: {
             </div>
           }
         >
-          <Show when={compatiblePrompt().length}>
+          <Show when={candidatePrompts().length}>
             <PromptList
-              prompts={compatiblePrompt()}
+              prompts={candidatePrompts()}
               select={selectPrompt}
             ></PromptList>
           </Show>
@@ -184,7 +166,7 @@ export default function (props: {
               onClick={scrollToBottom}
               onKeyDown={e => {
                 if (e.isComposing) return
-                if (compatiblePrompt().length) {
+                if (candidatePrompts().length) {
                   if (
                     e.key === "ArrowUp" ||
                     e.key === "ArrowDown" ||
@@ -214,7 +196,7 @@ export default function (props: {
               }}
               class="self-end p-3 pr-2.2em resize-none w-full text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-800 dark:text-slate-400 op-40)"
               classList={{
-                "rounded-t": compatiblePrompt().length === 0,
+                "rounded-t": candidatePrompts().length === 0,
                 "rounded-b": true
               }}
             />

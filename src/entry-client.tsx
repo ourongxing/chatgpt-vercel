@@ -1,6 +1,7 @@
 import { mount, StartClient } from "solid-start/entry-client"
+import { LocalStorageKey } from "./store"
 
-const e = localStorage.getItem("theme") || ""
+const e = localStorage.getItem(LocalStorageKey.Theme) || ""
 const a = window.matchMedia("(prefers-color-scheme: dark)").matches
 if (!e || e === "auto" ? a : e === "dark") {
   document.documentElement.classList.add("dark")

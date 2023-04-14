@@ -29,11 +29,17 @@ const roleIcons: Record<FakeRoleUnion, string> = {
   user: "i-ri:user-3-fill bg-gradient-to-r from-red-300 to-blue-700 "
 }
 
-export default function SettingAction(props: { clear: any }) {
+export default function SettingAction() {
   const { store, setStore } = RootStore
   createEffect(() => {
     localStorage.setItem("setting", JSON.stringify(store.setting))
   })
+
+  function clearSession() {
+    setStore("messageList", messages =>
+      messages.filter(k => k.type === "locked")
+    )
+  }
 
   // tree shaking
   clickOutside
@@ -188,7 +194,7 @@ export default function SettingAction(props: { clear: any }) {
             }
           />
           <ActionItem
-            onClick={props.clear}
+            onClick={clearSession}
             icon="i-carbon:trash-can"
             label="清空对话"
           />
@@ -232,6 +238,7 @@ async function exportJpg() {
     const messageContainer = document.querySelector(
       "#message-container-img"
     ) as HTMLElement
+    const header = document.querySelector("header") as HTMLElement
     async function downloadIMG() {
       const url = await toJpeg(messageContainer)
       const a = document.createElement("a")
