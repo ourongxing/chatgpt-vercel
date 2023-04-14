@@ -5,7 +5,6 @@ import type { Model } from "./types"
  * 以 CLIENT_ 开头的变量会暴露给前端
  */
 export const defaultEnv = {
-  CLIENT_AUTO_RESET_CONTINUOUS_DIALOGUE: false,
   CLIENT_DEFAULT_SETTING: {
     continuousDialogue: true,
     archiveSession: false,
