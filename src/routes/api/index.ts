@@ -1,7 +1,7 @@
 import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { createParser } from "eventsource-parser"
 import type { ChatMessage, Model } from "~/types"
-import { countTokens, splitKeys, randomKey, fetchWithTimeout } from "~/utils"
+import { splitKeys, randomKey, fetchWithTimeout } from "~/utils"
 import { defaultEnv } from "~/env"
 import type { APIEvent } from "solid-start/api"
 
@@ -46,26 +46,6 @@ export const baseURL = import.meta.env.NOGFW
 const timeout = isNaN(+import.meta.env.TIMEOUT!)
   ? defaultEnv.TIMEOUT
   : +import.meta.env.TIMEOUT!
-
-let maxInputTokens = defaultEnv.MAX_INPUT_TOKENS
-const _ = import.meta.env.MAX_INPUT_TOKENS
-if (_) {
-  try {
-    if (Number.isNaN(+_)) {
-      maxInputTokens = {
-        ...maxInputTokens,
-        ...JSON.parse(_)
-      }
-    } else {
-      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
-        acc[k as Model] = +_
-        return acc
-      }, {} as typeof maxInputTokens)
-    }
-  } catch (e) {
-    console.error("Error parsing MAX_INPUT_TOKEN:", e)
-  }
-}
 
 const passwordSet = import.meta.env.PASSWORD || defaultEnv.PASSWORD
 
@@ -115,22 +95,6 @@ export async function POST({ request }: APIEvent) {
 
     if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
-    const tokens = messages.reduce((acc, cur) => {
-      const tokens = countTokens(cur.content)
-      return acc + tokens
-    }, 0)
-
-    if (
-      tokens >
-      (body.key ? defaultEnv.MAX_INPUT_TOKENS[model] : maxInputTokens[model])
-    ) {
-      if (messages.length > 1)
-        throw new Error(
-          `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
-        )
-      else throw new Error("太长了，缩短一点吧。")
-    }
-
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
@@ -147,7 +111,6 @@ export async function POST({ request }: APIEvent) {
           model: model,
           messages: messages.map(k => ({ role: k.role, content: k.content })),
           temperature,
-          // max_tokens: 4096 - tokens,
           stream: true
         })
       }

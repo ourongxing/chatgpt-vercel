@@ -22,10 +22,6 @@ if (import.meta.env.CLIENT_DEFAULT_SETTING) {
   }
 }
 
-const _ = import.meta.env.CLIENT_AUTO_RESET_CONTINUOUS_DIALOGUE
-const __ = defaultEnv.CLIENT_AUTO_RESET_CONTINUOUS_DIALOGUE
-const _reset = _ && _ !== String(__) ? !__ : __
-
 export default function (props: { sessionID?: string }) {
   let containerRef: HTMLDivElement
   let controller: AbortController | undefined = undefined
@@ -50,8 +46,7 @@ export default function (props: { sessionID?: string }) {
         archiveSession = parsed.archiveSession
         setStore("setting", t => ({
           ...t,
-          ...parsed,
-          ...(_reset ? { continuousDialogue: false } : {})
+          ...parsed
         }))
       }
       if (searchParams.q) {
@@ -83,7 +78,7 @@ export default function (props: { sessionID?: string }) {
       controller = undefined
     }
     !isMobile() && store.inputRef?.focus()
-    searchParams.q && setSearchParams({ q: undefined })
+    // searchParams.q && setSearchParams({ q: undefined })
   }
 
   function stopStreamFetch() {
@@ -107,7 +102,6 @@ export default function (props: { sessionID?: string }) {
           role: "assistant",
           content: inputValue
         })
-        return
       } else if (store.messageList.at(-1)?.role === "user") {
         setStore("messageList", k => [
           ...k,
@@ -116,7 +110,14 @@ export default function (props: { sessionID?: string }) {
             content: inputValue
           }
         ])
-        return
+      } else {
+        setStore("messageList", k => [
+          ...k,
+          {
+            role: "user",
+            content: inputValue
+          }
+        ])
       }
     } else if (fakeRole === "user") {
       setActionState("fakeRole", "normal")
@@ -127,43 +128,37 @@ export default function (props: { sessionID?: string }) {
           content: inputValue
         }
       ])
-      return
-    }
-
-    // 如果传入值为空，或者传入值与最后一条用户消息不相同，就新增一条用户消息
-    if (
-      !value ||
-      value !== store.messageList.filter(k => k.role === "user").at(-1)?.content
-    ) {
-      setStore("messageList", k => [
-        ...k,
-        {
-          role: "user",
-          content: inputValue
-        }
-      ])
-    }
-
-    const message: ChatMessage = {
-      role: "user",
-      content: inputValue
-    }
-    const messages = [...store.validContext, message]
-    try {
-      setStore("loading", true)
-      controller = new AbortController()
-      await fetchGPT(messages)
-    } catch (error: any) {
-      setStore("loading", false)
-      controller = undefined
-      if (!error.message.includes("abort")) {
+    } else {
+      try {
         setStore("messageList", k => [
           ...k,
           {
-            role: "error",
-            content: error.message.replace(/(sk-\w{5})\w+/g, "$1")
+            role: "user",
+            content: inputValue
           }
         ])
+        if (store.remainingToken < 0) {
+          throw new Error(
+            store.setting.continuousDialogue
+              ? "本次对话过长，请清除之前部分对话或者缩短当前提问。"
+              : "提问太长了，请缩短。"
+          )
+        }
+        setStore("loading", true)
+        controller = new AbortController()
+        await fetchGPT(store.validContext)
+      } catch (error: any) {
+        setStore("loading", false)
+        controller = undefined
+        if (!error.message.includes("abort")) {
+          setStore("messageList", k => [
+            ...k,
+            {
+              role: "error",
+              content: error.message.replace(/(sk-\w{5})\w+/g, "$1")
+            }
+          ])
+        }
       }
     }
     archiveCurrentMessage()
