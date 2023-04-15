@@ -1,9 +1,10 @@
+import { makeEventListener } from "@solid-primitives/event-listener"
 import { type Accessor, onCleanup, onMount } from "solid-js"
 import { copyToClipboard } from "~/utils"
 
 export function useCopyCode() {
   const timeoutIdMap: Map<HTMLElement, number> = new Map()
-  const listerner = (e: MouseEvent) => {
+  makeEventListener(window, "click", e => {
     const el = e.target as HTMLElement
     if (el.matches(".copy")) {
       const parent = el.parentElement
@@ -25,12 +26,6 @@ export function useCopyCode() {
         timeoutIdMap.set(el, timeoutId)
       })
     }
-  }
-  onMount(() => {
-    window.addEventListener("click", listerner)
-    onCleanup(() => {
-      window.removeEventListener("click", listerner)
-    })
   })
 }
 

@@ -33,15 +33,12 @@ export default function Header() {
   const iconTitle = createMemo(() => splitEmoji(store.sessionSettings.title))
   return (
     <>
-      <div
-        id="logo"
-        class="px-2em cursor-pointer hover:animate-swing inline-block"
-      >
+      <div id="logo" class="pl-1em cursor-pointer inline-block">
         <Show
           when={iconTitle().icon}
           fallback={
             <div
-              class="w-8em h-8em mb-1.5em"
+              class="w-8em h-8em"
               innerHTML={logo}
               onClick={() => {
                 navigate("/")
@@ -50,7 +47,7 @@ export default function Header() {
           }
         >
           <div
-            class="text-7em"
+            class="text-7em h-1em mb-8"
             onClick={() => {
               navigate("/")
             }}
@@ -59,9 +56,9 @@ export default function Header() {
           </div>
         </Show>
       </div>
-      <header class="px-2em sticky top-0 z-99 flex justify-between items-center">
+      <header class="px-4 py-2 sticky top-0 z-99 flex justify-between items-center">
         <div
-          class="flex items-center mt-2 pb-2 text-2xl cursor-pointer"
+          class="flex items-center text-2xl cursor-pointer"
           onClick={() => {
             scrollTo("main", -48)
           }}

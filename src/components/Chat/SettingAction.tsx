@@ -272,7 +272,7 @@ export default function SettingAction() {
                 icon={
                   state.clearSessionConfirm
                     ? "i-carbon:checkmark animate-bounce text-red-6 dark:text-red"
-                    : "i-carbon:trash-can"
+                    : "i-carbon:clean"
                 }
                 label={state.clearSessionConfirm ? "确定" : "清空对话"}
               />

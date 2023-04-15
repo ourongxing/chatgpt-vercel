@@ -11,7 +11,7 @@ import { state as actionState } from "./SettingAction"
 
 const prompts = parsePrompts()
 const fzf = new Fzf(prompts, {
-  selector: k => `${k.desc}||${k.prompt}`
+  selector: k => `${k.desc}\n${k.prompt}`
 })
 
 // 3em
@@ -82,14 +82,15 @@ export default function (props: {
   const findPrompts = throttle(
     (value: string) => {
       if (value === "/" || value === " ") return setCandidatePrompts(prompts)
-      const query = value.replace(/^[\/ ](.*)/, "$1")
-      if (query !== value)
+      const query = value.replace(/^[\/ ]+(.*)/, "$1")
+      if (query !== value) {
         setCandidatePrompts(
           fzf.find(query).map(k => ({
             ...k.item,
             positions: k.positions
           }))
         )
+      }
     },
     250,
     {
@@ -102,7 +103,7 @@ export default function (props: {
     setHeight(defaultHeight)
     setSuitableheight()
     if (!compositionend()) return
-    const value = store.inputRef?.value.trim()
+    const value = store.inputRef?.value
     if (value) {
       setStore("inputContent", value)
       findPrompts(value)
