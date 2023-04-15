@@ -92,7 +92,7 @@ export default function SettingAction() {
             <Show when={sessionId()}>
               <SettingItem
                 icon="i-carbon:text-annotation-toggle"
-                label="会话标题"
+                label="对话标题"
               >
                 <input
                   type="text"
@@ -150,7 +150,7 @@ export default function SettingAction() {
                 </span>
               </div>
             </SettingItem>
-            <SettingItem icon="i-carbon:save-image" label="保存对话内容">
+            <SettingItem icon="i-carbon:save-image" label="记录对话内容">
               <SwitchButton
                 checked={store.sessionSettings.saveSession}
                 onChange={e => {
@@ -197,7 +197,7 @@ export default function SettingAction() {
               )
             }}
             icon="i-carbon:settings-services"
-            label="会话设置"
+            label="对话设置"
           />
         </div>
         <Switch
@@ -282,8 +282,10 @@ export default function SettingAction() {
                   } while (getSession(sessionID))
                   setSession(sessionID, {
                     lastVisit: Date.now(),
-                    title: "",
-                    settings: defaultEnv.CLIENT_SESSION_SETTINGS,
+                    settings: {
+                      ...defaultEnv.CLIENT_SESSION_SETTINGS,
+                      title: "新的对话"
+                    },
                     messages: []
                   })
                   // 如果是在同一层路由下，不会触发 onMount
@@ -291,7 +293,7 @@ export default function SettingAction() {
                   navigator("/session/" + sessionID, { replace: true })
                 }}
                 icon="i-carbon:add-alt"
-                label="新建会话"
+                label="新的对话"
               />
               <Show when={sessionId()}>
                 <ActionItem
@@ -328,7 +330,7 @@ export default function SettingAction() {
                       ? "i-carbon:checkmark animate-bounce text-red-6 dark:text-red"
                       : "i-carbon:trash-can"
                   }
-                  label={state.deleteSessionConfirm ? "确定" : "删除会话"}
+                  label={state.deleteSessionConfirm ? "确定" : "删除对话"}
                 />
               </Show>
             </div>
@@ -441,6 +443,7 @@ async function importData() {
     if (file) {
       const text = await file.text()
       const data = JSON.parse(text)
+      localStorage.clear()
       Object.keys(data).forEach(k => {
         localStorage.setItem(k, data[k])
       })

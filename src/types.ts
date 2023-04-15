@@ -16,7 +16,6 @@ export interface PromptItem {
 }
 
 export interface Session {
-  title: string
   lastVisit: number
   messages: ChatMessage[]
   settings: SessionSettings

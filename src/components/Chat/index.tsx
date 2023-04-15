@@ -65,7 +65,6 @@ export default function (props: { sessionID: string }) {
 
   createEffect(() => {
     setSession(props.sessionID, {
-      title: store.sessionSettings.title,
       lastVisit: Date.now(),
       messages: store.sessionSettings.continuousDialogue
         ? store.validContext
