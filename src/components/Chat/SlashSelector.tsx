@@ -4,36 +4,18 @@ import {
   createEffect,
   createSignal,
   onMount,
-  type JSXElement
+  type JSXElement,
+  Show
 } from "solid-js"
-import type { PromptItem } from "~/types"
+import type { Option } from "~/types"
 
 export default function PromptList(props: {
-  prompts: PromptItem[]
-  select: (k: string) => void
+  options: Option[]
+  select(k?: Option): void
 }) {
   let containerRef: HTMLUListElement
   const [hoverIndex, setHoverIndex] = createSignal(0)
   const [maxHeight, setMaxHeight] = createSignal("320px")
-
-  createEffect(() => {
-    if (hoverIndex() < 0) {
-      setHoverIndex(0)
-    } else if (hoverIndex() && hoverIndex() >= props.prompts.length) {
-      setHoverIndex(props.prompts.length - 1)
-    }
-  })
-
-  createEffect(() => {
-    if (containerRef && props.prompts.length)
-      setMaxHeight(
-        `${
-          window.innerHeight - containerRef.clientHeight > 112
-            ? 320
-            : window.innerHeight - 112
-        }px`
-      )
-  })
 
   onMount(() => {
     makeEventListener(
@@ -45,37 +27,60 @@ export default function PromptList(props: {
         } else if (e.key === "ArrowUp") {
           setHoverIndex(hoverIndex() - 1)
         } else if (e.keyCode === 13) {
-          props.select(props.prompts[hoverIndex()].prompt)
+          props.select(props.options[hoverIndex()])
+        } else if (e.key === "Escape") {
+          props.select()
         }
       },
       { passive: true }
     )
   })
 
+  createEffect(() => {
+    if (hoverIndex() < 0) {
+      setHoverIndex(0)
+    } else if (hoverIndex() && hoverIndex() >= props.options.length) {
+      setHoverIndex(props.options.length - 1)
+    }
+  })
+
+  createEffect(() => {
+    if (containerRef && props.options.length)
+      setMaxHeight(
+        `${
+          window.innerHeight - containerRef.clientHeight > 112
+            ? 320
+            : window.innerHeight - 112
+        }px`
+      )
+  })
+
   return (
-    <ul
-      ref={containerRef!}
-      class="bg-slate bg-op-20 dark:text-slate text-slate-7 overflow-y-auto rounded-t"
-      style={{
-        "max-height": maxHeight()
-      }}
-    >
-      <For each={props.prompts}>
-        {(prompt, i) => (
-          <Item
-            prompt={prompt}
-            select={props.select}
-            hover={hoverIndex() === i()}
-          />
-        )}
-      </For>
-    </ul>
+    <Show when={props.options.length}>
+      <ul
+        ref={containerRef!}
+        class="bg-slate bg-op-20 dark:text-slate text-slate-7 overflow-y-auto rounded-t"
+        style={{
+          "max-height": maxHeight()
+        }}
+      >
+        <For each={props.options}>
+          {(item, i) => (
+            <Item
+              option={item}
+              select={props.select}
+              hover={hoverIndex() === i()}
+            />
+          )}
+        </For>
+      </ul>
+    </Show>
   )
 }
 
 function Item(props: {
-  prompt: PromptItem
-  select: (k: string) => void
+  option: Option
+  select(k?: Option): void
   hover: boolean
 }) {
   let ref: HTMLLIElement
@@ -85,13 +90,13 @@ function Item(props: {
       ref.scrollIntoView({ block: "center" })
     }
   })
-  let DescComponent: JSXElement = props.prompt.desc
-  let PromptComponent: JSXElement = props.prompt.prompt
-  if (props.prompt.positions?.size) {
-    const descLen = props.prompt.desc.length
+  let DescComponent: JSXElement = props.option.title
+  let PromptComponent: JSXElement = props.option.desc
+  if (props.option.positions?.size) {
+    const descLen = props.option.desc.length
     const descRange = [0, descLen - 1]
-    const promptRange = [descLen + 1, props.prompt.prompt.length - 1]
-    const { desc, prompt } = Array.from(props.prompt.positions).reduce(
+    const promptRange = [descLen + 1, props.option.desc.length - 1]
+    const { desc, prompt } = Array.from(props.option.positions).reduce(
       (acc, cur) => {
         if (cur >= descRange[0] && cur <= descRange[1]) {
           acc.desc.push(cur)
@@ -106,7 +111,7 @@ function Item(props: {
       }
     )
     if (desc) {
-      DescComponent = props.prompt.desc.split("").map((c, i) => {
+      DescComponent = props.option.desc.split("").map((c, i) => {
         if (desc.includes(i)) {
           return <b class="dark:text-slate-2 text-black">{c}</b>
         }
@@ -114,7 +119,7 @@ function Item(props: {
       })
     }
     if (prompt) {
-      PromptComponent = props.prompt.prompt.split("").map((c, i) => {
+      PromptComponent = props.option.desc.split("").map((c, i) => {
         if (prompt.includes(i + descLen + 2)) {
           return <b class="dark:text-slate-2 text-black">{c}</b>
         }
@@ -131,7 +136,7 @@ function Item(props: {
         "bg-op-20": props.hover
       }}
       onClick={() => {
-        props.select(props.prompt.prompt)
+        props.select(props.option)
       }}
     >
       <p>{DescComponent}</p>
