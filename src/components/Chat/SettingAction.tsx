@@ -4,7 +4,7 @@ import { clickOutside } from "~/hooks"
 import { RootStore, delSession, getSession, setSession } from "~/store"
 import type { ChatMessage, Model } from "~/types"
 import { copyToClipboard, dateFormat, generateId, isMobile } from "~/utils"
-import { Switch as SwitchButton } from "../Common"
+import { Selector, Switch as SwitchButton } from "../Common"
 import { createStore } from "solid-js/store"
 import { useNavigate, useParams } from "solid-start"
 import { defaultEnv } from "~/env"
@@ -84,6 +84,18 @@ export default function SettingAction() {
                 }}
               />
             </SettingItem>
+            <SettingItem icon="i-carbon:keyboard" label="Enter 键发送消息">
+              <SwitchButton
+                checked={store.globalSettings.enterToSend}
+                onChange={e => {
+                  setStore(
+                    "globalSettings",
+                    "enterToSend",
+                    (e.target as HTMLInputElement).checked
+                  )
+                }}
+              />
+            </SettingItem>
           </div>
           <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
         </Match>
@@ -112,9 +124,8 @@ export default function SettingAction() {
               icon="i-carbon:machine-learning-model"
               label="OpenAI 模型"
             >
-              <select
-                name="model"
-                class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center focus:(bg-op-20 ring-0 outline-none)"
+              <Selector
+                class="max-w-150px"
                 value={store.sessionSettings.APIModel}
                 onChange={e => {
                   setStore(
@@ -123,11 +134,21 @@ export default function SettingAction() {
                     (e.target as HTMLSelectElement).value as Model
                   )
                 }}
-              >
-                <option value="gpt-3.5-turbo">gpt-3.5-turbo(4k)</option>
-                <option value="gpt-4">gpt-4(8k)</option>
-                <option value="gpt-4-32k">gpt-4(32k)</option>
-              </select>
+                options={[
+                  {
+                    value: "gpt-3.5-turbo",
+                    label: "gpt-3.5-turbo(4k)"
+                  },
+                  {
+                    value: "gpt-4",
+                    label: "gpt-4(8k)"
+                  },
+                  {
+                    value: "gpt-4-32k",
+                    label: "gpt-4(32k)"
+                  }
+                ]}
+              />
             </SettingItem>
             <SettingItem icon="i-carbon:data-enrichment" label="思维发散程度">
               <div class="flex items-center justify-between w-150px">

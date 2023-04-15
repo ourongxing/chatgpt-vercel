@@ -3,9 +3,9 @@ import { Fzf } from "fzf"
 import throttle from "just-throttle"
 import { Show, createEffect, createSignal, onMount } from "solid-js"
 import { RootStore } from "~/store"
-import type { PromptItem } from "~/types"
+import type { Option, PromptItem } from "~/types"
 import { parsePrompts, scrollToBottom } from "~/utils"
-import PromptList from "./PromptList"
+import SlashSelector from "./SlashSelector"
 import SettingAction, { type FakeRoleUnion } from "./SettingAction"
 import { state as actionState } from "./SettingAction"
 
@@ -72,8 +72,8 @@ export default function (props: {
     return true
   })
 
-  function selectPrompt(prompt: string) {
-    setStore("inputContent", prompt)
+  function selectOption(option?: Option) {
+    if (option) setStore("inputContent", option.desc)
     setCandidatePrompts([])
     setSuitableheight()
     store.inputRef?.focus()
@@ -102,7 +102,7 @@ export default function (props: {
     setHeight(defaultHeight)
     setSuitableheight()
     if (!compositionend()) return
-    const value = store.inputRef?.value
+    const value = store.inputRef?.value.trim()
     if (value) {
       setStore("inputContent", value)
       findPrompts(value)
@@ -149,12 +149,14 @@ export default function (props: {
             </div>
           }
         >
-          <Show when={candidatePrompts().length}>
-            <PromptList
-              prompts={candidatePrompts()}
-              select={selectPrompt}
-            ></PromptList>
-          </Show>
+          <SlashSelector
+            options={candidatePrompts().map(k => ({
+              title: k.desc,
+              desc: k.prompt,
+              positions: k.positions
+            }))}
+            select={selectOption}
+          ></SlashSelector>
           <div class="flex items-end relative">
             <textarea
               ref={el => setStore("inputRef", el)}
@@ -175,7 +177,7 @@ export default function (props: {
                     e.preventDefault()
                   }
                 } else if (e.keyCode === 13) {
-                  if (!e.shiftKey) {
+                  if (!e.shiftKey && store.globalSettings.enterToSend) {
                     e.preventDefault()
                     props.sendMessage(undefined, actionState.fakeRole)
                   }

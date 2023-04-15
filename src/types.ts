@@ -20,3 +20,9 @@ export interface Session {
   messages: ChatMessage[]
   settings: SessionSettings
 }
+
+export interface Option {
+  desc: string
+  title: string
+  positions?: Set<number>
+}
