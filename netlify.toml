@@ -4,4 +4,4 @@
 
 [build]
   command = "solid-start build"
-  publish = "dist"
+  publish = "netlify"
