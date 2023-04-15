@@ -5,13 +5,16 @@ import type { Model } from "./types"
  * 以 CLIENT_ 开头的变量会暴露给前端
  */
 export const defaultEnv = {
-  CLIENT_DEFAULT_SETTING: {
-    continuousDialogue: true,
-    archiveSession: false,
+  CLIENT_GLOBAL_SETTINGS: {
     APIKey: "",
+    password: ""
+  },
+  CLIENT_SESSION_SETTINGS: {
     // 0-2
+    title: "",
+    saveSession: true,
     APITemperature: 0.6,
-    password: "",
+    continuousDialogue: true,
     APIModel: "gpt-3.5-turbo" as Model
   },
   CLIENT_DEFAULT_MESSAGE: `Powered by OpenAI Vercel
@@ -32,5 +35,4 @@ export const defaultEnv = {
   NO_GFW: false
 }
 
-export type EnvKey = keyof typeof defaultEnv
-export type Setting = typeof defaultEnv.CLIENT_DEFAULT_SETTING
+export type SessionSettings = typeof defaultEnv.CLIENT_SESSION_SETTINGS

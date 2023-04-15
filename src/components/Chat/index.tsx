@@ -1,8 +1,7 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer"
-import { createSignal, onMount } from "solid-js"
+import { createEffect, createSignal, onMount } from "solid-js"
 import { useSearchParams } from "solid-start"
-import { defaultEnv } from "~/env"
-import { RootStore } from "~/store"
+import { LocalStorageKey, RootStore, getSession, setSession } from "~/store"
 import type { ChatMessage } from "~/types"
 import { isMobile } from "~/utils"
 import MessageContainer from "./MessageContainer"
@@ -10,25 +9,15 @@ import InputBox from "./InputBox"
 import PrefixTitle from "../PrefixTitle"
 import { type FakeRoleUnion, setState as setActionState } from "./SettingAction"
 
-let _setting = defaultEnv.CLIENT_DEFAULT_SETTING
-if (import.meta.env.CLIENT_DEFAULT_SETTING) {
-  try {
-    _setting = {
-      ..._setting,
-      ...JSON.parse(import.meta.env.CLIENT_DEFAULT_SETTING)
-    }
-  } catch (e) {
-    console.error("Error parsing DEFAULT_SETTING:", e)
-  }
-}
+const SearchParamKey = "q"
 
-export default function (props: { sessionID?: string }) {
+export default function (props: { sessionID: string }) {
   let containerRef: HTMLDivElement
   let controller: AbortController | undefined = undefined
   const [containerWidth, setContainerWidth] = createSignal("init")
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
+  const q = searchParams[SearchParamKey]
   const { store, setStore } = RootStore
-
   onMount(() => {
     createResizeObserver(containerRef, ({ width }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
@@ -37,31 +26,59 @@ export default function (props: { sessionID?: string }) {
       document.querySelector("#root")?.classList.remove("before")
     })
     document.querySelector("#root")?.classList.add("after")
-    const setting = localStorage.getItem("setting")
-    const session = localStorage.getItem("session")
+    const globalSettings = localStorage.getItem(LocalStorageKey.GlobalSettings)
     try {
-      let archiveSession = false
-      if (setting) {
-        const parsed = JSON.parse(setting)
-        archiveSession = parsed.archiveSession
-        setStore("setting", t => ({
+      if (globalSettings) {
+        const parsed = JSON.parse(globalSettings)
+        setStore("globalSettings", t => ({
           ...t,
           ...parsed
         }))
       }
-      if (searchParams.q) {
-        sendMessage(searchParams.q)
-      } else {
-        if (session && archiveSession) {
-          const parsed = JSON.parse(session) as ChatMessage[]
-          if (parsed.length > 0) {
-            setStore("messageList", parsed)
+      const session = getSession(props.sessionID)
+      if (session) {
+        const { settings, messages } = session
+        if (settings) {
+          setStore("sessionSettings", t => ({
+            ...t,
+            ...settings
+          }))
+        }
+        if (messages) {
+          if (store.sessionSettings.saveSession || !q) {
+            setStore("messageList", messages)
+          } else {
+            setStore(
+              "messageList",
+              messages.filter(m => m.type === "locked")
+            )
+            if (q) sendMessage(q)
           }
         }
+      } else if (q) {
+        sendMessage(q)
       }
     } catch {
-      console.log("Setting parse error")
+      console.log("Localstorage parse error")
     }
+  })
+
+  createEffect(() => {
+    setSession(props.sessionID, {
+      title: store.sessionSettings.title,
+      lastVisit: Date.now(),
+      messages: store.sessionSettings.continuousDialogue
+        ? store.validContext
+        : store.validContext.filter(m => m.type === "locked"),
+      settings: store.sessionSettings
+    })
+  })
+
+  createEffect(() => {
+    localStorage.setItem(
+      LocalStorageKey.GlobalSettings,
+      JSON.stringify(store.globalSettings)
+    )
   })
 
   function archiveCurrentMessage() {
@@ -78,7 +95,7 @@ export default function (props: { sessionID?: string }) {
       controller = undefined
     }
     !isMobile() && store.inputRef?.focus()
-    // searchParams.q && setSearchParams({ q: undefined })
+    // searchParams[SearchParamKey] && setSearchParams({ q: undefined })
   }
 
   function stopStreamFetch() {
@@ -139,7 +156,7 @@ export default function (props: { sessionID?: string }) {
         ])
         if (store.remainingToken < 0) {
           throw new Error(
-            store.setting.continuousDialogue
+            store.sessionSettings.continuousDialogue
               ? "本次对话过长，请清除之前部分对话或者缩短当前提问。"
               : "提问太长了，请缩短。"
           )
@@ -169,10 +186,10 @@ export default function (props: { sessionID?: string }) {
       method: "POST",
       body: JSON.stringify({
         messages,
-        key: store.setting.APIKey || undefined,
-        temperature: store.setting.APITemperature,
-        password: store.setting.password,
-        model: store.setting.APIModel
+        key: store.globalSettings.APIKey || undefined,
+        temperature: store.sessionSettings.APITemperature,
+        password: store.globalSettings.password,
+        model: store.sessionSettings.APIModel
       }),
       signal: controller?.signal
     })
@@ -205,7 +222,9 @@ export default function (props: { sessionID?: string }) {
 
   return (
     <main ref={containerRef!} class="mt-4">
-      {searchParams.q && <PrefixTitle>{searchParams.q}</PrefixTitle>}
+      {searchParams[SearchParamKey] && (
+        <PrefixTitle>{searchParams[SearchParamKey]}</PrefixTitle>
+      )}
       <MessageContainer sendMessage={sendMessage} />
       <InputBox
         width={containerWidth()}

@@ -17,14 +17,15 @@ import { pwaInfo } from "virtual:pwa-info"
 import "@unocss/reset/tailwind.css"
 import "~/styles/main.css"
 import "uno.css"
+import PrefixTitle from "./components/PrefixTitle"
 
 export default function Root() {
   return (
     <Html lang="zh-cn">
       <Head>
-        <Title>ChatGPT</Title>
+        <PrefixTitle />
         <Meta charset="utf-8" />
-        <Link rel="icon" type="image/svg+xml" href="favicon.svg" />
+        <Link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
         <Link
           rel="apple-touch-icon"

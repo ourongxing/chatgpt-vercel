@@ -3,10 +3,10 @@
 }
 
 .before #theme-toggle {
-  transform: translate3D(0, 200px, 0) rotate(540deg);
+  transform: rotate(540deg);
 }
 
-.before #title,
+.before header,
 .before #message-container {
   transform: translate3D(0, 200px, 0);
 }
@@ -16,7 +16,7 @@
   opacity: 0;
 }
 
-.after #title,
+.after header,
 .after #theme-toggle,
 .after #logo,
 .after #message-container {

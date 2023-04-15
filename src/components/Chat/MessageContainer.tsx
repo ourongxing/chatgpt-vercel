@@ -5,15 +5,6 @@ import MessageItem from "./MessageItem"
 
 export default function (props: { sendMessage(value?: string): void }) {
   const { store } = RootStore
-  createEffect(prev => {
-    store.messageList
-    if (prev) {
-      if (store.setting.archiveSession) {
-        localStorage.setItem("session", JSON.stringify(store.messageList))
-      }
-    }
-    return true
-  })
 
   createEffect((prev: number | undefined) => {
     if (prev !== undefined && store.messageList.length > prev) {

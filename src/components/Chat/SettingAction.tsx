@@ -1,22 +1,26 @@
 import { toBlob, toJpeg } from "html-to-image"
-import { Show, createEffect, type JSXElement } from "solid-js"
+import { Show, Switch, Match, type JSXElement, createMemo } from "solid-js"
 import { clickOutside } from "~/hooks"
-import { RootStore } from "~/store"
+import { RootStore, delSession, getSession, setSession } from "~/store"
 import type { ChatMessage, Model } from "~/types"
-import { copyToClipboard, dateFormat, isMobile } from "~/utils"
-import { Switch } from "../Common"
+import { copyToClipboard, dateFormat, generateId, isMobile } from "~/utils"
+import { Switch as SwitchButton } from "../Common"
 import { createStore } from "solid-js/store"
+import { useNavigate, useParams } from "solid-start"
+import { defaultEnv } from "~/env"
 
 export const [state, setState] = createStore({
-  shown: false,
-  copied: false,
+  showSetting: "none" as "none" | "global" | "session",
+  success: false as false | "markdown" | "link",
   genImg: "normal" as ImgStatusUnion,
-  fakeRole: "normal" as FakeRoleUnion
+  fakeRole: "normal" as FakeRoleUnion,
+  clearSessionConfirm: false,
+  deleteSessionConfirm: false
 })
 
 type ImgStatusUnion = "normal" | "loading" | "success" | "error"
 const imgIcons: Record<ImgStatusUnion, string> = {
-  success: "i-ri:check-fill dark:text-yellow text-yellow-6",
+  success: "i-carbon:status-resolved dark:text-yellow text-yellow-6",
   normal: "i-carbon:image",
   loading: "i-ri:loader-2-line animate-spin",
   error: "i-carbon:warning-alt text-red-6 dark:text-red"
@@ -31,10 +35,9 @@ const roleIcons: Record<FakeRoleUnion, string> = {
 
 export default function SettingAction() {
   const { store, setStore } = RootStore
-  createEffect(() => {
-    localStorage.setItem("setting", JSON.stringify(store.setting))
-  })
-
+  const navigator = useNavigate()
+  const params = useParams<{ session?: string }>()
+  const sessionId = createMemo(() => params.session)
   function clearSession() {
     setStore("messageList", messages =>
       messages.filter(k => k.type === "locked")
@@ -46,159 +49,291 @@ export default function SettingAction() {
   return (
     <div
       class="text-sm text-slate-7 dark:text-slate my-2"
-      use:clickOutside={() => setState("shown", false)}
+      use:clickOutside={() => {
+        setState("showSetting", "none")
+      }}
     >
-      <Show when={state.shown}>
-        <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
-          <SettingItem icon="i-ri:lock-password-line" label="网站访问密码">
-            <input
-              type="password"
-              value={store.setting.password}
-              class="input-box"
-              onInput={e => {
-                setStore(
-                  "setting",
-                  "password",
-                  (e.target as HTMLInputElement).value
-                )
-              }}
-            />
-          </SettingItem>
-          <SettingItem icon="i-carbon:api" label="OpenAI Key">
-            <input
-              type="password"
-              value={store.setting.APIKey}
-              class="input-box"
-              onInput={e => {
-                setStore(
-                  "setting",
-                  "APIKey",
-                  (e.target as HTMLInputElement).value
-                )
-              }}
-            />
-          </SettingItem>
-          <SettingItem
-            icon="i-carbon:machine-learning-model"
-            label="OpenAI 模型"
-          >
-            <select
-              name="model"
-              class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center focus:(bg-op-20 ring-0 outline-none)"
-              value={store.setting.APIModel}
-              onChange={e => {
-                setStore(
-                  "setting",
-                  "APIModel",
-                  (e.target as HTMLSelectElement).value as Model
-                )
-              }}
-            >
-              <option value="gpt-3.5-turbo">gpt-3.5-turbo(4k)</option>
-              <option value="gpt-4">gpt-4(8k)</option>
-              <option value="gpt-4-32k">gpt-4(32k)</option>
-            </select>
-          </SettingItem>
-          <SettingItem icon="i-carbon:data-enrichment" label="思维发散程度">
-            <div class="flex items-center justify-between w-150px">
+      <Switch>
+        <Match when={state.showSetting === "global"}>
+          <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
+            <SettingItem icon="i-ri:lock-password-line" label="网站访问密码">
               <input
-                type="range"
-                min={0}
-                max={100}
-                value={String(store.setting.APITemperature * 50)}
-                class="bg-slate max-w-100px w-full h-2 bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
+                type="password"
+                value={store.globalSettings.password}
+                class="input-box"
                 onInput={e => {
                   setStore(
-                    "setting",
-                    "APITemperature",
-                    Number((e.target as HTMLInputElement).value) / 50
+                    "globalSettings",
+                    "password",
+                    (e.target as HTMLInputElement).value
                   )
                 }}
               />
-              <span class="bg-slate bg-op-15 rounded-sm px-1 text-10px">
-                {store.setting.APITemperature.toFixed(2)}
-              </span>
-            </div>
-          </SettingItem>
-          <SettingItem icon="i-carbon:save-image" label="保存对话内容">
-            <label class="relative inline-flex items-center cursor-pointer ml-1">
+            </SettingItem>
+            <SettingItem icon="i-carbon:api" label="OpenAI Key">
               <input
-                type="checkbox"
-                checked={store.setting.archiveSession}
-                class="sr-only peer"
+                type="password"
+                value={store.globalSettings.APIKey}
+                class="input-box"
+                onInput={e => {
+                  setStore(
+                    "globalSettings",
+                    "APIKey",
+                    (e.target as HTMLInputElement).value
+                  )
+                }}
+              />
+            </SettingItem>
+          </div>
+          <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
+        </Match>
+        <Match when={state.showSetting === "session"}>
+          <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
+            <Show when={sessionId()}>
+              <SettingItem
+                icon="i-carbon:text-annotation-toggle"
+                label="会话标题"
+              >
+                <input
+                  type="text"
+                  value={store.sessionSettings.title}
+                  class="input-box text-ellipsis"
+                  onInput={e => {
+                    setStore(
+                      "sessionSettings",
+                      "title",
+                      (e.target as HTMLInputElement).value
+                    )
+                  }}
+                />
+              </SettingItem>
+            </Show>
+            <SettingItem
+              icon="i-carbon:machine-learning-model"
+              label="OpenAI 模型"
+            >
+              <select
+                name="model"
+                class="max-w-150px w-full bg-slate bg-op-15 rounded-sm appearance-none accent-slate text-center focus:(bg-op-20 ring-0 outline-none)"
+                value={store.sessionSettings.APIModel}
                 onChange={e => {
                   setStore(
-                    "setting",
-                    "archiveSession",
+                    "sessionSettings",
+                    "APIModel",
+                    (e.target as HTMLSelectElement).value as Model
+                  )
+                }}
+              >
+                <option value="gpt-3.5-turbo">gpt-3.5-turbo(4k)</option>
+                <option value="gpt-4">gpt-4(8k)</option>
+                <option value="gpt-4-32k">gpt-4(32k)</option>
+              </select>
+            </SettingItem>
+            <SettingItem icon="i-carbon:data-enrichment" label="思维发散程度">
+              <div class="flex items-center justify-between w-150px">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={String(store.sessionSettings.APITemperature * 50)}
+                  class="bg-slate max-w-100px w-full h-2 bg-op-15 rounded-lg appearance-none cursor-pointer accent-slate"
+                  onInput={e => {
+                    setStore(
+                      "sessionSettings",
+                      "APITemperature",
+                      Number((e.target as HTMLInputElement).value) / 50
+                    )
+                  }}
+                />
+                <span class="bg-slate bg-op-15 rounded-sm px-1 text-10px">
+                  {store.sessionSettings.APITemperature.toFixed(2)}
+                </span>
+              </div>
+            </SettingItem>
+            <SettingItem icon="i-carbon:save-image" label="保存对话内容">
+              <SwitchButton
+                checked={store.sessionSettings.saveSession}
+                onChange={e => {
+                  setStore(
+                    "sessionSettings",
+                    "saveSession",
                     (e.target as HTMLInputElement).checked
                   )
                 }}
               />
-              <div class="w-9 h-5 bg-slate bg-op-15 peer-focus:outline-none peer-focus:ring-0  rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate"></div>
-            </label>
-          </SettingItem>
-          <SettingItem icon="i-carbon:3d-curve-auto-colon" label="开启连续对话">
-            <Switch
-              checked={store.setting.continuousDialogue}
-              onChange={e => {
-                setStore(
-                  "setting",
-                  "continuousDialogue",
-                  (e.target as HTMLInputElement).checked
-                )
-              }}
-            />
-          </SettingItem>
-        </div>
-        <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
-      </Show>
+            </SettingItem>
+            <SettingItem
+              icon="i-carbon:3d-curve-auto-colon"
+              label="开启连续对话"
+            >
+              <SwitchButton
+                checked={store.sessionSettings.continuousDialogue}
+                onChange={e => {
+                  setStore(
+                    "sessionSettings",
+                    "continuousDialogue",
+                    (e.target as HTMLInputElement).checked
+                  )
+                }}
+              />
+            </SettingItem>
+          </div>
+          <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
+        </Match>
+      </Switch>
       <div class="flex items-center justify-between">
-        <ActionItem
-          onClick={() => {
-            setState("shown", k => !k)
-          }}
-          icon="i-carbon:settings"
-          label="设置"
-        />
         <div class="flex">
           <ActionItem
             onClick={() => {
-              setState("fakeRole", k => {
-                const _ = ["normal", "user", "assistant"] as FakeRoleUnion[]
-                return _[(_.indexOf(k) + 1) % _.length]
-              })
+              setState("showSetting", k => (k !== "global" ? "global" : "none"))
             }}
-            icon={roleIcons[state.fakeRole]}
-            label="伪装角色"
+            icon="i-carbon:settings"
+            label="全局设置"
           />
           <ActionItem
-            onClick={async () => {
-              setState("genImg", "loading")
-              await exportJpg()
-              setTimeout(() => setState("genImg", "normal"), 1000)
+            onClick={() => {
+              setState("showSetting", k =>
+                k !== "session" ? "session" : "none"
+              )
             }}
-            icon={imgIcons[state.genImg]}
-            label="导出图片"
-          />
-          <ActionItem
-            label="导出MD"
-            onClick={async () => {
-              await exportMD(store.messageList)
-              setState("copied", true)
-              setTimeout(() => setState("copied", false), 1000)
-            }}
-            icon={
-              state.copied
-                ? "i-ri:check-fill dark:text-yellow text-yellow-6"
-                : "i-ri:markdown-line"
-            }
-          />
-          <ActionItem
-            onClick={clearSession}
-            icon="i-carbon:trash-can"
-            label="清空对话"
+            icon="i-carbon:settings-services"
+            label="会话设置"
           />
         </div>
+        <Switch
+          fallback={
+            <div class="flex">
+              <ActionItem
+                onClick={() => {
+                  setState("fakeRole", k => {
+                    const _ = ["normal", "user", "assistant"] as FakeRoleUnion[]
+                    return _[(_.indexOf(k) + 1) % _.length]
+                  })
+                }}
+                icon={roleIcons[state.fakeRole]}
+                label="伪装角色"
+              />
+              <ActionItem
+                onClick={async () => {
+                  setState("genImg", "loading")
+                  await exportJpg()
+                  setTimeout(() => setState("genImg", "normal"), 1000)
+                }}
+                icon={imgIcons[state.genImg]}
+                label="导出图片"
+              />
+              <ActionItem
+                label="导出MD"
+                onClick={async () => {
+                  await exportMD(store.messageList)
+                  setState("success", "markdown")
+                  setTimeout(() => setState("success", false), 1000)
+                }}
+                icon={
+                  state.success === "markdown"
+                    ? "i-carbon:status-resolved dark:text-yellow text-yellow-6"
+                    : "i-ri:markdown-line"
+                }
+              />
+              <ActionItem
+                onClick={() => {
+                  if (state.clearSessionConfirm) {
+                    clearSession()
+                    setState("clearSessionConfirm", false)
+                  } else {
+                    setState("clearSessionConfirm", true)
+                    setTimeout(
+                      () => setState("clearSessionConfirm", false),
+                      3000
+                    )
+                  }
+                }}
+                icon={
+                  state.clearSessionConfirm
+                    ? "i-carbon:checkmark animate-bounce text-red-6 dark:text-red"
+                    : "i-carbon:trash-can"
+                }
+                label={state.clearSessionConfirm ? "确定" : "清空对话"}
+              />
+            </div>
+          }
+        >
+          <Match when={state.showSetting === "global"}>
+            <div class="flex">
+              <ActionItem
+                label="导出"
+                onClick={exportData}
+                icon="i-carbon:export"
+              />
+              <ActionItem
+                label="导入"
+                onClick={importData}
+                icon="i-carbon:download"
+              />
+            </div>
+          </Match>
+          <Match when={state.showSetting === "session"}>
+            <div class="flex">
+              <ActionItem
+                onClick={() => {
+                  let sessionID: string
+                  do {
+                    sessionID = generateId()
+                  } while (getSession(sessionID))
+                  setSession(sessionID, {
+                    lastVisit: Date.now(),
+                    title: "",
+                    settings: defaultEnv.CLIENT_SESSION_SETTINGS,
+                    messages: []
+                  })
+                  // 如果是在同一层路由下，不会触发 onMount
+                  navigator("/", { replace: true })
+                  navigator("/session/" + sessionID, { replace: true })
+                }}
+                icon="i-carbon:add-alt"
+                label="新建会话"
+              />
+              <Show when={sessionId()}>
+                <ActionItem
+                  onClick={async () => {
+                    await copyToClipboard(
+                      window.location.origin + window.location.pathname
+                    )
+                    setState("success", "link")
+                    setTimeout(() => setState("success", false), 1000)
+                  }}
+                  icon={
+                    state.success === "link"
+                      ? "i-carbon:status-resolved dark:text-yellow text-yellow-6"
+                      : "i-carbon:link"
+                  }
+                  label="复制链接"
+                />
+                <ActionItem
+                  onClick={() => {
+                    if (state.deleteSessionConfirm) {
+                      setState("deleteSessionConfirm", false)
+                      delSession(sessionId() ?? "index")
+                      navigator("/", { replace: true })
+                    } else {
+                      setState("deleteSessionConfirm", true)
+                      setTimeout(
+                        () => setState("deleteSessionConfirm", false),
+                        3000
+                      )
+                    }
+                  }}
+                  icon={
+                    state.deleteSessionConfirm
+                      ? "i-carbon:checkmark animate-bounce text-red-6 dark:text-red"
+                      : "i-carbon:trash-can"
+                  }
+                  label={state.deleteSessionConfirm ? "确定" : "删除会话"}
+                />
+              </Show>
+            </div>
+          </Match>
+        </Switch>
       </div>
     </div>
   )
@@ -223,7 +358,7 @@ function SettingItem(props: {
 function ActionItem(props: { onClick: any; icon: string; label?: string }) {
   return (
     <div
-      class="flex items-center cursor-pointer mx-1 p-2 hover:bg-slate hover:bg-op-10 rounded text-1.2em"
+      class="flex items-center cursor-pointer mx-1 p-2 hover:(dark:bg-#23252A bg-#ECF0F4) rounded text-1.2em"
       onClick={props.onClick}
       attr:tooltip={props.label}
       attr:position="top"
@@ -285,4 +420,31 @@ async function exportMD(messages: ChatMessage[]) {
       })
       .join("\n\n---\n\n")
   )
+}
+
+async function exportData() {
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(
+    new Blob([JSON.stringify(localStorage)], { type: "application/json" })
+  )
+  a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.json`
+  a.click()
+}
+
+async function importData() {
+  const input = document.createElement("input")
+  input.type = "file"
+  input.accept = "application/json"
+  input.click()
+  input.onchange = async () => {
+    const file = input.files?.[0]
+    if (file) {
+      const text = await file.text()
+      const data = JSON.parse(text)
+      Object.keys(data).forEach(k => {
+        localStorage.setItem(k, data[k])
+      })
+      location.reload()
+    }
+  }
 }

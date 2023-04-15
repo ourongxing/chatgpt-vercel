@@ -1,17 +1,8 @@
-import { onMount } from "solid-js"
-import { Title } from "solid-start"
-import { HttpStatusCode } from "solid-start/server"
-import Layout from "~/layout"
+import { useNavigate } from "solid-start"
 
 export default function NotFound() {
-  onMount(() => {
-    // @ts-ignore
-    window.location = "/"
-  })
-  return (
-    <Layout>
-      <Title>Not Found</Title>
-      <HttpStatusCode code={404} />
-    </Layout>
-  )
+  const navigator = useNavigate()
+  console.log("404")
+  navigator("/", { replace: true })
+  return <></>
 }

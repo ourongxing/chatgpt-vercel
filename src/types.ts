@@ -1,3 +1,5 @@
+import { type SessionSettings } from "./env"
+
 export interface ChatMessage {
   role: Role
   content: string
@@ -11,4 +13,11 @@ export interface PromptItem {
   desc: string
   prompt: string
   positions?: Set<number>
+}
+
+export interface Session {
+  title: string
+  lastVisit: number
+  messages: ChatMessage[]
+  settings: SessionSettings
 }
