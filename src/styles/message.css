@@ -12,6 +12,12 @@
   color: #939090;
 }
 
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+
 .dark .message pre .lang {
   opacity: 0.5;
 }
@@ -55,6 +61,7 @@
   text-decoration: none;
   border-bottom: 1px solid;
 }
+
 .dark .message a:hover {
   color: rgba(255, 255, 255, 0.8);
 }
