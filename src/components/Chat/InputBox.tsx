@@ -1,32 +1,67 @@
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
-import { Show, createEffect, createSignal, onMount } from "solid-js"
+import {
+  type Accessor,
+  type Setter,
+  Show,
+  createEffect,
+  createSignal,
+  onMount
+} from "solid-js"
 import { RootStore } from "~/store"
-import type { Option, PromptItem } from "~/types"
-import { parsePrompts, scrollToBottom } from "~/utils"
+import type { Option } from "~/types"
+import { fetchAllSessions, parsePrompts, scrollToBottom } from "~/utils"
+import SettingAction, { actionState, type FakeRoleUnion } from "./SettingAction"
 import SlashSelector from "./SlashSelector"
-import SettingAction, { type FakeRoleUnion } from "./SettingAction"
-import { state as actionState } from "./SettingAction"
+import { useNavigate } from "solid-start"
 
-const prompts = parsePrompts()
-const fzf = new Fzf(prompts, {
-  selector: k => `${k.desc}\n${k.prompt}`
-})
+let promptOptions: Option[]
+let fzfPrompts: Fzf<Option[]>
+let sessionOptions: Option[]
+let fzfSessions: Fzf<Option[]>
 
 // 3em
-const defaultHeight = 48
-export default function (props: {
-  width: string
+export const defaultInputBoxHeight = 48
+export default function ({
+  width,
+  height,
+  setHeight,
+  sendMessage,
+  stopStreamFetch
+}: {
+  width: Accessor<string>
+  height: Accessor<number>
+  setHeight: Setter<number>
   sendMessage(content?: string, fakeRole?: FakeRoleUnion): void
   stopStreamFetch(): void
 }) {
-  const [height, setHeight] = createSignal(defaultHeight)
-  const [candidatePrompts, setCandidatePrompts] = createSignal<PromptItem[]>([])
+  const [candidateOptions, setCandidateOptions] = createSignal<Option[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
   const { store, setStore } = RootStore
-
+  const navigator = useNavigate()
   onMount(() => {
+    setTimeout(() => {
+      sessionOptions = fetchAllSessions()
+        .sort((m, n) => n.lastVisit - m.lastVisit)
+        .filter(k => k.id !== store.sessionId && k.id !== "index")
+        .map(k => ({
+          title: k.settings.title,
+          desc: k.messages.map(k => k.content).join("\n"),
+          extra: {
+            id: k.id
+          }
+        }))
+      fzfSessions = new Fzf(sessionOptions, {
+        selector: k => `${k.title}\n${k.desc}`
+      })
+      promptOptions = parsePrompts().map(
+        k => ({ title: k.desc, desc: k.detail } as Option)
+      )
+      fzfPrompts = new Fzf(promptOptions, {
+        selector: k => `${k.title}\n${k.desc}`
+      })
+    }, 1000)
     if (store.inputRef) {
       makeEventListener(
         store.inputRef,
@@ -61,9 +96,9 @@ export default function (props: {
   createEffect(prev => {
     store.inputContent
     if (prev) {
-      setHeight(defaultHeight)
+      setHeight(defaultInputBoxHeight)
       if (store.inputContent === "") {
-        setCandidatePrompts([])
+        setCandidateOptions([])
       } else {
         setSuitableheight()
       }
@@ -73,26 +108,47 @@ export default function (props: {
   })
 
   function selectOption(option?: Option) {
-    if (option) setStore("inputContent", option.desc)
-    setCandidatePrompts([])
+    if (option) {
+      if (option.extra?.id) {
+        navigator("/", { replace: true })
+        navigator("/session/" + option.extra.id)
+        setStore("inputContent", "")
+      } else setStore("inputContent", option.desc)
+    }
+    setCandidateOptions([])
     setSuitableheight()
     store.inputRef?.focus()
   }
 
-  const findPrompts = throttle(
+  const searchOptions = throttle(
     (value: string) => {
-      if (value === "/" || value === " ") return setCandidatePrompts(prompts)
-      const query = value.replace(/^[\/ ]+(.*)/, "$1")
-      if (query !== value) {
-        setCandidatePrompts(
-          fzf.find(query).map(k => ({
+      if (/^\s{2,}$|^\/{2,}$/.test(value))
+        return setCandidateOptions(sessionOptions)
+      if (value === "/" || value === " ")
+        return setCandidateOptions(promptOptions)
+
+      const sessionQuery = value.replace(
+        /^\s{2,}(.*)\s*$|^\/{2,}(.*)\s*$/,
+        "$1"
+      )
+      const promptQuery = value.replace(/^\s(.*)\s*$|^\/(.*)\s*$/, "$1$2")
+      if (sessionQuery !== value) {
+        setCandidateOptions(
+          fzfPrompts.find(sessionQuery).map(k => ({
+            ...k.item,
+            positions: k.positions
+          }))
+        )
+      } else if (promptQuery !== value) {
+        setCandidateOptions(
+          fzfSessions.find(promptQuery).map(k => ({
             ...k.item,
             positions: k.positions
           }))
         )
       }
     },
-    250,
+    100,
     {
       trailing: false,
       leading: true
@@ -100,16 +156,16 @@ export default function (props: {
   )
 
   async function handleInput() {
-    setHeight(defaultHeight)
+    setHeight(defaultInputBoxHeight)
     setSuitableheight()
     if (!compositionend()) return
     const value = store.inputRef?.value
     if (value) {
       setStore("inputContent", value)
-      findPrompts(value)
+      searchOptions(value)
     } else {
       setStore("inputContent", "")
-      setCandidatePrompts([])
+      setCandidateOptions([])
     }
   }
 
@@ -118,30 +174,24 @@ export default function (props: {
       class="pb-2em px-2em fixed bottom-0 z-100"
       style={{
         "background-color": "var(--c-bg)",
-        width: props.width === "init" ? "100%" : props.width
+        width: width() === "init" ? "100%" : width()
       }}
     >
       <div
         style={{
           transition: "opacity 1s ease-in-out",
-          opacity: props.width === "init" ? 0 : 100
+          opacity: width() === "init" ? 0 : 100
         }}
       >
-        <Show
-          when={
-            !store.loading &&
-            !candidatePrompts().length &&
-            height() === defaultHeight
-          }
-        >
+        <Show when={!store.loading && !candidateOptions().length}>
           <SettingAction />
         </Show>
         <Show
           when={!store.loading}
           fallback={
             <div
-              class="px-2em animate-gradient-border cursor-pointer hover:bg-op-90 dark:bg-#292B31 bg-#E7EBF0 h-3em flex items-center justify-center"
-              onClick={props.stopStreamFetch}
+              class="px-2em animate-gradient-border cursor-pointer dark:bg-#292B31/90 bg-#E7EBF0/80 h-3em flex items-center justify-center"
+              onClick={stopStreamFetch}
             >
               <span class="dark:text-slate text-slate-7">
                 AI 正在思考 | Tokens: {store.currentMessageToken}/$
@@ -151,11 +201,7 @@ export default function (props: {
           }
         >
           <SlashSelector
-            options={candidatePrompts().map(k => ({
-              title: k.desc,
-              desc: k.prompt,
-              positions: k.positions
-            }))}
+            options={candidateOptions()}
             select={selectOption}
           ></SlashSelector>
           <div class="flex items-end relative">
@@ -169,7 +215,7 @@ export default function (props: {
               onClick={scrollToBottom}
               onKeyDown={e => {
                 if (e.isComposing) return
-                if (candidatePrompts().length) {
+                if (candidateOptions().length) {
                   if (
                     e.key === "ArrowUp" ||
                     e.key === "ArrowDown" ||
@@ -180,7 +226,7 @@ export default function (props: {
                 } else if (e.keyCode === 13) {
                   if (!e.shiftKey && store.globalSettings.enterToSend) {
                     e.preventDefault()
-                    props.sendMessage(undefined, actionState.fakeRole)
+                    sendMessage(undefined, actionState.fakeRole)
                   }
                 } else if (e.key === "ArrowUp") {
                   const userMessages = store.messageList
@@ -199,7 +245,7 @@ export default function (props: {
               }}
               class="self-end p-3 pr-2.2em resize-none w-full text-slate-7 dark:text-slate bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none) placeholder:(text-slate-800 dark:text-slate-400 op-40)"
               classList={{
-                "rounded-t": candidatePrompts().length === 0,
+                "rounded-t": candidateOptions().length === 0,
                 "rounded-b": true
               }}
             />
@@ -207,8 +253,8 @@ export default function (props: {
               <div
                 class="absolute flex text-1em items-center"
                 classList={{
-                  "right-2.5em bottom-1em": height() === defaultHeight,
-                  "right-0.8em top-0.8em": height() !== defaultHeight
+                  "right-2.5em bottom-1em": height() === defaultInputBoxHeight,
+                  "right-0.8em top-0.8em": height() !== defaultInputBoxHeight
                 }}
               >
                 <button
@@ -223,9 +269,7 @@ export default function (props: {
             <div class="absolute right-0.5em bottom-0.8em flex items-center">
               <button
                 title="发送"
-                onClick={() =>
-                  props.sendMessage(undefined, actionState.fakeRole)
-                }
+                onClick={() => sendMessage(undefined, actionState.fakeRole)}
                 class="i-carbon:send-filled text-1.5em text-slate-7 dark:text-slate text-op-80! hover:text-op-100!"
               />
             </div>

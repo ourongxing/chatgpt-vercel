@@ -1,15 +1,23 @@
 import { toBlob, toJpeg } from "html-to-image"
-import { Show, Switch, Match, type JSXElement, createMemo } from "solid-js"
-import { clickOutside } from "~/hooks"
-import { RootStore, delSession, getSession, setSession } from "~/store"
-import type { ChatMessage, Model } from "~/types"
-import { copyToClipboard, dateFormat, generateId, isMobile } from "~/utils"
-import { Selector, Switch as SwitchButton } from "../Common"
+import { Match, Show, Switch, type JSXElement } from "solid-js"
 import { createStore } from "solid-js/store"
-import { useNavigate, useParams } from "solid-start"
 import { defaultEnv } from "~/env"
+import { clickOutside } from "~/hooks"
+import { RootStore } from "~/store"
+import type { ChatMessage, Model } from "~/types"
+import {
+  copyToClipboard,
+  dateFormat,
+  delSession,
+  generateId,
+  getSession,
+  isMobile,
+  setSession
+} from "~/utils"
+import { Selector, Switch as SwitchButton } from "../Common"
+import { useNavigate } from "solid-start"
 
-export const [state, setState] = createStore({
+export const [actionState, setActionState] = createStore({
   showSetting: "none" as "none" | "global" | "session",
   success: false as false | "markdown" | "link",
   genImg: "normal" as ImgStatusUnion,
@@ -35,9 +43,7 @@ const roleIcons: Record<FakeRoleUnion, string> = {
 
 export default function SettingAction() {
   const { store, setStore } = RootStore
-  const navigator = useNavigate()
-  const params = useParams<{ session?: string }>()
-  const sessionId = createMemo(() => params.session)
+  const nav = useNavigate()
   function clearSession() {
     setStore("messageList", messages =>
       messages.filter(k => k.type === "locked")
@@ -50,11 +56,11 @@ export default function SettingAction() {
     <div
       class="text-sm text-slate-7 dark:text-slate my-2"
       use:clickOutside={() => {
-        setState("showSetting", "none")
+        setActionState("showSetting", "none")
       }}
     >
       <Switch>
-        <Match when={state.showSetting === "global"}>
+        <Match when={actionState.showSetting === "global"}>
           <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
             <SettingItem icon="i-ri:lock-password-line" label="网站访问密码">
               <input
@@ -99,9 +105,9 @@ export default function SettingAction() {
           </div>
           <hr class="my-1 bg-slate-5 bg-op-15 border-none h-1px"></hr>
         </Match>
-        <Match when={state.showSetting === "session"}>
+        <Match when={actionState.showSetting === "session"}>
           <div class="<sm:max-h-10em max-h-14em overflow-y-auto">
-            <Show when={sessionId()}>
+            <Show when={store.sessionId !== "index"}>
               <SettingItem
                 icon="i-carbon:text-annotation-toggle"
                 label="对话标题"
@@ -206,14 +212,16 @@ export default function SettingAction() {
         <div class="flex">
           <ActionItem
             onClick={() => {
-              setState("showSetting", k => (k !== "global" ? "global" : "none"))
+              setActionState("showSetting", k =>
+                k !== "global" ? "global" : "none"
+              )
             }}
             icon="i-carbon:settings"
             label="全局设置"
           />
           <ActionItem
             onClick={() => {
-              setState("showSetting", k =>
+              setActionState("showSetting", k =>
                 k !== "session" ? "session" : "none"
               )
             }}
@@ -226,60 +234,60 @@ export default function SettingAction() {
             <div class="flex">
               <ActionItem
                 onClick={() => {
-                  setState("fakeRole", k => {
+                  setActionState("fakeRole", k => {
                     const _ = ["normal", "user", "assistant"] as FakeRoleUnion[]
                     return _[(_.indexOf(k) + 1) % _.length]
                   })
                 }}
-                icon={roleIcons[state.fakeRole]}
+                icon={roleIcons[actionState.fakeRole]}
                 label="伪装角色"
               />
               <ActionItem
                 onClick={async () => {
-                  setState("genImg", "loading")
+                  setActionState("genImg", "loading")
                   await exportJpg()
-                  setTimeout(() => setState("genImg", "normal"), 1000)
+                  setTimeout(() => setActionState("genImg", "normal"), 1000)
                 }}
-                icon={imgIcons[state.genImg]}
+                icon={imgIcons[actionState.genImg]}
                 label="导出图片"
               />
               <ActionItem
                 label="导出MD"
                 onClick={async () => {
                   await exportMD(store.messageList)
-                  setState("success", "markdown")
-                  setTimeout(() => setState("success", false), 1000)
+                  setActionState("success", "markdown")
+                  setTimeout(() => setActionState("success", false), 1000)
                 }}
                 icon={
-                  state.success === "markdown"
+                  actionState.success === "markdown"
                     ? "i-carbon:status-resolved dark:text-yellow text-yellow-6"
                     : "i-ri:markdown-line"
                 }
               />
               <ActionItem
                 onClick={() => {
-                  if (state.clearSessionConfirm) {
+                  if (actionState.clearSessionConfirm) {
                     clearSession()
-                    setState("clearSessionConfirm", false)
+                    setActionState("clearSessionConfirm", false)
                   } else {
-                    setState("clearSessionConfirm", true)
+                    setActionState("clearSessionConfirm", true)
                     setTimeout(
-                      () => setState("clearSessionConfirm", false),
+                      () => setActionState("clearSessionConfirm", false),
                       3000
                     )
                   }
                 }}
                 icon={
-                  state.clearSessionConfirm
+                  actionState.clearSessionConfirm
                     ? "i-carbon:checkmark animate-bounce text-red-6 dark:text-red"
                     : "i-carbon:clean"
                 }
-                label={state.clearSessionConfirm ? "确定" : "清空对话"}
+                label={actionState.clearSessionConfirm ? "确定" : "清空对话"}
               />
             </div>
           }
         >
-          <Match when={state.showSetting === "global"}>
+          <Match when={actionState.showSetting === "global"}>
             <div class="flex">
               <ActionItem
                 label="导出"
@@ -293,7 +301,7 @@ export default function SettingAction() {
               />
             </div>
           </Match>
-          <Match when={state.showSetting === "session"}>
+          <Match when={actionState.showSetting === "session"}>
             <div class="flex">
               <ActionItem
                 onClick={() => {
@@ -302,6 +310,7 @@ export default function SettingAction() {
                     sessionID = generateId()
                   } while (getSession(sessionID))
                   setSession(sessionID, {
+                    id: sessionID,
                     lastVisit: Date.now(),
                     settings: {
                       ...defaultEnv.CLIENT_SESSION_SETTINGS,
@@ -310,23 +319,23 @@ export default function SettingAction() {
                     messages: []
                   })
                   // 如果是在同一层路由下，不会触发 onMount
-                  navigator("/", { replace: true })
-                  navigator("/session/" + sessionID, { replace: true })
+                  nav("/", { replace: true })
+                  nav("/session/" + sessionID)
                 }}
                 icon="i-carbon:add-alt"
                 label="新的对话"
               />
-              <Show when={sessionId()}>
+              <Show when={store.sessionId !== "index"}>
                 <ActionItem
                   onClick={async () => {
                     await copyToClipboard(
                       window.location.origin + window.location.pathname
                     )
-                    setState("success", "link")
-                    setTimeout(() => setState("success", false), 1000)
+                    setActionState("success", "link")
+                    setTimeout(() => setActionState("success", false), 1000)
                   }}
                   icon={
-                    state.success === "link"
+                    actionState.success === "link"
                       ? "i-carbon:status-resolved dark:text-yellow text-yellow-6"
                       : "i-carbon:link"
                   }
@@ -334,24 +343,24 @@ export default function SettingAction() {
                 />
                 <ActionItem
                   onClick={() => {
-                    if (state.deleteSessionConfirm) {
-                      setState("deleteSessionConfirm", false)
-                      delSession(sessionId() ?? "index")
-                      navigator("/", { replace: true })
+                    if (actionState.deleteSessionConfirm) {
+                      setActionState("deleteSessionConfirm", false)
+                      delSession(store.sessionId)
+                      nav("/", { replace: true })
                     } else {
-                      setState("deleteSessionConfirm", true)
+                      setActionState("deleteSessionConfirm", true)
                       setTimeout(
-                        () => setState("deleteSessionConfirm", false),
+                        () => setActionState("deleteSessionConfirm", false),
                         3000
                       )
                     }
                   }}
                   icon={
-                    state.deleteSessionConfirm
+                    actionState.deleteSessionConfirm
                       ? "i-carbon:checkmark animate-bounce text-red-6 dark:text-red"
                       : "i-carbon:trash-can"
                   }
-                  label={state.deleteSessionConfirm ? "确定" : "删除对话"}
+                  label={actionState.deleteSessionConfirm ? "确定" : "删除对话"}
                 />
               </Show>
             </div>
@@ -419,9 +428,9 @@ async function exportJpg() {
     } else {
       await downloadIMG()
     }
-    setState("genImg", "success")
+    setActionState("genImg", "success")
   } catch {
-    setState("genImg", "error")
+    setActionState("genImg", "error")
   }
 }
 

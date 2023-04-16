@@ -1,22 +1,23 @@
 import Chat from "~/components/Chat"
 import Layout from "~/layout"
-import { useParams, useNavigate } from "solid-start"
+import { useNavigate, useParams } from "solid-start"
 import { Show } from "solid-js"
-import { RootStore, getSession } from "~/store"
+import { RootStore } from "~/store"
 import PrefixTitle from "~/components/PrefixTitle"
+import { getSession } from "~/utils"
 
 export default function () {
-  const params = useParams<{ session: string }>()
-  const { store } = RootStore
-  const navigate = useNavigate()
+  const { store, setStore } = RootStore
+  const params = useParams<{ session?: string }>()
   const redirect = () =>
     !params.session || params.session === "index" || !getSession(params.session)
-  if (redirect()) navigate("/", { replace: true })
+  if (redirect()) useNavigate()("/", { replace: true })
+  else setStore("sessionId", params.session!)
   return (
     <Show when={!redirect()}>
       <PrefixTitle>{store.sessionSettings.title}</PrefixTitle>
       <Layout>
-        <Chat sessionID={params.session} />
+        <Chat />
       </Layout>
     </Show>
   )

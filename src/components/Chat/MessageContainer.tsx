@@ -1,9 +1,15 @@
-import { For, Show, createEffect } from "solid-js"
+import { type Accessor, For, Show, createEffect } from "solid-js"
 import { RootStore, defaultMessage } from "~/store"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
 
-export default function (props: { sendMessage(value?: string): void }) {
+export default function ({
+  sendMessage,
+  inputBoxHeight
+}: {
+  sendMessage(value?: string): void
+  inputBoxHeight: Accessor<number>
+}) {
   const { store } = RootStore
 
   createEffect((prev: number | undefined) => {
@@ -13,12 +19,24 @@ export default function (props: { sendMessage(value?: string): void }) {
     return store.messageList.length
   })
 
-  createEffect(() => {
+  createEffect(prev => {
     if (store.currentAssistantMessage) scrollToBottom()
   })
 
+  createEffect(prev => {
+    inputBoxHeight()
+    if (prev) scrollToBottom()
+    return true
+  })
+
   return (
-    <div class="px-1em mb-6em" id="message-container">
+    <div
+      class="px-1em"
+      id="message-container"
+      style={{
+        "margin-bottom": `calc(6em + ${inputBoxHeight() + "px" ?? "0px"})`
+      }}
+    >
       <div
         id="message-container-img"
         class="px-1em"
@@ -35,7 +53,7 @@ export default function (props: { sendMessage(value?: string): void }) {
               message={message}
               hiddenAction={store.loading}
               index={index()}
-              sendMessage={props.sendMessage}
+              sendMessage={sendMessage}
             />
           )}
         </For>

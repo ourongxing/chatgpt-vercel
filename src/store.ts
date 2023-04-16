@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store"
 import { defaultEnv } from "./env"
-import type { ChatMessage, Session } from "./types"
+import type { ChatMessage } from "./types"
 import { createMemo, createRoot } from "solid-js"
 import { countTokens, countTokensDollar } from "./utils"
 
@@ -54,6 +54,7 @@ export const defaultMessage: ChatMessage = {
 
 function Store() {
   const [store, setStore] = createStore({
+    sessionId: "index",
     globalSettings,
     sessionSettings,
     inputContent: "",
@@ -137,26 +138,3 @@ function Store() {
 }
 
 export const RootStore = createRoot(Store)
-
-export const LocalStorageKey = {
-  GlobalSettings: "gpt-global-settings",
-  Theme: "gpt-theme"
-}
-
-export function getSession(id: string) {
-  try {
-    const _ = localStorage.getItem("gpt-session-" + id)
-    if (_) return JSON.parse(_) as Session
-  } catch (e) {
-    console.error("Error parsing session:", e)
-  }
-  return undefined
-}
-
-export function setSession(id: string, data: Session) {
-  localStorage.setItem("gpt-session-" + id, JSON.stringify(data))
-}
-
-export function delSession(id: string) {
-  localStorage.removeItem("gpt-session-" + id)
-}

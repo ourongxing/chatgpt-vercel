@@ -1,20 +1,23 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { createEffect, createSignal, onMount } from "solid-js"
 import { useSearchParams } from "solid-start"
-import { LocalStorageKey, RootStore, getSession, setSession } from "~/store"
-import type { ChatMessage } from "~/types"
-import { isMobile } from "~/utils"
+import { RootStore } from "~/store"
+import { LocalStorageKey, type ChatMessage } from "~/types"
+import { getSession, setSession, isMobile } from "~/utils"
 import MessageContainer from "./MessageContainer"
-import InputBox from "./InputBox"
+import InputBox, { defaultInputBoxHeight } from "./InputBox"
 import PrefixTitle from "../PrefixTitle"
-import { type FakeRoleUnion, setState as setActionState } from "./SettingAction"
+import { type FakeRoleUnion, setActionState } from "./SettingAction"
 
 const SearchParamKey = "q"
 
-export default function (props: { sessionID: string }) {
+export default function () {
   let containerRef: HTMLDivElement
   let controller: AbortController | undefined = undefined
   const [containerWidth, setContainerWidth] = createSignal("init")
+  const [inputBoxHeight, setInputBoxHeight] = createSignal(
+    defaultInputBoxHeight
+  )
   const [searchParams] = useSearchParams()
   const q = searchParams[SearchParamKey]
   const { store, setStore } = RootStore
@@ -26,7 +29,7 @@ export default function (props: { sessionID: string }) {
       document.querySelector("#root")?.classList.remove("before")
     })
     document.querySelector("#root")?.classList.add("after")
-    const globalSettings = localStorage.getItem(LocalStorageKey.GlobalSettings)
+    const globalSettings = localStorage.getItem(LocalStorageKey.GLOBALSETTINGS)
     try {
       if (globalSettings) {
         const parsed = JSON.parse(globalSettings)
@@ -35,7 +38,7 @@ export default function (props: { sessionID: string }) {
           ...parsed
         }))
       }
-      const session = getSession(props.sessionID)
+      const session = getSession(store.sessionId)
       if (session) {
         const { settings, messages } = session
         if (settings) {
@@ -64,7 +67,8 @@ export default function (props: { sessionID: string }) {
   })
 
   createEffect(() => {
-    setSession(props.sessionID, {
+    setSession(store.sessionId, {
+      id: store.sessionId,
       lastVisit: Date.now(),
       messages: store.sessionSettings.continuousDialogue
         ? store.validContext
@@ -75,7 +79,7 @@ export default function (props: { sessionID: string }) {
 
   createEffect(() => {
     localStorage.setItem(
-      LocalStorageKey.GlobalSettings,
+      LocalStorageKey.GLOBALSETTINGS,
       JSON.stringify(store.globalSettings)
     )
   })
@@ -162,7 +166,18 @@ export default function (props: { sessionID: string }) {
         }
         setStore("loading", true)
         controller = new AbortController()
-        await fetchGPT(store.validContext)
+        // 在关闭连续对话时，有效上下文只包含了锁定的对话。
+        await fetchGPT(
+          store.sessionSettings.continuousDialogue
+            ? store.validContext
+            : [
+                ...store.validContext,
+                {
+                  role: "user",
+                  content: inputValue
+                }
+              ]
+        )
       } catch (error: any) {
         setStore("loading", false)
         controller = undefined
@@ -224,9 +239,14 @@ export default function (props: { sessionID: string }) {
       {searchParams[SearchParamKey] && (
         <PrefixTitle>{searchParams[SearchParamKey]}</PrefixTitle>
       )}
-      <MessageContainer sendMessage={sendMessage} />
+      <MessageContainer
+        sendMessage={sendMessage}
+        inputBoxHeight={inputBoxHeight}
+      />
       <InputBox
-        width={containerWidth()}
+        height={inputBoxHeight}
+        width={containerWidth}
+        setHeight={setInputBoxHeight}
         sendMessage={sendMessage}
         stopStreamFetch={stopStreamFetch}
       />

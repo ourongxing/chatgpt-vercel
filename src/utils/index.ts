@@ -1,6 +1,7 @@
 import throttle from "just-throttle"
 export * from "./parse"
 export * from "./tokens"
+export * from "./storage"
 
 export async function copyToClipboard(text: string) {
   if (!text) return

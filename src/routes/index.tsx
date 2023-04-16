@@ -4,7 +4,7 @@ import Layout from "~/layout"
 export default function () {
   return (
     <Layout>
-      <Chat sessionID="index" />
+      <Chat />
     </Layout>
   )
 }

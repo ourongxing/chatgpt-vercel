@@ -131,12 +131,12 @@ export default (props: Props) => {
         innerHTML={md
           .render(props.message.content)
           .replace(
-            /Vercel/g,
-            `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0">${vercel}</a>`
+            /\s*Vercel\s*/g,
+            `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0;margin-left: 6px">${vercel}</a>`
           )
           .replace(
-            /OpenAI/g,
-            `<a href="https://www.openai.com" style="border-bottom:0">${openai}</a>`
+            /\s*OpenAI\s*/g,
+            `<a href="https://www.openai.com" style="border-bottom:0;margin-left: 6px">${openai}</a>`
           )}
       />
       <MessageAction
