@@ -34,20 +34,21 @@ export const config = {
   ]
 }
 
-export const localKey = import.meta.env.OPENAI_API_KEY || ""
+export const localKey = process.env.OPENAI_API_KEY || ""
 
-export const baseURL = import.meta.env.NOGFW
+export const baseURL = process.env.NOGFW
   ? defaultEnv.OPENAI_API_BASE_URL
-  : (
-      import.meta.env.OPENAI_API_BASE_URL || defaultEnv.OPENAI_API_BASE_URL
-    ).replace(/^https?:\/\//, "")
+  : (process.env.OPENAI_API_BASE_URL || defaultEnv.OPENAI_API_BASE_URL).replace(
+      /^https?:\/\//,
+      ""
+    )
 
 // + 作用是将字符串转换为数字
-const timeout = isNaN(+import.meta.env.TIMEOUT!)
+const timeout = isNaN(+process.env.TIMEOUT!)
   ? defaultEnv.TIMEOUT
-  : +import.meta.env.TIMEOUT!
+  : +process.env.TIMEOUT!
 
-const passwordSet = import.meta.env.PASSWORD || defaultEnv.PASSWORD
+const passwordSet = process.env.PASSWORD || defaultEnv.PASSWORD
 
 export async function POST({ request }: APIEvent) {
   try {
@@ -58,13 +59,7 @@ export async function POST({ request }: APIEvent) {
       password?: string
       model: Model
     } = await request.json()
-    const {
-      messages,
-      key = localKey,
-      temperature = 0.6,
-      password,
-      model
-    } = body
+    const { messages, key = localKey, temperature, password, model } = body
 
     if (password && password !== passwordSet) {
       throw new Error("密码错误，请联系网站管理员。")
@@ -93,6 +88,9 @@ export async function POST({ request }: APIEvent) {
 
     const apiKey = randomKey(splitKeys(key))
 
+    console.log(localKey)
+    console.log(key)
+    console.log(apiKey)
     if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
     const encoder = new TextEncoder()
