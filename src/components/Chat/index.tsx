@@ -48,7 +48,7 @@ export default function () {
           }))
         }
         if (messages) {
-          if (store.sessionSettings.saveSession || !q) {
+          if (store.sessionSettings.saveSession && !q) {
             setStore("messageList", messages)
           } else {
             setStore(
