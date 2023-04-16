@@ -477,7 +477,7 @@ async function importData() {
       Object.keys(data).forEach(k => {
         localStorage.setItem(k, data[k])
       })
-      location.reload()
+      window.location.href = "/"
     }
   }
 }
