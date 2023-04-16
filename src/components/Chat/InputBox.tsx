@@ -129,19 +129,19 @@ export default function ({
 
       const sessionQuery = value.replace(
         /^\s{2,}(.*)\s*$|^\/{2,}(.*)\s*$/,
-        "$1"
+        "$1$2"
       )
       const promptQuery = value.replace(/^\s(.*)\s*$|^\/(.*)\s*$/, "$1$2")
       if (sessionQuery !== value) {
         setCandidateOptions(
-          fzfPrompts.find(sessionQuery).map(k => ({
+          fzfSessions.find(sessionQuery).map(k => ({
             ...k.item,
             positions: k.positions
           }))
         )
       } else if (promptQuery !== value) {
         setCandidateOptions(
-          fzfSessions.find(promptQuery).map(k => ({
+          fzfPrompts.find(promptQuery).map(k => ({
             ...k.item,
             positions: k.positions
           }))
