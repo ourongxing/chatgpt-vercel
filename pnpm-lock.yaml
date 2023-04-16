@@ -99,15 +99,9 @@ devDependencies:
   lint-staged:
     specifier: ^13.2.1
     version: registry.npmmirror.com/lint-staged@13.2.1
-  postcss:
-    specifier: ^8.4.21
-    version: registry.npmmirror.com/postcss@8.4.21
   prettier:
     specifier: ^2.8.7
     version: registry.npmmirror.com/prettier@2.8.7
-  punycode:
-    specifier: ^2.3.0
-    version: registry.npmmirror.com/punycode@2.3.0
   simple-git-hooks:
     specifier: ^2.8.1
     version: registry.npmmirror.com/simple-git-hooks@2.8.1
@@ -170,7 +164,7 @@ packages:
     name: '@antfu/utils'
     version: 0.7.2
 
-  registry.npmmirror.com/@apideck/better-ajv-errors@0.3.6(ajv@8.12.0):
+  registry.npmmirror.com/@apideck/better-ajv-errors@0.3.6(ajv@8.6.3):
     resolution: {integrity: sha512-P+ZygBLZtkp0qqOAJJVX4oX/sFo5JR3eBWwwuqHHhK0GIgQOKWrAfiAaWX0aArHkRWHMuggFEgAZNxVPwPZYaA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@apideck/better-ajv-errors/-/better-ajv-errors-0.3.6.tgz}
     id: registry.npmmirror.com/@apideck/better-ajv-errors/0.3.6
     name: '@apideck/better-ajv-errors'
@@ -179,7 +173,7 @@ packages:
     peerDependencies:
       ajv: '>=8'
     dependencies:
-      ajv: registry.npmmirror.com/ajv@8.12.0
+      ajv: registry.npmmirror.com/ajv@8.6.3
       json-schema: registry.npmmirror.com/json-schema@0.4.0
       jsonpointer: registry.npmmirror.com/jsonpointer@5.0.1
       leven: registry.npmmirror.com/leven@3.1.0
@@ -3164,17 +3158,6 @@ packages:
       fast-deep-equal: registry.npmmirror.com/fast-deep-equal@3.1.3
       fast-json-stable-stringify: registry.npmmirror.com/fast-json-stable-stringify@2.1.0
       json-schema-traverse: registry.npmmirror.com/json-schema-traverse@0.4.1
-      uri-js: registry.npmmirror.com/uri-js@4.4.1
-    dev: true
-
-  registry.npmmirror.com/ajv@8.12.0:
-    resolution: {integrity: sha512-sRu1kpcO9yLtYxBKvqfTeh9KzZEwO3STyX1HT+4CaDzC6HpTGYhIhPIzj9XuKU7KYDwnaeh5hcOwjy1QuJzBPA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/ajv/-/ajv-8.12.0.tgz}
-    name: ajv
-    version: 8.12.0
-    dependencies:
-      fast-deep-equal: registry.npmmirror.com/fast-deep-equal@3.1.3
-      json-schema-traverse: registry.npmmirror.com/json-schema-traverse@1.0.0
-      require-from-string: registry.npmmirror.com/require-from-string@2.0.2
       uri-js: registry.npmmirror.com/uri-js@4.4.1
     dev: true
 
@@ -7875,7 +7858,7 @@ packages:
     version: 6.5.4
     engines: {node: '>=10.0.0'}
     dependencies:
-      '@apideck/better-ajv-errors': registry.npmmirror.com/@apideck/better-ajv-errors@0.3.6(ajv@8.12.0)
+      '@apideck/better-ajv-errors': registry.npmmirror.com/@apideck/better-ajv-errors@0.3.6(ajv@8.6.3)
       '@babel/core': registry.npmmirror.com/@babel/core@7.21.4
       '@babel/preset-env': registry.npmmirror.com/@babel/preset-env@7.21.4(@babel/core@7.21.4)
       '@babel/runtime': registry.npmmirror.com/@babel/runtime@7.21.0
@@ -7883,7 +7866,7 @@ packages:
       '@rollup/plugin-node-resolve': registry.npmmirror.com/@rollup/plugin-node-resolve@11.2.1(rollup@2.79.1)
       '@rollup/plugin-replace': registry.npmmirror.com/@rollup/plugin-replace@2.4.2(rollup@2.79.1)
       '@surma/rollup-plugin-off-main-thread': registry.npmmirror.com/@surma/rollup-plugin-off-main-thread@2.2.3
-      ajv: registry.npmmirror.com/ajv@8.12.0
+      ajv: registry.npmmirror.com/ajv@8.6.3
       common-tags: registry.npmmirror.com/common-tags@1.8.2
       fast-json-stable-stringify: registry.npmmirror.com/fast-json-stable-stringify@2.1.0
       fs-extra: registry.npmmirror.com/fs-extra@9.1.0

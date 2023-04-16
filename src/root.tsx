@@ -12,8 +12,6 @@ import {
   Scripts,
   Title
 } from "solid-start"
-// @ts-ignore
-import { pwaInfo } from "virtual:pwa-info"
 import "@unocss/reset/tailwind.css"
 import "~/styles/main.css"
 import "uno.css"
@@ -33,7 +31,6 @@ export default function Root() {
           sizes="192x192"
         />
         <Meta name="theme-color" content="#f6f8fa" />
-        {pwaInfo && <Link href={pwaInfo.webManifest.href} />}
       </Head>
       <Body>
         <Suspense>
