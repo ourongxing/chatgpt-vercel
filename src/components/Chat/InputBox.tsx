@@ -179,7 +179,7 @@ export default function ({
           when={!store.loading}
           fallback={
             <div
-              class="px-2em animate-gradient-border cursor-pointer dark:bg-#292B31/90 bg-#E7EBF0/80 h-3em flex items-center justify-center"
+              class="animate-gradient-border cursor-pointer dark:bg-#292B31/90 bg-#E7EBF0/80 h-3em flex items-center justify-center"
               onClick={stopStreamFetch}
             >
               <span class="dark:text-slate text-slate-7">
