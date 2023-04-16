@@ -3,7 +3,7 @@ import { Match, Show, Switch, type JSXElement } from "solid-js"
 import { createStore } from "solid-js/store"
 import { defaultEnv } from "~/env"
 import { clickOutside } from "~/hooks"
-import { RootStore } from "~/store"
+import { RootStore, loadSession } from "~/store"
 import type { ChatMessage, Model } from "~/types"
 import {
   copyToClipboard,
@@ -43,7 +43,7 @@ const roleIcons: Record<FakeRoleUnion, string> = {
 
 export default function SettingAction() {
   const { store, setStore } = RootStore
-  const nav = useNavigate()
+  const navigator = useNavigate()
   function clearSession() {
     setStore("messageList", messages =>
       messages.filter(k => k.type === "locked")
@@ -318,9 +318,8 @@ export default function SettingAction() {
                     },
                     messages: []
                   })
-                  // 如果是在同一层路由下，不会触发 onMount
-                  nav("/", { replace: true })
-                  nav("/session/" + sessionID)
+                  navigator(`/session/${sessionID}`)
+                  loadSession(sessionID)
                 }}
                 icon="i-carbon:add-alt"
                 label="新的对话"
@@ -346,7 +345,8 @@ export default function SettingAction() {
                     if (actionState.deleteSessionConfirm) {
                       setActionState("deleteSessionConfirm", false)
                       delSession(store.sessionId)
-                      nav("/", { replace: true })
+                      navigator("/", { replace: true })
+                      loadSession("index")
                     } else {
                       setActionState("deleteSessionConfirm", true)
                       setTimeout(

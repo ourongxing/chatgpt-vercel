@@ -7,19 +7,15 @@ import {
   Show,
   createEffect,
   createSignal,
-  onMount
+  onMount,
+  batch
 } from "solid-js"
-import { RootStore } from "~/store"
+import { FZFData, RootStore, loadSession } from "~/store"
 import type { Option } from "~/types"
-import { fetchAllSessions, parsePrompts, scrollToBottom } from "~/utils"
+import { parsePrompts, scrollToBottom } from "~/utils"
 import SettingAction, { actionState, type FakeRoleUnion } from "./SettingAction"
 import SlashSelector from "./SlashSelector"
 import { useNavigate } from "solid-start"
-
-let promptOptions: Option[]
-let fzfPrompts: Fzf<Option[]>
-let sessionOptions: Option[]
-let fzfSessions: Fzf<Option[]>
 
 // 3em
 export const defaultInputBoxHeight = 48
@@ -38,30 +34,17 @@ export default function ({
 }) {
   const [candidateOptions, setCandidateOptions] = createSignal<Option[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
+  const navgiate = useNavigate()
   const { store, setStore } = RootStore
-  const navigator = useNavigate()
   onMount(() => {
     setTimeout(() => {
-      sessionOptions = fetchAllSessions()
-        .sort((m, n) => n.lastVisit - m.lastVisit)
-        .filter(k => k.id !== store.sessionId && k.id !== "index")
-        .map(k => ({
-          title: k.settings.title,
-          desc: k.messages.map(k => k.content).join("\n"),
-          extra: {
-            id: k.id
-          }
-        }))
-      fzfSessions = new Fzf(sessionOptions, {
-        selector: k => `${k.title}\n${k.desc}`
-      })
-      promptOptions = parsePrompts().map(
+      FZFData.promptOptions = parsePrompts().map(
         k => ({ title: k.desc, desc: k.detail } as Option)
       )
-      fzfPrompts = new Fzf(promptOptions, {
+      FZFData.fzfPrompts = new Fzf(FZFData.promptOptions, {
         selector: k => `${k.title}\n${k.desc}`
       })
-    }, 1000)
+    }, 500)
     if (store.inputRef) {
       makeEventListener(
         store.inputRef,
@@ -96,36 +79,40 @@ export default function ({
   createEffect(prev => {
     store.inputContent
     if (prev) {
-      setHeight(defaultInputBoxHeight)
-      if (store.inputContent === "") {
-        setCandidateOptions([])
-      } else {
-        setSuitableheight()
-      }
+      batch(() => {
+        setHeight(defaultInputBoxHeight)
+        if (store.inputContent === "") {
+          setCandidateOptions([])
+        } else {
+          setSuitableheight()
+        }
+      })
       store.inputRef?.focus()
     }
     return true
   })
 
   function selectOption(option?: Option) {
-    if (option) {
-      if (option.extra?.id) {
-        navigator("/", { replace: true })
-        navigator("/session/" + option.extra.id)
-        setStore("inputContent", "")
-      } else setStore("inputContent", option.desc)
-    }
-    setCandidateOptions([])
-    setSuitableheight()
+    batch(() => {
+      if (option) {
+        if (option.extra?.id) {
+          navgiate(`/session/${option.extra.id}`)
+          loadSession(option.extra.id)
+          setStore("inputContent", "")
+        } else setStore("inputContent", option.desc)
+      }
+      setCandidateOptions([])
+      setSuitableheight()
+    })
     store.inputRef?.focus()
   }
 
   const searchOptions = throttle(
     (value: string) => {
       if (/^\s{2,}$|^\/{2,}$/.test(value))
-        return setCandidateOptions(sessionOptions)
+        return setCandidateOptions(FZFData.sessionOptions)
       if (value === "/" || value === " ")
-        return setCandidateOptions(promptOptions)
+        return setCandidateOptions(FZFData.promptOptions)
 
       const sessionQuery = value.replace(
         /^\s{2,}(.*)\s*$|^\/{2,}(.*)\s*$/,
@@ -134,14 +121,14 @@ export default function ({
       const promptQuery = value.replace(/^\s(.*)\s*$|^\/(.*)\s*$/, "$1$2")
       if (sessionQuery !== value) {
         setCandidateOptions(
-          fzfSessions.find(sessionQuery).map(k => ({
+          FZFData.fzfSessions!.find(sessionQuery).map(k => ({
             ...k.item,
             positions: k.positions
           }))
         )
       } else if (promptQuery !== value) {
         setCandidateOptions(
-          fzfPrompts.find(promptQuery).map(k => ({
+          FZFData.fzfPrompts!.find(promptQuery).map(k => ({
             ...k.item,
             positions: k.positions
           }))
@@ -156,17 +143,19 @@ export default function ({
   )
 
   async function handleInput() {
-    setHeight(defaultInputBoxHeight)
-    setSuitableheight()
-    if (!compositionend()) return
-    const value = store.inputRef?.value
-    if (value) {
-      setStore("inputContent", value)
-      searchOptions(value)
-    } else {
-      setStore("inputContent", "")
-      setCandidateOptions([])
-    }
+    batch(() => {
+      setHeight(defaultInputBoxHeight)
+      setSuitableheight()
+      if (!compositionend()) return
+      const value = store.inputRef?.value
+      if (value) {
+        setStore("inputContent", value)
+        searchOptions(value)
+      } else {
+        setStore("inputContent", "")
+        setCandidateOptions([])
+      }
+    })
   }
 
   return (

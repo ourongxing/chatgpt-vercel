@@ -1,8 +1,8 @@
 import logo from "/assets/logo.svg?raw"
 import ThemeToggle from "./ThemeToggle"
-import { useNavigate } from "solid-start"
-import { RootStore } from "~/store"
+import { RootStore, loadSession } from "~/store"
 import { Show, createMemo } from "solid-js"
+import { useNavigate } from "solid-start"
 
 function splitEmoji(text: string) {
   const [icon, title] = text
@@ -29,6 +29,7 @@ function scrollTo(selector: string, yOffset = 0) {
 
 export default function Header() {
   const { store } = RootStore
+  const navigate = useNavigate()
   const iconTitle = createMemo(() => splitEmoji(store.sessionSettings.title))
   return (
     <>
@@ -36,7 +37,8 @@ export default function Header() {
         id="logo"
         class="pl-1em cursor-pointer inline-block"
         onClick={() => {
-          window.location.href = "/"
+          navigate("/", { replace: true })
+          loadSession("index")
         }}
       >
         <Show

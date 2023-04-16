@@ -12,7 +12,7 @@ export default function () {
   const redirect = () =>
     !params.session || params.session === "index" || !getSession(params.session)
   if (redirect()) useNavigate()("/", { replace: true })
-  else setStore("sessionId", params.session!)
+  else setStore("sessionId", params.session ?? "index")
   return (
     <Show when={!redirect()}>
       <PrefixTitle>{store.sessionSettings.title}</PrefixTitle>

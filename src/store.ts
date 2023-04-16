@@ -1,8 +1,15 @@
 import { createStore } from "solid-js/store"
 import { defaultEnv } from "./env"
-import type { ChatMessage } from "./types"
-import { createMemo, createRoot } from "solid-js"
-import { countTokens, countTokensDollar } from "./utils"
+import { type ChatMessage, LocalStorageKey } from "./types"
+import { batch, createMemo, createRoot } from "solid-js"
+import {
+  countTokens,
+  countTokensDollar,
+  fetchAllSessions,
+  getSession
+} from "./utils"
+import { Fzf } from "fzf"
+import type { Option } from "~/types"
 
 let globalSettings = { ...defaultEnv.CLIENT_GLOBAL_SETTINGS }
 let _ = import.meta.env.CLIENT_GLOBAL_SETTINGS
@@ -138,3 +145,67 @@ function Store() {
 }
 
 export const RootStore = createRoot(Store)
+
+export const FZFData = {
+  promptOptions: [] as Option[],
+  fzfPrompts: undefined as Fzf<Option[]> | undefined,
+  sessionOptions: [] as Option[],
+  fzfSessions: undefined as Fzf<Option[]> | undefined
+}
+
+export function loadSession(id: string) {
+  const { store, setStore } = RootStore
+  // 只触发一次更新
+  batch(() => {
+    setStore("sessionId", id)
+    try {
+      const globalSettings = localStorage.getItem(
+        LocalStorageKey.GLOBALSETTINGS
+      )
+      const session = getSession(id)
+      if (globalSettings) {
+        const parsed = JSON.parse(globalSettings)
+        setStore("globalSettings", t => ({
+          ...t,
+          ...parsed
+        }))
+      }
+      if (session) {
+        const { settings, messages } = session
+        if (settings) {
+          setStore("sessionSettings", t => ({
+            ...t,
+            ...settings
+          }))
+        }
+        if (messages) {
+          if (store.sessionSettings.saveSession) {
+            setStore("messageList", messages)
+          } else {
+            setStore(
+              "messageList",
+              messages.filter(m => m.type === "locked")
+            )
+          }
+        }
+      }
+    } catch {
+      console.log("Localstorage parse error")
+    }
+  })
+  setTimeout(() => {
+    FZFData.sessionOptions = fetchAllSessions()
+      .sort((m, n) => n.lastVisit - m.lastVisit)
+      .filter(k => k.id !== store.sessionId && k.id !== "index")
+      .map(k => ({
+        title: k.settings.title,
+        desc: k.messages.map(k => k.content).join("\n"),
+        extra: {
+          id: k.id
+        }
+      }))
+    FZFData.fzfSessions = new Fzf(FZFData.sessionOptions, {
+      selector: k => `${k.title}\n${k.desc}`
+    })
+  }, 500)
+}

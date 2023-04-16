@@ -1,12 +1,11 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer"
-import { createEffect, createSignal, onMount } from "solid-js"
+import { batch, createEffect, createSignal, onMount } from "solid-js"
 import { useSearchParams } from "solid-start"
-import { RootStore } from "~/store"
+import { RootStore, loadSession } from "~/store"
 import { LocalStorageKey, type ChatMessage } from "~/types"
-import { getSession, setSession, isMobile } from "~/utils"
+import { setSession, isMobile } from "~/utils"
 import MessageContainer from "./MessageContainer"
 import InputBox, { defaultInputBoxHeight } from "./InputBox"
-import PrefixTitle from "../PrefixTitle"
 import { type FakeRoleUnion, setActionState } from "./SettingAction"
 
 const SearchParamKey = "q"
@@ -29,41 +28,8 @@ export default function () {
       document.querySelector("#root")?.classList.remove("before")
     })
     document.querySelector("#root")?.classList.add("after")
-    const globalSettings = localStorage.getItem(LocalStorageKey.GLOBALSETTINGS)
-    try {
-      if (globalSettings) {
-        const parsed = JSON.parse(globalSettings)
-        setStore("globalSettings", t => ({
-          ...t,
-          ...parsed
-        }))
-      }
-      const session = getSession(store.sessionId)
-      if (session) {
-        const { settings, messages } = session
-        if (settings) {
-          setStore("sessionSettings", t => ({
-            ...t,
-            ...settings
-          }))
-        }
-        if (messages) {
-          if (store.sessionSettings.saveSession && !q) {
-            setStore("messageList", messages)
-          } else {
-            setStore(
-              "messageList",
-              messages.filter(m => m.type === "locked")
-            )
-            if (q) sendMessage(q)
-          }
-        }
-      } else if (q) {
-        sendMessage(q)
-      }
-    } catch {
-      console.log("Localstorage parse error")
-    }
+    loadSession(store.sessionId)
+    if (q) sendMessage(q)
   })
 
   createEffect(() => {
@@ -86,19 +52,20 @@ export default function () {
 
   function archiveCurrentMessage() {
     if (store.currentAssistantMessage) {
-      setStore("messageList", k => [
-        ...k,
-        {
-          role: "assistant",
-          content: store.currentAssistantMessage.trim()
-        }
-      ])
-      setStore("currentAssistantMessage", "")
-      setStore("loading", false)
+      batch(() => {
+        setStore("messageList", k => [
+          ...k,
+          {
+            role: "assistant",
+            content: store.currentAssistantMessage.trim()
+          }
+        ])
+        setStore("currentAssistantMessage", "")
+        setStore("loading", false)
+      })
       controller = undefined
     }
     !isMobile() && store.inputRef?.focus()
-    // searchParams[SearchParamKey] && setSearchParams({ q: undefined })
   }
 
   function stopStreamFetch() {
@@ -236,9 +203,6 @@ export default function () {
 
   return (
     <main ref={containerRef!} class="mt-4">
-      {searchParams[SearchParamKey] && (
-        <PrefixTitle>{searchParams[SearchParamKey]}</PrefixTitle>
-      )}
       <MessageContainer
         sendMessage={sendMessage}
         inputBoxHeight={inputBoxHeight}
