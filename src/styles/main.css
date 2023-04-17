@@ -31,7 +31,8 @@ html {
   color: var(--c-fg);
 }
 
-header {
+header,
+#message-container-img {
   background-color: var(--c-bg);
 }
 

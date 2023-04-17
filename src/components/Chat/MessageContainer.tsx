@@ -1,7 +1,15 @@
-import { type Accessor, For, Show, createEffect } from "solid-js"
+import {
+  type Accessor,
+  For,
+  Show,
+  createEffect,
+  createSignal,
+  createMemo
+} from "solid-js"
 import { RootStore, defaultMessage } from "~/store"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
+import { defaultInputBoxHeight } from "./InputBox"
 
 export default function ({
   sendMessage,
@@ -11,6 +19,12 @@ export default function ({
   inputBoxHeight: Accessor<number>
 }) {
   const { store } = RootStore
+  // 防止重新设置高度时页面跳动
+  const paddingBottom = createMemo(
+    k =>
+      inputBoxHeight() === defaultInputBoxHeight - 1 ? k : inputBoxHeight(),
+    defaultInputBoxHeight
+  )
 
   createEffect((prev: number | undefined) => {
     if (prev !== undefined && store.messageList.length > prev) {
@@ -25,7 +39,9 @@ export default function ({
 
   createEffect(prev => {
     inputBoxHeight()
-    if (prev) scrollToBottom()
+    if (prev && paddingBottom() !== defaultInputBoxHeight) {
+      scrollToBottom()
+    }
     return true
   })
 
@@ -34,16 +50,10 @@ export default function ({
       class="px-1em"
       id="message-container"
       style={{
-        "margin-bottom": `calc(6em + ${inputBoxHeight() + "px" ?? "0px"})`
+        "margin-bottom": `calc(6em + ${paddingBottom() + "px"})`
       }}
     >
-      <div
-        id="message-container-img"
-        class="px-1em"
-        style={{
-          "background-color": "var(--c-bg)"
-        }}
-      >
+      <div id="message-container-img" class="px-1em">
         <Show when={!store.messageList.length}>
           <MessageItem hiddenAction={true} message={defaultMessage} />
         </Show>

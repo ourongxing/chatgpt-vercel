@@ -70,8 +70,8 @@ export default function ({
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
-        scrollHeight > window.innerHeight - 64
-          ? window.innerHeight - 64
+        scrollHeight > window.innerHeight - 80
+          ? window.innerHeight - 80
           : scrollHeight
       )
   }
@@ -142,8 +142,9 @@ export default function ({
   )
 
   async function handleInput() {
+    // 重新设置高度，让输入框可以自适应高度，-1 是为了标记不是初始状态
+    setHeight(defaultInputBoxHeight - 1)
     batch(() => {
-      setHeight(defaultInputBoxHeight)
       setSuitableheight()
       if (!compositionend()) return
       const value = store.inputRef?.value
