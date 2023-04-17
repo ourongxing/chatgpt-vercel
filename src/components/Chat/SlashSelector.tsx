@@ -52,7 +52,7 @@ export default function PromptList(props: {
       setMaxHeight(
         containerRef.clientHeight > window.innerHeight - 130
           ? window.innerHeight - 130
-          : containerRef.clientHeight
+          : DefaultHeight
       )
     }
   })
