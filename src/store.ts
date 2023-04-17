@@ -137,7 +137,9 @@ function Store() {
 
   const remainingToken = createMemo(
     () =>
-      maxInputTokens[store.sessionSettings.APIModel] -
+      (store.globalSettings.APIKey
+        ? maxInputTokens[store.sessionSettings.APIModel]
+        : defaultEnv.CLIENT_MAX_INPUT_TOKENS[store.sessionSettings.APIModel]) -
       store.contextToken -
       store.inputContentToken
   )

@@ -29,7 +29,7 @@ export const defaultEnv = {
   } as Record<Model, number>,
   OPENAI_API_BASE_URL: "api.openai.com",
   OPENAI_API_KEY: "",
-  TIMEOUT: 60000,
+  TIMEOUT: 30000,
   PASSWORD: "",
   SEND_KEY: "",
   SEND_CHANNEL: 9,
