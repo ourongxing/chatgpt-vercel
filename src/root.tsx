@@ -14,6 +14,8 @@ import {
 import "@unocss/reset/tailwind.css"
 import "~/styles/main.css"
 import "uno.css"
+import "katex/dist/katex.min.css"
+import "highlight.js/styles/atom-one-dark.css"
 import PrefixTitle from "./components/PrefixTitle"
 import { useRegisterSW } from "virtual:pwa-register/solid"
 // @ts-ignore
