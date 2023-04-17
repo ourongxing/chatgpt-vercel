@@ -1,10 +1,10 @@
 import { splitKeys } from "~/utils"
 import { localKey, genBillingsTable, fetchBilling } from "."
 import { defaultEnv } from "~/env"
-const sendKey = import.meta.env.SEND_KEY
-const channel = isNaN(+import.meta.env.SEND_CHANNEL!)
+const sendKey = process.env.SEND_KEY
+const channel = isNaN(+process.env.SEND_CHANNEL!)
   ? defaultEnv.SEND_KEY
-  : +import.meta.env.SEND_CHANNEL!
+  : +process.env.SEND_CHANNEL!
 
 export const config = {
   runtime: "edge",
