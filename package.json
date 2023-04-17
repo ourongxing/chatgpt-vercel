@@ -45,6 +45,7 @@
     "undici": "^5.21.2"
   },
   "devDependencies": {
+    "@cloudflare/kv-asset-handler": "^0.3.0",
     "@iconify-json/carbon": "^1.1.16",
     "@iconify-json/ri": "^1.1.7",
     "@types/markdown-it": "^12.2.3",

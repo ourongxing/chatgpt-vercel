@@ -63,6 +63,9 @@ dependencies:
     version: registry.npmmirror.com/undici@5.21.2
 
 devDependencies:
+  '@cloudflare/kv-asset-handler':
+    specifier: ^0.3.0
+    version: registry.npmmirror.com/@cloudflare/kv-asset-handler@0.3.0
   '@iconify-json/carbon':
     specifier: ^1.1.16
     version: registry.npmmirror.com/@iconify-json/carbon@1.1.16
@@ -1574,6 +1577,14 @@ packages:
     version: 0.2.0
     dependencies:
       mime: registry.npmmirror.com/mime@3.0.0
+
+  registry.npmmirror.com/@cloudflare/kv-asset-handler@0.3.0:
+    resolution: {integrity: sha512-9CB/MKf/wdvbfkUdfrj+OkEwZ5b7rws0eogJ4293h+7b6KX5toPwym+VQKmILafNB9YiehqY0DlNrDcDhdWHSQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@cloudflare/kv-asset-handler/-/kv-asset-handler-0.3.0.tgz}
+    name: '@cloudflare/kv-asset-handler'
+    version: 0.3.0
+    dependencies:
+      mime: registry.npmmirror.com/mime@3.0.0
+    dev: true
 
   registry.npmmirror.com/@cloudflare/workers-types@3.19.0:
     resolution: {integrity: sha512-0FRcsz7Ea3jT+gc5gKPIYciykm1bbAaTpygdzpCwGt0RL+V83zWnYN30NWDW4rIHj/FHtz+MIuBKS61C8l7AzQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@cloudflare/workers-types/-/workers-types-3.19.0.tgz}
