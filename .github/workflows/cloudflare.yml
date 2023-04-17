@@ -38,7 +38,9 @@ jobs:
         run: pnpm i
 
       - name: Build
-        run: CF_WORKER pnpm build
+        run: pnpm build
+        env:
+          CF_WORKER: "1"
 
       - name: Publish to Cloudflare
         uses: cloudflare/wrangler-action@2.0.0
