@@ -1,0 +1,6 @@
+main = "./dist/server.js"
+[site]
+bucket= "./dist/public"
+[vars]
+NODE_VERSION = "18"
+CLOUDFLARE_WORKER = "true"

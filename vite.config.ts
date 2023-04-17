@@ -4,6 +4,7 @@ import netlify from "solid-start-netlify"
 // @ts-ignore
 import node from "solid-start-node"
 import vercel from "solid-start-vercel"
+import cloudflare from "solid-start-cloudflare-workers"
 import { defineConfig } from "vite"
 import unocss from "unocss/vite"
 import {
@@ -20,6 +21,8 @@ const adapter = () => {
     return vercel({ edge: true })
   } else if (process.env.NETLIFY) {
     return netlify({ edge: true })
+  } else if (process.env.CLOUDFLARE_WORKER) {
+    return cloudflare({})
   } else {
     return node()
   }
