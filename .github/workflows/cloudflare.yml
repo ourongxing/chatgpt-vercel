@@ -2,8 +2,8 @@ name: cloudflare
 
 on:
   push:
-		branches: [ main ]
-  workflow_dispatch:
+		branches:
+			- main
 
 jobs:
 	ci:
@@ -11,8 +11,8 @@ jobs:
 
 		strategy:
 			matrix:
-			os: [ ubuntu-latest ]
-			node: [ 16 ]
+				os: "ubuntu-latest"
+				node: 18
 
 		steps:
 			- uses: actions/setup-node@v1
