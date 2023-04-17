@@ -112,10 +112,11 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 目前本项目除 Vercel 以外还支持
 
-- [Netlify](https://www.netlify.com/)
-- [Railway](https://railway.app/)
+- [Netlify](https://www.netlify.com/)：直接导入即可。
+- [CloudFlare Worker](https://cloudflare.com/)：使用 Github Action 部署，需要设置 `CF_API_TOKEN`。
+- [Railway](https://railway.app/)：直接导入即可。
 
-直接导入即可，但是不建议使用除 Vercel 以外的部署方案。 除了比较慢以外，更重要的是只有 Vercel 支持设置 Edge Function 服务器的地区，其他平台会自动使用距离最近的服务器，有可能是 OpenAI 不支持的地区，从而导致封号。
+不建议使用除 Vercel 以外的部署方案。 除了比较慢以外，更重要的是只有 Vercel 支持设置 Edge Function 服务器的地区，其他平台会自动使用距离最近的服务器，有可能是 OpenAI 不支持的地区，从而导致封号。
 
 ### 环境变量
 
