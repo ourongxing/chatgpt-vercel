@@ -47,12 +47,14 @@ export default function PromptList(props: {
   })
 
   createEffect(() => {
-    if (containerRef && props.options.length)
+    props.options
+    if (containerRef && props.options.length) {
       setMaxHeight(
-        window.innerHeight - containerRef.clientHeight > 150
-          ? DefaultHeight
-          : window.innerHeight - 150
+        containerRef.clientHeight > window.innerHeight - 130
+          ? window.innerHeight - 130
+          : containerRef.clientHeight
       )
+    }
   })
 
   return (
