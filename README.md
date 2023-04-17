@@ -3,6 +3,10 @@
 ![](assets/preview-light.png#gh-light-mode-only)
 ![](assets/preview-dark.png#gh-dark-mode-only)
 
+https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-a739-20e0b3d63eb2.mp4
+
+
+
 > 本项目基于 [chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo) 开发。正式版本（v1.0.0）使用 Solid-Start 框架，并且不再开启 SSR。请重新设置环境变量。
 
 在线预览:
@@ -18,9 +22,10 @@
 3. 支持 PWA。
 4. 支持 Prompts 预设，使用 <kbd>空格</kbd> 或者 <kbd>/</kbd> 搜索，可以模糊匹配，突出显示匹配的文字。
 5. 支持多个对话（聊天），并且每个对话都可以单独设置，自由设置角色，不同对话可以通过 URL 直达。使用 <kbd>空格</kbd><kbd>空格</kbd> 或者 <kbd>/</kbd><kbd>/</kbd> 搜索，可以模糊匹配，搜索历史消息。
-6. 实时查看当前对话会消耗的 token 以及回答的 token，及时打断。
-7. 支持多种余额查询方式，支持定义查询内置账号余额，并且发送到微信。
-8. 支持 URL query，当作搜索引擎使用，所有对话都支持。比如 `url?q=keyword` 或者 `url/session/xxxxx?q=keyword`
+6. 支持导出和导入对话和设置。
+7. 实时查看当前对话会消耗的 token 以及回答的 token，及时打断。
+8. 支持多种余额查询方式，支持定时查询内置账号余额，并且发送到微信。
+9. 支持 URL query，当作搜索引擎使用，所有对话都支持。比如 `url?q=keyword` 或者 `url/session/xxxxx?q=keyword`
 
 ## 使用技巧
 
