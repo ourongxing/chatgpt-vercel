@@ -36,9 +36,9 @@ export default function () {
     setSession(store.sessionId, {
       id: store.sessionId,
       lastVisit: Date.now(),
-      messages: store.sessionSettings.continuousDialogue
-        ? store.validContext
-        : store.validContext.filter(m => m.type === "locked"),
+      messages: store.sessionSettings.saveSession
+        ? store.messageList
+        : store.messageList.filter(m => m.type === "locked"),
       settings: store.sessionSettings
     })
   })
