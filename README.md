@@ -3,6 +3,8 @@
 ![](assets/preview-light.png#gh-light-mode-only)
 ![](assets/preview-dark.png#gh-dark-mode-only)
 
+
+
 https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-a739-20e0b3d63eb2.mp4
 
 
@@ -86,7 +88,7 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 [![](assets/powered-by-vercel.svg)](http://vercel.com/?utm_source=busiyi&utm_campaign=oss)
 
-> **warnings**
+> **Warning**
 >
 > vercel.app 域名已经被墙，但 vercel 本身没有被墙，所以你绑定自己的域名就可以了。如果广泛分享，域名有被墙的风险。如果是国内购买的域名，有请去喝茶的风险，所以要么小范围加密码使用，要么在国外购买域名。更推荐小范围内使用。
 
