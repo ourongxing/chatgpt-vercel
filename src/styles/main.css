@@ -1,7 +1,11 @@
+@import url(./animation.css);
+@import url(./tooltip.css);
+@import url(./message.css);
+@import url(./clipboard.css);
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-  /**/
 }
 
 ::-webkit-scrollbar-track {
@@ -22,11 +26,13 @@
 html {
   font-family: "lucida grande", "lucida sans unicode", lucida, helvetica,
     "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  font-size: 16px;
   background-color: var(--c-bg);
   color: var(--c-fg);
 }
 
-header {
+header,
+#message-container-img {
   background-color: var(--c-bg);
 }
 
@@ -35,20 +41,15 @@ html.dark {
   --c-scroll-thumb: #4c4c4c;
 }
 
-main {
+body {
   max-width: 72ch;
-  margin: 0 auto;
+  margin: 0 auto !important;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-.katex .vlist {
-  vertical-align: unset !important;
-}
-
-// https://www.zhangxinxu.com/wordpress/2015/01/css-page-scrollbar-toggle-center-no-jumping/
 /* html {
   overflow-y: scroll;
 }

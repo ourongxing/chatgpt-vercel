@@ -1,10 +1,9 @@
-import type { APIRoute } from "astro"
 import type { ParsedEvent, ReconnectInterval } from "eventsource-parser"
 import { createParser } from "eventsource-parser"
 import type { ChatMessage, Model } from "~/types"
-import { countTokens } from "~/utils/tokens"
 import { splitKeys, randomKey, fetchWithTimeout } from "~/utils"
-import { defaultMaxInputTokens, defaultModel } from "~/system"
+import { defaultEnv } from "~/env"
+import type { APIEvent } from "solid-start/api"
 
 export const config = {
   runtime: "edge",
@@ -35,40 +34,23 @@ export const config = {
   ]
 }
 
-export const localKey = import.meta.env.OPENAI_API_KEY || ""
+export const localKey = process.env.OPENAI_API_KEY || ""
 
-export const baseURL = import.meta.env.NOGFW
-  ? "api.openai.com"
-  : (import.meta.env.OPENAI_API_BASE_URL || "api.openai.com").replace(
+export const baseURL = process.env.NOGFW
+  ? defaultEnv.OPENAI_API_BASE_URL
+  : (process.env.OPENAI_API_BASE_URL || defaultEnv.OPENAI_API_BASE_URL).replace(
       /^https?:\/\//,
       ""
     )
 
-const timeout = Number(import.meta.env.TIMEOUT)
+// + 作用是将字符串转换为数字
+const timeout = isNaN(+process.env.TIMEOUT!)
+  ? defaultEnv.TIMEOUT
+  : +process.env.TIMEOUT!
 
-let maxInputTokens = defaultMaxInputTokens
-const _ = import.meta.env.MAX_INPUT_TOKENS
-if (_) {
-  try {
-    if (Number.isInteger(Number(_))) {
-      maxInputTokens = Object.entries(maxInputTokens).reduce((acc, [k]) => {
-        acc[k as Model] = Number(_)
-        return acc
-      }, {} as typeof maxInputTokens)
-    } else {
-      maxInputTokens = {
-        ...maxInputTokens,
-        ...JSON.parse(_)
-      }
-    }
-  } catch (e) {
-    console.error("Error parsing MAX_INPUT_TOKEN:", e)
-  }
-}
+const passwordSet = process.env.PASSWORD || defaultEnv.PASSWORD
 
-const pwd = import.meta.env.PASSWORD
-
-export const post: APIRoute = async context => {
+export async function POST({ request }: APIEvent) {
   try {
     const body: {
       messages?: ChatMessage[]
@@ -76,16 +58,10 @@ export const post: APIRoute = async context => {
       temperature: number
       password?: string
       model: Model
-    } = await context.request.json()
-    const {
-      messages,
-      key = localKey,
-      temperature = 0.6,
-      password,
-      model = defaultModel
-    } = body
+    } = await request.json()
+    const { messages, key = localKey, temperature, password, model } = body
 
-    if (pwd && pwd !== password) {
+    if (passwordSet && password !== passwordSet) {
       throw new Error("密码错误，请联系网站管理员。")
     }
 
@@ -114,21 +90,6 @@ export const post: APIRoute = async context => {
 
     if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
 
-    const tokens = messages.reduce((acc, cur) => {
-      const tokens = countTokens(cur.content)
-      return acc + tokens
-    }, 0)
-
-    if (
-      tokens > (body.key ? defaultMaxInputTokens[model] : maxInputTokens[model])
-    ) {
-      if (messages.length > 1)
-        throw new Error(
-          `由于开启了连续对话选项，导致本次对话过长，请清除部分内容后重试，或者关闭连续对话选项。`
-        )
-      else throw new Error("太长了，缩短一点吧。")
-    }
-
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
@@ -139,17 +100,16 @@ export const post: APIRoute = async context => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`
         },
-        timeout: !timeout || Number.isNaN(timeout) ? 30000 : timeout,
+        timeout,
         method: "POST",
         body: JSON.stringify({
-          model: model || "gpt-3.5-turbo",
+          model: model,
           messages: messages.map(k => ({ role: k.role, content: k.content })),
           temperature,
-          // max_tokens: 4096 - tokens,
           stream: true
         })
       }
-    ).catch(err => {
+    ).catch((err: { message: any }) => {
       return new Response(
         JSON.stringify({
           error: {

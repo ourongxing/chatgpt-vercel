@@ -1,53 +1,57 @@
-import { defineConfig } from "astro/config"
-import vercel from "@astrojs/vercel/edge"
-import node from "@astrojs/node"
-import netlify from "@astrojs/netlify/edge-functions"
-import cloudflare from "@astrojs/cloudflare"
-import unocss from "unocss/astro"
+import solid from "solid-start/vite"
+// @ts-ignore
+import netlify from "solid-start-netlify"
+// @ts-ignore
+import node from "solid-start-node"
+import vercel from "solid-start-vercel"
+import { defineConfig } from "vite"
+import unocss from "unocss/vite"
 import {
   presetUno,
   presetIcons,
-  presetAttributify,
-  presetTypography
+  presetTypography,
+  transformerDirectives,
+  transformerVariantGroup
 } from "unocss"
-import solidJs from "@astrojs/solid-js"
-import AstroPWA from "@vite-pwa/astro"
+import { VitePWA } from "vite-plugin-pwa"
 
 const adapter = () => {
   if (process.env.VERCEL) {
-    return vercel()
+    return vercel({ edge: true })
   } else if (process.env.NETLIFY) {
-    return netlify()
-  } else if (process.env.CF_PAGES) {
-    // cloudflare 无法提供 node18 环境，所以目前无法正常运行。
-    return cloudflare()
+    return netlify({ edge: true })
   } else {
-    return node({
-      mode: "standalone"
-    })
+    return node()
   }
 }
 
-// https://astro.build/config
 export default defineConfig({
-  integrations: [
+  envPrefix: "CLIENT_",
+  plugins: [
     unocss({
+      mergeSelectors: false,
+      transformers: [transformerDirectives(), transformerVariantGroup()],
       presets: [
-        presetAttributify(),
         presetUno(),
         presetTypography({
           cssExtend: {
-            ":not(pre) > code::before,:not(pre) > code::after": ""
+            ":not(pre) > code::before,:not(pre) > code::after": {
+              content: ""
+            }
           }
         }),
         presetIcons()
-      ]
+      ],
+      shortcuts: {
+        "input-box":
+          "max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none)"
+      }
     }),
-    solidJs(),
-    AstroPWA({
+    solid({ ssr: false, adapter: adapter() }),
+    VitePWA({
       base: "/",
       scope: "/",
-      includeAssets: ["favicon.svg"],
+      includeAssets: ["favicon.svg", "apple-touch-icon.png"],
       registerType: "autoUpdate",
       manifest: {
         name: "ChatGPT",
@@ -78,16 +82,9 @@ export default defineConfig({
         ]
       },
       disable: !!process.env.NETLIFY,
-      workbox: {
-        navigateFallback: "/404",
-        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"]
-      },
       devOptions: {
-        enabled: true,
-        navigateFallbackAllowlist: [/^\/404$/]
+        enabled: true
       }
     })
-  ],
-  output: "server",
-  adapter: adapter()
+  ]
 })

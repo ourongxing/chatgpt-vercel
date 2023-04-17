@@ -1,4 +1,10 @@
+import throttle from "just-throttle"
+export * from "./parse"
+export * from "./tokens"
+export * from "./storage"
+
 export async function copyToClipboard(text: string) {
+  if (!text) return
   try {
     return await navigator.clipboard.writeText(text)
   } catch {
@@ -79,6 +85,17 @@ export function randomKey(keys: string[]) {
   return keys.length ? keys[Math.floor(Math.random() * keys.length)] : ""
 }
 
+export const scrollToBottom = throttle(
+  () => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    })
+  },
+  250,
+  { leading: false, trailing: true }
+)
+
 export async function fetchWithTimeout(
   input: RequestInfo | URL,
   init?: (RequestInit & { timeout?: number }) | undefined
@@ -93,4 +110,21 @@ export async function fetchWithTimeout(
   })
   clearTimeout(id)
   return response
+}
+
+export function generateId() {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  let result = ""
+  for (let i = 0; i < 8; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)]
+  }
+  return result
+}
+
+export function isEmoji(character: string) {
+  const regex = new RegExp(
+    "[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]",
+    "u"
+  )
+  return regex.test(character)
 }

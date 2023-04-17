@@ -2,10 +2,12 @@ node_modules/
 .env
 yarn-error.log
 .idea/
-.vercel
+.vercel/
 .DS_Store
 src/temp.ts
 dist
 .netlify/
 dev-dist/
 .eslintcache
+.solid/
+netlify/

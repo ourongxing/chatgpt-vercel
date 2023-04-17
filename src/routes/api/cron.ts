@@ -1,8 +1,10 @@
-import type { APIRoute } from "astro"
 import { splitKeys } from "~/utils"
-import { localKey, genBillingsTable, baseURL, fetchBilling } from "."
-const sendKey = import.meta.env.SENDKEY
-const sendChannel = import.meta.env.SENDCHANNEL || "9"
+import { localKey, genBillingsTable, fetchBilling } from "."
+import { defaultEnv } from "~/env"
+const sendKey = process.env.SEND_KEY
+const channel = isNaN(+process.env.SEND_CHANNEL!)
+  ? defaultEnv.SEND_KEY
+  : +process.env.SEND_CHANNEL!
 
 export const config = {
   runtime: "edge",
@@ -33,7 +35,7 @@ export const config = {
   ]
 }
 
-export const get: APIRoute = async () => {
+export async function GET() {
   try {
     const keys = Array.from(new Set(splitKeys(localKey)))
     if (keys.length === 0) return new Response("")
@@ -52,7 +54,7 @@ export const get: APIRoute = async () => {
   } catch (e) {
     await push(`运行错误\n${String(e)}`)
   }
-  return new Response(`ok`)
+  return new Response("")
 }
 
 async function push(title: string, desp?: string) {
@@ -65,7 +67,7 @@ async function push(title: string, desp?: string) {
       body: JSON.stringify({
         title,
         desp,
-        channel: Number.isInteger(sendChannel) ? Number(sendChannel) : 9
+        channel
       })
     })
 }
