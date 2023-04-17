@@ -13,6 +13,7 @@ import {
   transformerDirectives,
   transformerVariantGroup
 } from "unocss"
+import { VitePWA } from "vite-plugin-pwa"
 
 const adapter = () => {
   if (process.env.VERCEL) {
@@ -46,6 +47,44 @@ export default defineConfig({
           "max-w-150px ml-1em px-1 text-slate-7 dark:text-slate rounded-sm bg-slate bg-op-15 focus:(bg-op-20 ring-0 outline-none)"
       }
     }),
-    solid({ ssr: false, adapter: adapter() })
+    solid({ ssr: false, adapter: adapter() }),
+    VitePWA({
+      base: "/",
+      scope: "/",
+      includeAssets: ["favicon.svg", "apple-touch-icon.png"],
+      registerType: "autoUpdate",
+      manifest: {
+        name: "ChatGPT",
+        lang: "zh-cn",
+        short_name: "ChatGPT",
+        background_color: "#f6f8fa",
+        icons: [
+          {
+            src: "192.png",
+            sizes: "192x192",
+            type: "image/png"
+          },
+          {
+            src: "256.png",
+            sizes: "256x256",
+            type: "image/png"
+          },
+          {
+            src: "512.png",
+            sizes: "512x512",
+            type: "image/png"
+          },
+          {
+            src: "apple-touch-icon.png",
+            sizes: "192x192",
+            type: "image/png"
+          }
+        ]
+      },
+      disable: !!process.env.NETLIFY,
+      devOptions: {
+        enabled: true
+      }
+    })
   ]
 })

@@ -9,15 +9,18 @@ import {
   Link,
   Meta,
   Routes,
-  Scripts,
-  Title
+  Scripts
 } from "solid-start"
 import "@unocss/reset/tailwind.css"
 import "~/styles/main.css"
 import "uno.css"
 import PrefixTitle from "./components/PrefixTitle"
+import { useRegisterSW } from "virtual:pwa-register/solid"
+// @ts-ignore
+import { pwaInfo } from "virtual:pwa-info"
 
 export default function Root() {
+  useRegisterSW({ immediate: true })
   return (
     <Html lang="zh-cn">
       <Head>
@@ -30,6 +33,11 @@ export default function Root() {
           href="/apple-touch-icon.png"
           sizes="192x192"
         />
+        {pwaInfo?.webManifest?.href ? (
+          <Link rel="manifest" href={pwaInfo.webManifest.href} />
+        ) : (
+          ""
+        )}
         <Meta name="theme-color" content="#f6f8fa" />
       </Head>
       <Body>
