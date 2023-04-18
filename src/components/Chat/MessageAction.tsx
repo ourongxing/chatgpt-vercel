@@ -26,7 +26,7 @@ export default function MessageAction({
             onClick={() => {
               setCopied(true)
               copy()
-              setTimeout(() => setCopied(false), 2000)
+              setTimeout(() => setCopied(false), 1000)
             }}
             icon={copied() ? "i-un:copied" : "i-un:copy"}
           />
@@ -45,23 +45,16 @@ export default function MessageAction({
   )
 }
 
-function ActionItem({
-  onClick,
-  icon,
-  label
-}: {
-  onClick: any
-  icon: string
-  label?: string
-}) {
+function ActionItem(props: { onClick: any; icon: string; label?: string }) {
   return (
     <div
       class="flex items-center cursor-pointer p-2 hover:bg-slate/10 rounded text-1.2em"
-      onClick={onClick}
-      attr:tooltip={label}
+      // 不能解构
+      onClick={props.onClick}
+      attr:tooltip={props.label}
       attr:position="top"
     >
-      <button class={icon} title={label} />
+      <button class={props.icon} title={props.label} />
     </div>
   )
 }
