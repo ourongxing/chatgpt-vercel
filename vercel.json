@@ -18,5 +18,8 @@
       "path": "/api/cron",
       "schedule": "0 12 * * *"
     }
-  ]
+  ],
+  "github": {
+    "silent": true
+  }
 }
