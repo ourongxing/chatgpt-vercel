@@ -126,7 +126,7 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 | ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | `OPENAI_API_KEY`          | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。 | 无                                                           |
 | `OPENAI_API_BASE_URL`     | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。并且不建议生产阶段使用。 | api.openai.com                                               |
-| `NOGFW`                   | 表示可以服务器可以直连，不需要`OPENAI_API_BASE_URL`，就算设置了也不使用。 | false                                                        |
+| `NO_GFW`                  | 表示可以服务器可以直连，不需要`OPENAI_API_BASE_URL`，就算设置了也不使用。 | false                                                        |
 | `TIMEOUT`                 | OpenAI API 超时。单位为毫秒，Vercel Edge Function 最大超时为 30000。 | 30000                                                        |
 | `PASSWORD`                | 网站密码                                                     | 无                                                           |
 | `CLIENT_DEFAULT_MESSAGE`  | 默认提示信息                                                 | - xx xx                                                      |

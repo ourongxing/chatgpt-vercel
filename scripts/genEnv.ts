@@ -14,9 +14,27 @@ ${Object.keys(defaultEnv)
   .map(key => `  ${key}?: string`)
   .join("\n")}
 }
-
+`
+await fs.writeFile(
+  "env.d.ts",
+  envDTS +
+    `
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 `
-await fs.writeFile("env.d.ts", envDTS)
+)
+
+await fs.writeFile(
+  "env.node.d.ts",
+  envDTS +
+    `
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends ImportMetaEnv { }
+  }
+}
+
+export {}
+  `
+)

@@ -36,7 +36,7 @@ export const config = {
 
 export const localKey = process.env.OPENAI_API_KEY || ""
 
-export const baseURL = process.env.NOGFW
+export const baseURL = process.env.NO_GFW
   ? defaultEnv.OPENAI_API_BASE_URL
   : (process.env.OPENAI_API_BASE_URL || defaultEnv.OPENAI_API_BASE_URL).replace(
       /^https?:\/\//,
