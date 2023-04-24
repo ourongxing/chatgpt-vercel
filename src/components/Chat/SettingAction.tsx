@@ -410,7 +410,7 @@ async function exportJpg() {
       const url = await toJpeg(messageContainer)
       const a = document.createElement("a")
       a.href = url
-      a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
+      a.download = `Starbox-${dateFormat(new Date(), "HH-MM-SS")}.jpg`
       a.click()
     }
     if (!isMobile() && navigator.clipboard) {
@@ -459,7 +459,7 @@ async function exportData() {
   a.href = URL.createObjectURL(
     new Blob([JSON.stringify(localStorage)], { type: "application/json" })
   )
-  a.download = `ChatGPT-${dateFormat(new Date(), "HH-MM-SS")}.json`
+  a.download = `Starbox-${dateFormat(new Date(), "HH-MM-SS")}.json`
   a.click()
 }
 
