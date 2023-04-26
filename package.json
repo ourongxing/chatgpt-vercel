@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx scripts/genEnv.ts && solid-start dev",
-    "build": "tsx scripts/genEnv.ts && NODE_OPTIONS=\"--max-old-space-size=3072\" solid-start build",
+    "build": "tsx scripts/genEnv.ts && solid-start build",
+    "build:vps": "NODE_OPTIONS=\"--max-old-space-size=3072\" pnpm build",
     "start": "solid-start start",
     "lint:fix": "eslint . --fix --ext .ts",
     "lint": "eslint . --ext .ts",
