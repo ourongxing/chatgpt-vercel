@@ -18,7 +18,7 @@ export const defaultEnv = {
     continuousDialogue: true,
     APIModel: "gpt-3.5-turbo" as Model
   },
-  CLIENT_DEFAULT_MESSAGE: `Powered by OpenAI Vercel
+  CLIENT_DEFAULT_MESSAGE: ` 
 - 本网站仅作为项目演示，已内置3个120美金的Key轮询使用，长期使用请自行部署，简单成本低，可联系客服：Andy_8023。
 - 点击每条消息前的头像，可以锁定对话，作为角色设定。
 - 现在支持多个对话，打开对话设置，点击新建对话。在输入框里输入 [[/]][[/]] 或者 [[空格]][[空格]] 可以切换对话，搜索历史消息。
