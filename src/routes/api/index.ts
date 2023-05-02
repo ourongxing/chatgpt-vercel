@@ -62,7 +62,7 @@ export async function POST({ request }: APIEvent) {
     const { messages, key = localKey, temperature, password, model } = body
 
     if (passwordSet && password !== passwordSet) {
-      throw new Error("密码错误，请联系网站管理员。")
+      throw new Error("密码错误，请联系网站管理员：Andy_8023。")
     }
 
     if (!messages?.length) {
