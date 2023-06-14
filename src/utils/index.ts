@@ -1,5 +1,4 @@
 import throttle from "just-throttle"
-export * from "./parse"
 export * from "./tokens"
 export * from "./storage"
 

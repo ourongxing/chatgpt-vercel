@@ -12,7 +12,7 @@ import {
 } from "solid-js"
 import { FZFData, RootStore, loadSession } from "~/store"
 import type { Option } from "~/types"
-import { parsePrompts, scrollToBottom } from "~/utils"
+import { scrollToBottom } from "~/utils"
 import SettingAction, { actionState, type FakeRoleUnion } from "./SettingAction"
 import SlashSelector from "./SlashSelector"
 import { useNavigate } from "solid-start"
@@ -37,14 +37,14 @@ export default function ({
   const navgiate = useNavigate()
   const { store, setStore } = RootStore
   onMount(() => {
-    setTimeout(() => {
+    import("~/utils/parse").then(({ parsePrompts }) => {
       FZFData.promptOptions = parsePrompts().map(
         k => ({ title: k.desc, desc: k.detail } as Option)
       )
       FZFData.fzfPrompts = new Fzf(FZFData.promptOptions, {
         selector: k => `${k.title}\n${k.desc}`
       })
-    }, 500)
+    })
     if (store.inputRef) {
       makeEventListener(
         store.inputRef,
