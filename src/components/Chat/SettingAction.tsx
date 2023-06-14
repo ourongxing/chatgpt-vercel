@@ -4,7 +4,7 @@ import { createStore } from "solid-js/store"
 import { defaultEnv } from "~/env"
 import { clickOutside } from "~/hooks"
 import { RootStore, loadSession } from "~/store"
-import type { ChatMessage, Model } from "~/types"
+import type { ChatMessage, SimpleModel } from "~/types"
 import {
   copyToClipboard,
   dateFormat,
@@ -132,26 +132,22 @@ export default function SettingAction() {
             >
               <Selector
                 class="max-w-150px"
-                value={store.sessionSettings.APIModel}
+                value={store.sessionSettings.model}
                 onChange={e => {
                   setStore(
                     "sessionSettings",
-                    "APIModel",
-                    (e.target as HTMLSelectElement).value as Model
+                    "model",
+                    (e.target as HTMLSelectElement).value as SimpleModel
                   )
                 }}
                 options={[
                   {
-                    value: "gpt-3.5-turbo",
-                    label: "gpt-3.5-turbo(4k)"
+                    value: "gpt-3.5",
+                    label: "gpt-3.5(auto)"
                   },
                   {
                     value: "gpt-4",
-                    label: "gpt-4(8k)"
-                  },
-                  {
-                    value: "gpt-4-32k",
-                    label: "gpt-4(32k)"
+                    label: "gpt-4(auto)"
                   }
                 ]}
               />
