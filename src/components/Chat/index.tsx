@@ -24,11 +24,8 @@ export default function () {
     createResizeObserver(containerRef, ({ width }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
-    import("~/markdown-it").then(({ mdFactory }) => {
-      mdFactory().then(md => {
-        if (!store.md) setStore("md", md)
-        document.querySelector("#root")?.classList.remove("before")
-      })
+    window.setTimeout(() => {
+      document.querySelector("#root")?.classList.remove("before")
     })
     document.querySelector("#root")?.classList.add("after")
     loadSession(store.sessionId)

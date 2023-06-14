@@ -1,11 +1,11 @@
 import { createStore } from "solid-js/store"
 import { defaultEnv } from "./env"
 import { type ChatMessage, LocalStorageKey } from "./types"
-import { batch, createMemo, createRoot } from "solid-js"
-import { countTokens, fetchAllSessions, getSession } from "./utils"
+import { batch, createEffect, createMemo, createRoot } from "solid-js"
+import { fetchAllSessions, getSession, throttle250 } from "./utils"
 import { Fzf } from "fzf"
 import type { Model, Option, SimpleModel } from "~/types"
-import type MarkdownIt from "markdown-it"
+import { countTokensInWorker } from "~/wokers"
 
 let globalSettings = { ...defaultEnv.CLIENT_GLOBAL_SETTINGS }
 let _ = import.meta.env.CLIENT_GLOBAL_SETTINGS
@@ -102,26 +102,19 @@ function Store() {
     inputContent: "",
     messageList: [] as ChatMessage[],
     currentAssistantMessage: "",
+    contextToken: 0,
+    currentMessageToken: 0,
+    inputContentToken: 0,
     loading: false,
     inputRef: null as HTMLTextAreaElement | null,
-    md: null as MarkdownIt | null,
     get validContext() {
       return validContext()
-    },
-    get contextToken() {
-      return contextToken()
     },
     get contextToken$() {
       return contextToken$()
     },
-    get currentMessageToken() {
-      return currentMessageToken()
-    },
     get currentMessageToken$() {
       return currentMessageToken$()
-    },
-    get inputContentToken() {
-      return inputContentToken()
     },
     get inputContentToken$() {
       return inputContentToken$()
@@ -144,15 +137,34 @@ function Store() {
       : store.messageList.filter(k => k.type === "locked")
   )
 
-  const contextToken = createMemo(() =>
-    store.validContext.reduce((acc, cur) => acc + countTokens(cur.content), 0)
-  )
+  createEffect(() => {
+    store.inputContent
+    throttle250(() => {
+      countTokensInWorker(store.inputContent).then(res => {
+        setStore("inputContentToken", res)
+      })
+    })
+  })
 
-  const currentMessageToken = createMemo(() =>
-    countTokens(store.currentAssistantMessage)
-  )
+  createEffect(() => {
+    store.messageList
+    throttle250(() => {
+      countTokensInWorker(
+        store.messageList.map(k => k.content).join("\n")
+      ).then(res => {
+        setStore("contextToken", res)
+      })
+    })
+  })
 
-  const inputContentToken = createMemo(() => countTokens(store.inputContent))
+  createEffect(() => {
+    store.currentAssistantMessage
+    throttle250(() => {
+      countTokensInWorker(store.currentAssistantMessage).then(res => {
+        setStore("currentMessageToken", res)
+      })
+    })
+  })
 
   const remainingToken = createMemo(
     () =>

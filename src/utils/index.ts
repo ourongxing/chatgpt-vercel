@@ -1,5 +1,4 @@
 import throttle from "just-throttle"
-export * from "./tokens"
 export * from "./storage"
 
 export async function copyToClipboard(text: string) {
@@ -127,3 +126,14 @@ export function isEmoji(character: string) {
   )
   return regex.test(character)
 }
+
+export const throttle250 = throttle(
+  f => {
+    f()
+  },
+  300,
+  {
+    leading: false,
+    trailing: true
+  }
+)

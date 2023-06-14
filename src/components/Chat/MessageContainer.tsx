@@ -1,11 +1,4 @@
-import {
-  type Accessor,
-  For,
-  Show,
-  createEffect,
-  createSignal,
-  createMemo
-} from "solid-js"
+import { type Accessor, For, Show, createEffect, createMemo } from "solid-js"
 import { RootStore, defaultMessage } from "~/store"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
@@ -44,6 +37,11 @@ export default function ({
     }
     return true
   })
+
+  const shownTokens = (token: number) => {
+    if (token > 1000) return (token / 1000).toFixed(1) + "k"
+    else return token
+  }
 
   return (
     <div
@@ -87,22 +85,22 @@ export default function ({
             when={store.inputContentToken}
             fallback={
               <span class="mx-1 text-slate/40">
-                {`有效上下文 Tokens : ${
+                {`有效上下文 Tokens : ${shownTokens(
                   store.contextToken
-                }/$${store.contextToken$.toFixed(4)}`}
+                )}/$${store.contextToken$.toFixed(4)}`}
               </span>
             }
           >
             <span class="mx-1 text-slate/40">
-              {`有效上下文+提问 Tokens : ${
+              {`有效上下文+提问 Tokens : ${shownTokens(
                 store.contextToken + store.inputContentToken
-              }(`}
+              )}(`}
               <span
                 classList={{
                   "text-red-500": store.remainingToken < 0
                 }}
               >
-                {store.remainingToken}
+                {shownTokens(store.remainingToken)}
               </span>
               {`)/$${(store.contextToken$ + store.inputContentToken$).toFixed(
                 4
