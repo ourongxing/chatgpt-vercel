@@ -167,9 +167,9 @@ function Store() {
     const model = store.sessionSettings.model
     const tk = (store.inputContentToken + store.contextToken) / 1000
     if (model === "gpt-3.5") {
-      return models["gpt-3.5"][tk < 16 ? "4k" : "16k"]
+      return models["gpt-3.5"][tk < 3.5 ? "4k" : "16k"]
     } else {
-      return models["gpt-4"][tk < 32 ? "8k" : "32k"]
+      return models["gpt-4"][tk < 7 ? "8k" : "32k"]
     }
   })
 
