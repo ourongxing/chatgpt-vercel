@@ -70,8 +70,8 @@ export default function ({
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
-        scrollHeight > window.innerHeight - 80
-          ? window.innerHeight - 80
+        scrollHeight > window.innerHeight / 2
+          ? window.innerHeight / 2
           : scrollHeight
       )
   }
