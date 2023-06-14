@@ -1,4 +1,3 @@
-import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
 import throttle from "just-throttle"
 import {
@@ -45,33 +44,14 @@ export default function ({
         selector: k => `${k.title}\n${k.desc}`
       })
     })
-    if (store.inputRef) {
-      makeEventListener(
-        store.inputRef,
-        "compositionend",
-        () => {
-          setCompositionend(true)
-          handleInput()
-        },
-        { passive: true }
-      )
-      makeEventListener(
-        store.inputRef,
-        "compositionstart",
-        () => {
-          setCompositionend(false)
-        },
-        { passive: true }
-      )
-    }
   })
 
   function setSuitableheight() {
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
-        scrollHeight > window.innerHeight - 80
-          ? window.innerHeight - 80
+        scrollHeight > window.innerHeight / 2
+          ? window.innerHeight / 2
           : scrollHeight
       )
   }
@@ -134,7 +114,7 @@ export default function ({
         )
       }
     },
-    100,
+    200,
     {
       trailing: false,
       leading: true
@@ -229,6 +209,13 @@ export default function ({
                 }
               }}
               onInput={handleInput}
+              onCompositionStart={() => {
+                setCompositionend(false)
+              }}
+              onCompositionEnd={() => {
+                setCompositionend(true)
+                handleInput()
+              }}
               style={{
                 height: height() + "px"
               }}

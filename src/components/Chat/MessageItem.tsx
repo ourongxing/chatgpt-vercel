@@ -1,12 +1,13 @@
-import { Show } from "solid-js"
+import { Show, createEffect, createSignal } from "solid-js"
 import { useCopyCode } from "~/hooks"
 import { RootStore } from "~/store"
 import type { ChatMessage } from "~/types"
-import { copyToClipboard } from "~/utils"
+import { copyToClipboard, throttle250 } from "~/utils"
 import MessageAction from "./MessageAction"
 import openai from "/assets/openai.svg?raw"
 import vercel from "/assets/vercel.svg?raw"
 import type { FakeRoleUnion } from "./SettingAction"
+import { renderMarkdown } from "~/wokers"
 
 interface Props {
   message: ChatMessage
@@ -18,6 +19,7 @@ interface Props {
 export default (props: Props) => {
   useCopyCode()
   const { store, setStore } = RootStore
+  const [renderedMarkdown, setRenderedMarkdown] = createSignal("")
   const roleClass = {
     error: "bg-gradient-to-r from-red-400 to-red-700",
     system: "bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300",
@@ -105,47 +107,64 @@ export default (props: Props) => {
     }
   }
 
+  createEffect(() => {
+    props.message.content
+
+    if (props.message.type === "temporary") {
+      throttle250(() => {
+        renderMarkdown(props.message.content).then(html => {
+          setRenderedMarkdown(html)
+        })
+      })
+    } else {
+      renderMarkdown(props.message.content).then(html => {
+        setRenderedMarkdown(html)
+      })
+    }
+  })
+
   return (
-    <div
-      class="group flex gap-3 px-4 mx--4 rounded-lg transition-colors sm:hover:bg-slate/6 dark:sm:hover:bg-slate/5 relative message-item"
-      classList={{
-        temporary: props.message.type === "temporary"
-      }}
-    >
+    <Show when={renderedMarkdown()}>
       <div
-        class={`shadow-slate-5 shadow-sm dark:shadow-none shrink-0 w-7 h-7 mt-4 rounded-full op-80 flex items-center justify-center cursor-pointer ${
-          roleClass[props.message.role]
-        }`}
+        class="group flex gap-3 px-4 mx--4 rounded-lg transition-colors sm:hover:bg-slate/6 dark:sm:hover:bg-slate/5 relative message-item"
         classList={{
-          "animate-spin": props.message.type === "temporary"
+          temporary: props.message.type === "temporary"
         }}
-        onClick={lockMessage}
       >
-        <Show when={props.message.type === "locked"}>
-          <div class="i-carbon:locked text-white" />
-        </Show>
+        <div
+          class={`shadow-slate-5 shadow-sm dark:shadow-none shrink-0 w-7 h-7 mt-4 rounded-full op-80 flex items-center justify-center cursor-pointer ${
+            roleClass[props.message.role]
+          }`}
+          classList={{
+            "animate-spin": props.message.type === "temporary"
+          }}
+          onClick={lockMessage}
+        >
+          <Show when={props.message.type === "locked"}>
+            <div class="i-carbon:locked text-white" />
+          </Show>
+        </div>
+        <div
+          class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
+          innerHTML={renderedMarkdown()
+            .replace(
+              /\s*Vercel\s*/g,
+              `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0;margin-left: 6px">${vercel}</a>`
+            )
+            .replace(
+              /\s*OpenAI\s*/g,
+              `<a href="https://www.openai.com" style="border-bottom:0;margin-left: 6px">${openai}</a>`
+            )}
+        />
+        <MessageAction
+          del={del}
+          copy={copy}
+          edit={edit}
+          reAnswer={reAnswer}
+          role={props.message.role}
+          hidden={props.hiddenAction}
+        />
       </div>
-      <div
-        class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
-        innerHTML={store.md
-          ?.render(props.message.content)
-          .replace(
-            /\s*Vercel\s*/g,
-            `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0;margin-left: 6px">${vercel}</a>`
-          )
-          .replace(
-            /\s*OpenAI\s*/g,
-            `<a href="https://www.openai.com" style="border-bottom:0;margin-left: 6px">${openai}</a>`
-          )}
-      />
-      <MessageAction
-        del={del}
-        copy={copy}
-        edit={edit}
-        reAnswer={reAnswer}
-        role={props.message.role}
-        hidden={props.hiddenAction}
-      />
-    </div>
+    </Show>
   )
 }

@@ -24,11 +24,8 @@ export default function () {
     createResizeObserver(containerRef, ({ width }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
-    import("~/markdown-it").then(({ mdFactory }) => {
-      mdFactory().then(md => {
-        if (!store.md) setStore("md", md)
-        document.querySelector("#root")?.classList.remove("before")
-      })
+    window.setTimeout(() => {
+      document.querySelector("#root")?.classList.remove("before")
     })
     document.querySelector("#root")?.classList.add("after")
     loadSession(store.sessionId)
@@ -131,7 +128,7 @@ export default function () {
           throw new Error(
             store.sessionSettings.continuousDialogue
               ? "本次对话过长，请清除之前部分对话或者缩短当前提问。"
-              : "提问太长了，请缩短。"
+              : "当前提问太长了，请缩短。"
           )
         }
         setStore("loading", true)
@@ -173,7 +170,7 @@ export default function () {
         key: store.globalSettings.APIKey || undefined,
         temperature: store.sessionSettings.APITemperature,
         password: store.globalSettings.password,
-        model: store.sessionSettings.APIModel
+        model: store.currentModel
       }),
       signal: controller?.signal
     })

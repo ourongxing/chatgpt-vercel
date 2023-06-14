@@ -1,16 +1,11 @@
 import { createStore } from "solid-js/store"
 import { defaultEnv } from "./env"
 import { type ChatMessage, LocalStorageKey } from "./types"
-import { batch, createMemo, createRoot } from "solid-js"
-import {
-  countTokens,
-  countTokensDollar,
-  fetchAllSessions,
-  getSession
-} from "./utils"
+import { batch, createEffect, createMemo, createRoot } from "solid-js"
+import { fetchAllSessions, getSession, throttle250 } from "./utils"
 import { Fzf } from "fzf"
-import type { Option } from "~/types"
-import type MarkdownIt from "markdown-it"
+import type { Model, Option, SimpleModel } from "~/types"
+import { countTokensInWorker } from "~/wokers"
 
 let globalSettings = { ...defaultEnv.CLIENT_GLOBAL_SETTINGS }
 let _ = import.meta.env.CLIENT_GLOBAL_SETTINGS
@@ -30,7 +25,7 @@ _ = import.meta.env.CLIENT_SESSION_SETTINGS
 if (_) {
   try {
     sessionSettings = {
-      ...globalSettings,
+      ...sessionSettings,
       ...JSON.parse(_)
     }
   } catch (e) {
@@ -60,6 +55,45 @@ export const defaultMessage: ChatMessage = {
   type: "default"
 }
 
+const models = {
+  "gpt-3.5": {
+    "4k": "gpt-3.5-turbo-0613",
+    "16k": "gpt-3.5-turbo-16k-0613"
+  },
+  "gpt-4": {
+    "8k": "gpt-4-0613",
+    "32k": "gpt-4-32k-0613"
+  }
+} satisfies {
+  [k in SimpleModel]: {
+    [k: string]: Model
+  }
+}
+
+const modelFee = {
+  "gpt-3.5-turbo-0613": {
+    input: 0.0015,
+    output: 0.002
+  },
+  "gpt-3.5-turbo-16k-0613": {
+    input: 0.003,
+    output: 0.004
+  },
+  "gpt-4-0613": {
+    input: 0.03,
+    output: 0.06
+  },
+  "gpt-4-32k-0613": {
+    input: 0.06,
+    output: 0.12
+  }
+} satisfies {
+  [key in Model]: {
+    input: number
+    output: number
+  }
+}
+
 function Store() {
   const [store, setStore] = createStore({
     sessionId: "index",
@@ -68,32 +102,28 @@ function Store() {
     inputContent: "",
     messageList: [] as ChatMessage[],
     currentAssistantMessage: "",
+    contextToken: 0,
+    currentMessageToken: 0,
+    inputContentToken: 0,
     loading: false,
     inputRef: null as HTMLTextAreaElement | null,
-    md: null as MarkdownIt | null,
     get validContext() {
       return validContext()
-    },
-    get contextToken() {
-      return contextToken()
     },
     get contextToken$() {
       return contextToken$()
     },
-    get currentMessageToken() {
-      return currentMessageToken()
-    },
     get currentMessageToken$() {
       return currentMessageToken$()
-    },
-    get inputContentToken() {
-      return inputContentToken()
     },
     get inputContentToken$() {
       return inputContentToken$()
     },
     get remainingToken() {
       return remainingToken()
+    },
+    get currentModel() {
+      return currentModel()
     }
   })
 
@@ -107,44 +137,64 @@ function Store() {
       : store.messageList.filter(k => k.type === "locked")
   )
 
-  const contextToken = createMemo(() =>
-    store.validContext.reduce((acc, cur) => acc + countTokens(cur.content), 0)
-  )
+  createEffect(() => {
+    store.inputContent
+    throttle250(() => {
+      countTokensInWorker(store.inputContent).then(res => {
+        setStore("inputContentToken", res)
+      })
+    })
+  })
 
-  const contextToken$ = createMemo(() =>
-    countTokensDollar(store.contextToken, store.sessionSettings.APIModel, false)
-  )
+  createEffect(() => {
+    store.messageList
+    throttle250(() => {
+      countTokensInWorker(
+        store.messageList.map(k => k.content).join("\n")
+      ).then(res => {
+        setStore("contextToken", res)
+      })
+    })
+  })
 
-  const currentMessageToken = createMemo(() =>
-    countTokens(store.currentAssistantMessage)
-  )
-
-  const currentMessageToken$ = createMemo(() =>
-    countTokensDollar(
-      store.currentMessageToken,
-      store.sessionSettings.APIModel,
-      true
-    )
-  )
-
-  const inputContentToken = createMemo(() => countTokens(store.inputContent))
-
-  const inputContentToken$ = createMemo(() =>
-    countTokensDollar(
-      store.inputContentToken,
-      store.sessionSettings.APIModel,
-      true
-    )
-  )
+  createEffect(() => {
+    store.currentAssistantMessage
+    throttle250(() => {
+      countTokensInWorker(store.currentAssistantMessage).then(res => {
+        setStore("currentMessageToken", res)
+      })
+    })
+  })
 
   const remainingToken = createMemo(
     () =>
       (store.globalSettings.APIKey
-        ? maxInputTokens[store.sessionSettings.APIModel]
-        : defaultEnv.CLIENT_MAX_INPUT_TOKENS[store.sessionSettings.APIModel]) -
+        ? maxInputTokens[store.sessionSettings.model]
+        : defaultEnv.CLIENT_MAX_INPUT_TOKENS[store.sessionSettings.model]) -
       store.contextToken -
       store.inputContentToken
   )
+
+  const currentModel = createMemo(() => {
+    const model = store.sessionSettings.model
+    const tk = (store.inputContentToken + store.contextToken) / 1000
+    if (model === "gpt-3.5") {
+      return models["gpt-3.5"][tk < 3.5 ? "4k" : "16k"]
+    } else {
+      return models["gpt-4"][tk < 7 ? "8k" : "32k"]
+    }
+  })
+
+  const inputContentToken$ = createMemo(() =>
+    countTokensDollar(store.inputContentToken, store.currentModel, "input")
+  )
+  const contextToken$ = createMemo(() =>
+    countTokensDollar(store.contextToken, store.currentModel, "input")
+  )
+  const currentMessageToken$ = createMemo(() =>
+    countTokensDollar(store.currentMessageToken, store.currentModel, "output")
+  )
+
   return { store, setStore }
 }
 
@@ -212,4 +262,13 @@ export function loadSession(id: string) {
       selector: k => `${k.title}\n${k.desc}`
     })
   }, 500)
+}
+
+function countTokensDollar(
+  tokens: number,
+  model: Model,
+  io: "input" | "output"
+) {
+  const tk = tokens / 1000
+  return modelFee[model][io] * tk
 }
