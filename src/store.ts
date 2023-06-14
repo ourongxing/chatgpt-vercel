@@ -2,10 +2,11 @@ import { createStore } from "solid-js/store"
 import { defaultEnv } from "./env"
 import { type ChatMessage, LocalStorageKey } from "./types"
 import { batch, createEffect, createMemo, createRoot } from "solid-js"
-import { fetchAllSessions, getSession, throttle250 } from "./utils"
+import { fetchAllSessions, getSession } from "./utils"
 import { Fzf } from "fzf"
 import type { Model, Option, SimpleModel } from "~/types"
 import { countTokensInWorker } from "~/wokers"
+import { throttle } from "@solid-primitives/scheduled"
 
 let globalSettings = { ...defaultEnv.CLIENT_GLOBAL_SETTINGS }
 let _ = import.meta.env.CLIENT_GLOBAL_SETTINGS
@@ -131,39 +132,46 @@ function Store() {
     store.sessionSettings.continuousDialogue
       ? store.messageList.filter(
           (k, i, _) =>
-            (k.role === "assistant" && _[i - 1]?.role === "user") ||
-            (k.role === "user" && _[i + 1]?.role !== "error")
+            (k.role === "assistant" &&
+              k.type !== "temporary" &&
+              _[i - 1]?.role === "user") ||
+            (k.role === "user" &&
+              _[i + 1]?.role !== "error" &&
+              _[i + 1]?.type !== "temporary")
         )
       : store.messageList.filter(k => k.type === "locked")
   )
 
+  const throttleCountInputContent = throttle((content: string) => {
+    countTokensInWorker(content).then(res => {
+      setStore("inputContentToken", res)
+    })
+  }, 100)
+
   createEffect(() => {
     store.inputContent
-    throttle250(() => {
-      countTokensInWorker(store.inputContent).then(res => {
-        setStore("inputContentToken", res)
-      })
-    })
+    throttleCountInputContent(store.inputContent)
   })
 
-  createEffect(() => {
-    store.messageList
-    throttle250(() => {
-      countTokensInWorker(
-        store.messageList.map(k => k.content).join("\n")
-      ).then(res => {
-        setStore("contextToken", res)
-      })
+  const throttleCountContext = throttle((content: string) => {
+    countTokensInWorker(content).then(res => {
+      setStore("contextToken", res)
     })
-  })
+  }, 100)
 
   createEffect(() => {
-    store.currentAssistantMessage
-    throttle250(() => {
-      countTokensInWorker(store.currentAssistantMessage).then(res => {
-        setStore("currentMessageToken", res)
-      })
+    store.validContext
+    throttleCountContext(store.validContext.map(k => k.content).join("\n"))
+  })
+
+  const throttleCountCurrentAssistantMessage = throttle((content: string) => {
+    countTokensInWorker(content).then(res => {
+      setStore("currentMessageToken", res)
     })
+  }, 100)
+
+  createEffect(() => {
+    throttleCountCurrentAssistantMessage(store.currentAssistantMessage)
   })
 
   const remainingToken = createMemo(

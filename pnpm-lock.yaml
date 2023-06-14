@@ -14,6 +14,9 @@ dependencies:
   '@solid-primitives/resize-observer':
     specifier: ^2.0.18
     version: registry.npmmirror.com/@solid-primitives/resize-observer@2.0.18(solid-js@1.7.6)
+  '@solid-primitives/scheduled':
+    specifier: ^1.3.2
+    version: registry.npmmirror.com/@solid-primitives/scheduled@1.3.2(solid-js@1.7.6)
   '@solidjs/meta':
     specifier: ^0.28.5
     version: registry.npmmirror.com/@solidjs/meta@0.28.5(solid-js@1.7.6)
@@ -38,9 +41,6 @@ dependencies:
   html-to-image:
     specifier: ^1.11.11
     version: registry.npmmirror.com/html-to-image@1.11.11
-  just-throttle:
-    specifier: ^4.2.0
-    version: registry.npmmirror.com/just-throttle@4.2.0
   katex:
     specifier: ^0.16.7
     version: registry.npmmirror.com/katex@0.16.7
@@ -2805,6 +2805,17 @@ packages:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': registry.npmmirror.com/@solid-primitives/utils@6.2.0(solid-js@1.7.6)
+      solid-js: registry.npmmirror.com/solid-js@1.7.6
+    dev: false
+
+  registry.npmmirror.com/@solid-primitives/scheduled@1.3.2(solid-js@1.7.6):
+    resolution: {integrity: sha512-2rDCyYNjI9zBqpdmJG8sN8h90gbe2hSqRdj1OMmKp3qEbKVCrXXswLmrbBuNBi/uow6f8AHR9uheb7LWQ3ojcw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@solid-primitives/scheduled/-/scheduled-1.3.2.tgz}
+    id: registry.npmmirror.com/@solid-primitives/scheduled/1.3.2
+    name: '@solid-primitives/scheduled'
+    version: 1.3.2
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
       solid-js: registry.npmmirror.com/solid-js@1.7.6
     dev: false
 
@@ -6178,12 +6189,6 @@ packages:
     version: 5.0.1
     engines: {node: '>=0.10.0'}
     dev: true
-
-  registry.npmmirror.com/just-throttle@4.2.0:
-    resolution: {integrity: sha512-/iAZv1953JcExpvsywaPKjSzfTiCLqeguUTE6+VmK15mOcwxBx7/FHrVvS4WEErMR03TRazH8kcBSHqMagYIYg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/just-throttle/-/just-throttle-4.2.0.tgz}
-    name: just-throttle
-    version: 4.2.0
-    dev: false
 
   registry.npmmirror.com/katex@0.16.7:
     resolution: {integrity: sha512-Xk9C6oGKRwJTfqfIbtr0Kes9OSv6IFsuhFGc7tW4urlpMJtuh+7YhzU6YEG9n8gmWKcMAFzkp7nr+r69kV0zrA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/katex/-/katex-0.16.7.tgz}

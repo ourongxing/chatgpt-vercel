@@ -59,22 +59,12 @@ export default function ({
           {(message, index) => (
             <MessageItem
               message={message}
-              hiddenAction={store.loading}
+              hiddenAction={store.loading || message.type === "temporary"}
               index={index()}
               sendMessage={sendMessage}
             />
           )}
         </For>
-        <Show when={store.currentAssistantMessage}>
-          <MessageItem
-            hiddenAction={true}
-            message={{
-              role: "assistant",
-              content: store.currentAssistantMessage,
-              type: "temporary"
-            }}
-          />
-        </Show>
       </div>
       <Show
         when={!store.loading && (store.contextToken || store.inputContentToken)}

@@ -1,4 +1,5 @@
-import throttle from "just-throttle"
+import { throttle } from "@solid-primitives/scheduled"
+
 export * from "./storage"
 
 export async function copyToClipboard(text: string) {
@@ -83,16 +84,12 @@ export function randomKey(keys: string[]) {
   return keys.length ? keys[Math.floor(Math.random() * keys.length)] : ""
 }
 
-export const scrollToBottom = throttle(
-  () => {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth"
-    })
-  },
-  250,
-  { leading: false, trailing: true }
-)
+export const scrollToBottom = throttle(() => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  })
+}, 250)
 
 export async function fetchWithTimeout(
   input: RequestInfo | URL,
@@ -126,14 +123,3 @@ export function isEmoji(character: string) {
   )
   return regex.test(character)
 }
-
-export const throttle250 = throttle(
-  f => {
-    f()
-  },
-  300,
-  {
-    leading: false,
-    trailing: true
-  }
-)

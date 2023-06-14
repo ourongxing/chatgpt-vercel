@@ -2,12 +2,13 @@ import { Show, createEffect, createSignal } from "solid-js"
 import { useCopyCode } from "~/hooks"
 import { RootStore } from "~/store"
 import type { ChatMessage } from "~/types"
-import { copyToClipboard, throttle250 } from "~/utils"
+import { copyToClipboard } from "~/utils"
 import MessageAction from "./MessageAction"
 import openai from "/assets/openai.svg?raw"
 import vercel from "/assets/vercel.svg?raw"
 import type { FakeRoleUnion } from "./SettingAction"
-import { renderMarkdown } from "~/wokers"
+import { renderMarkdownInWorker } from "~/wokers"
+import { throttle } from "@solid-primitives/scheduled"
 
 interface Props {
   message: ChatMessage
@@ -16,7 +17,7 @@ interface Props {
   sendMessage?: (value?: string, fakeRole?: FakeRoleUnion) => void
 }
 
-export default (props: Props) => {
+export default function MessageItem(props: Props) {
   useCopyCode()
   const { store, setStore } = RootStore
   const [renderedMarkdown, setRenderedMarkdown] = createSignal("")
@@ -36,88 +37,71 @@ export default (props: Props) => {
   }
 
   function del() {
-    if (
-      !props.hiddenAction &&
-      props.index !== undefined &&
-      props.index < store.messageList.length
-    ) {
-      setStore("messageList", messages => {
-        if (messages[props.index!].role === "user") {
-          return messages.filter(
-            (_, i) =>
-              !(
-                i === props.index ||
-                (i === props.index! + 1 && _.role !== "user")
-              )
-          )
-        }
-        return messages.filter((_, i) => i !== props.index)
-      })
-    }
+    setStore("messageList", messages => {
+      if (messages[props.index!].role === "user") {
+        return messages.filter(
+          (_, i) =>
+            !(
+              i === props.index ||
+              (i === props.index! + 1 && _.role !== "user")
+            )
+        )
+      }
+      return messages.filter((_, i) => i !== props.index)
+    })
   }
 
   function reAnswer() {
-    if (
-      props.sendMessage &&
-      props.index !== undefined &&
-      props.index < store.messageList.length
-    ) {
-      let question = ""
-      setStore("messageList", messages => {
-        if (messages[props.index!].role === "user") {
-          question = messages[props.index!].content
-          return messages.filter(
-            (_, i) =>
-              !(
-                i === props.index ||
-                (i === props.index! + 1 && _.role !== "user")
-              )
-          )
-        } else {
-          question = messages[props.index! - 1].content
-          return messages.filter(
-            (_, i) => !(i === props.index || i === props.index! - 1)
-          )
-        }
-      })
-      props.sendMessage(question)
-    }
+    let question = ""
+    setStore("messageList", messages => {
+      if (messages[props.index!].role === "user") {
+        question = messages[props.index!].content
+        return messages.filter(
+          (_, i) =>
+            !(
+              i === props.index ||
+              (i === props.index! + 1 && _.role !== "user")
+            )
+        )
+      } else {
+        question = messages[props.index! - 1].content
+        return messages.filter(
+          (_, i) => !(i === props.index || i === props.index! - 1)
+        )
+      }
+    })
+    props.sendMessage?.(question)
   }
 
   function lockMessage() {
-    if (
-      !props.hiddenAction &&
-      props.index !== undefined &&
-      props.index < store.messageList.length
-    ) {
-      if (store.messageList[props.index].role === "user") {
-        setStore(
-          "messageList",
-          (k, i) =>
-            i === props.index ||
-            (i === props.index! + 1 && k.role === "assistant"),
-          "type",
-          type => (type === "locked" ? undefined : "locked")
-        )
-      } else {
-        setStore("messageList", [props.index - 1, props.index], "type", type =>
-          type === "locked" ? undefined : "locked"
-        )
-      }
+    if (props.index === undefined) return
+    if (store.messageList[props.index].role === "user") {
+      setStore(
+        "messageList",
+        (k, i) =>
+          i === props.index ||
+          (i === props.index! + 1 && k.role === "assistant"),
+        "type",
+        type => (type === "locked" ? undefined : "locked")
+      )
+    } else {
+      setStore("messageList", [props.index - 1, props.index], "type", type =>
+        type === "locked" ? undefined : "locked"
+      )
     }
   }
 
-  createEffect(() => {
-    props.message.content
+  const throttleRender = throttle((content: string) => {
+    renderMarkdownInWorker(content).then(html => {
+      setRenderedMarkdown(html)
+    })
+  }, 100)
 
+  createEffect(() => {
     if (props.message.type === "temporary") {
-      throttle250(() => {
-        renderMarkdown(props.message.content).then(html => {
-          setRenderedMarkdown(html)
-        })
-      })
+      throttleRender(props.message.content)
     } else {
-      renderMarkdown(props.message.content).then(html => {
+      renderMarkdownInWorker(props.message.content).then(html => {
         setRenderedMarkdown(html)
       })
     }
@@ -156,14 +140,15 @@ export default (props: Props) => {
               `<a href="https://www.openai.com" style="border-bottom:0;margin-left: 6px">${openai}</a>`
             )}
         />
-        <MessageAction
-          del={del}
-          copy={copy}
-          edit={edit}
-          reAnswer={reAnswer}
-          role={props.message.role}
-          hidden={props.hiddenAction}
-        />
+        <Show when={!props.hiddenAction}>
+          <MessageAction
+            del={del}
+            copy={copy}
+            edit={edit}
+            reAnswer={reAnswer}
+            role={props.message.role}
+          />
+        </Show>
       </div>
     </Show>
   )

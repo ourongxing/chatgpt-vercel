@@ -3,6 +3,10 @@
 @import url(./message.css);
 @import url(./clipboard.css);
 
+body::-webkit-scrollbar {
+  width: 0;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

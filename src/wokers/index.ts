@@ -19,7 +19,7 @@ export function countTokensInWorker(content: string): Promise<number> {
   })
 }
 
-export function renderMarkdown(content: string): Promise<string> {
+export function renderMarkdownInWorker(content: string): Promise<string> {
   if (!content) return Promise.resolve("")
   const id = generateId()
   markdownWorker.postMessage({ type: "markdown", id, payload: content })
