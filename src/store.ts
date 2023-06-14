@@ -10,6 +10,7 @@ import {
 } from "./utils"
 import { Fzf } from "fzf"
 import type { Option } from "~/types"
+import type MarkdownIt from "markdown-it"
 
 let globalSettings = { ...defaultEnv.CLIENT_GLOBAL_SETTINGS }
 let _ = import.meta.env.CLIENT_GLOBAL_SETTINGS
@@ -69,6 +70,7 @@ function Store() {
     currentAssistantMessage: "",
     loading: false,
     inputRef: null as HTMLTextAreaElement | null,
+    md: null as MarkdownIt | null,
     get validContext() {
       return validContext()
     },

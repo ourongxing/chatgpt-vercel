@@ -1,6 +1,5 @@
 import { Show } from "solid-js"
 import { useCopyCode } from "~/hooks"
-import md from "~/markdown-it"
 import { RootStore } from "~/store"
 import type { ChatMessage } from "~/types"
 import { copyToClipboard } from "~/utils"
@@ -128,8 +127,8 @@ export default (props: Props) => {
       </div>
       <div
         class="message prose prose-slate dark:prose-invert dark:text-slate break-words overflow-hidden"
-        innerHTML={md
-          .render(props.message.content)
+        innerHTML={store.md
+          ?.render(props.message.content)
           .replace(
             /\s*Vercel\s*/g,
             `<a href="http://vercel.com/?utm_source=busiyi&utm_campaign=oss" style="border-bottom:0;margin-left: 6px">${vercel}</a>`
