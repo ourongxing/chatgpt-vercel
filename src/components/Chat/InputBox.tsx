@@ -44,6 +44,7 @@ export default function ({
         selector: k => `${k.title}\n${k.desc}`
       })
     })
+    store.inputRef?.focus()
   })
 
   function setSuitableheight() {
@@ -75,15 +76,17 @@ export default function ({
     batch(() => {
       if (option) {
         if (option.extra?.id) {
-          navgiate(`/session/${option.extra.id}`)
-          loadSession(option.extra.id)
-          setStore("inputContent", "")
+          if (option.extra?.id === "index") window.location.href = "/"
+          else {
+            navgiate(`/session/${option.extra.id}`)
+            loadSession(option.extra.id)
+            setStore("inputContent", "")
+          }
         } else setStore("inputContent", option.desc)
       }
       setCandidateOptions([])
       setSuitableheight()
     })
-    store.inputRef?.focus()
   }
 
   const searchOptions = throttle((value: string) => {

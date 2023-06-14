@@ -266,6 +266,15 @@ export function loadSession(id: string) {
           id: k.id
         }
       }))
+    if (id !== "index") {
+      FZFData.sessionOptions.unshift({
+        title: "回到主对话",
+        desc: "其实点击顶部 Logo 也可以直接回到主对话",
+        extra: {
+          id: "index"
+        }
+      })
+    }
     FZFData.fzfSessions = new Fzf(FZFData.sessionOptions, {
       selector: k => `${k.title}\n${k.desc}`
     })
