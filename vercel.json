@@ -5,6 +5,10 @@
       "destination": "/api/cron"
     },
     {
+      "source": "/api/openai/:path*",
+      "destination": "/api/openai/:path*"
+    },
+    {
       "source": "/:path((?!api).*)",
       "destination": "/"
     }
