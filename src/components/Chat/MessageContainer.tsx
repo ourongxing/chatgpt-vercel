@@ -3,6 +3,8 @@ import { RootStore, defaultMessage } from "~/store"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
 import { defaultInputBoxHeight } from "./InputBox"
+import { TransitionGroup } from "solid-transition-group"
+import "~/styles/transition.css"
 
 export default function ({
   sendMessage,
@@ -55,16 +57,18 @@ export default function ({
         <Show when={!store.messageList.length}>
           <MessageItem hiddenAction={true} message={defaultMessage} />
         </Show>
-        <For each={store.messageList}>
-          {(message, index) => (
-            <MessageItem
-              message={message}
-              hiddenAction={store.loading || message.type === "temporary"}
-              index={index()}
-              sendMessage={sendMessage}
-            />
-          )}
-        </For>
+        <TransitionGroup name="transition-group">
+          <For each={store.messageList}>
+            {(message, index) => (
+              <MessageItem
+                message={message}
+                hiddenAction={store.loading || message.type === "temporary"}
+                index={index()}
+                sendMessage={sendMessage}
+              />
+            )}
+          </For>
+        </TransitionGroup>
       </div>
       <Show
         when={!store.loading && (store.contextToken || store.inputContentToken)}

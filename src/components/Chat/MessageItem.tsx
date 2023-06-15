@@ -111,6 +111,9 @@ export default function MessageItem(props: Props) {
     <Show when={renderedMarkdown()}>
       <div
         class="group flex gap-3 px-4 mx--4 rounded-lg transition-colors sm:hover:bg-slate/6 dark:sm:hover:bg-slate/5 relative message-item"
+        style={{
+          transition: "all 0.3s"
+        }}
         classList={{
           temporary: props.message.type === "temporary"
         }}

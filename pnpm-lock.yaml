@@ -62,6 +62,9 @@ dependencies:
   solid-start:
     specifier: ^0.2.26
     version: registry.npmmirror.com/solid-start@0.2.26(@solidjs/meta@0.28.5)(@solidjs/router@0.8.2)(solid-js@1.7.6)(solid-start-cloudflare-workers@0.2.26)(solid-start-netlify@0.2.26)(solid-start-node@0.2.26)(solid-start-vercel@0.2.26)(vite@4.3.9)(vue@3.2.47)
+  solid-transition-group:
+    specifier: ^0.2.2
+    version: registry.npmmirror.com/solid-transition-group@0.2.2(solid-js@1.7.6)
   undici:
     specifier: ^5.22.1
     version: registry.npmmirror.com/undici@5.22.1
@@ -2781,6 +2784,18 @@ packages:
       solid-js: registry.npmmirror.com/solid-js@1.7.6
     dev: false
 
+  registry.npmmirror.com/@solid-primitives/refs@1.0.4(solid-js@1.7.6):
+    resolution: {integrity: sha512-BxZKkct0OIyADWIoA9UITm+3G5Xb3IkOa0nZd40SgOK5DtMqpXFIEPUkJ/woPB90WqlM9UvvuiJHUyAjMeAmCw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@solid-primitives/refs/-/refs-1.0.4.tgz}
+    id: registry.npmmirror.com/@solid-primitives/refs/1.0.4
+    name: '@solid-primitives/refs'
+    version: 1.0.4
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/utils': registry.npmmirror.com/@solid-primitives/utils@6.2.0(solid-js@1.7.6)
+      solid-js: registry.npmmirror.com/solid-js@1.7.6
+    dev: false
+
   registry.npmmirror.com/@solid-primitives/resize-observer@2.0.18(solid-js@1.7.6):
     resolution: {integrity: sha512-k4jTqa2hQc1HBLGUUSy69ziVJF2xlBzglUp2Saeor7RrZiWudODGyoUMdNAY+PN3iH4zyH4eEa/Fs+9kIrREig==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@solid-primitives/resize-observer/-/resize-observer-2.0.18.tgz}
     id: registry.npmmirror.com/@solid-primitives/resize-observer/2.0.18
@@ -2828,6 +2843,17 @@ packages:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': registry.npmmirror.com/@solid-primitives/utils@6.2.0(solid-js@1.7.6)
+      solid-js: registry.npmmirror.com/solid-js@1.7.6
+    dev: false
+
+  registry.npmmirror.com/@solid-primitives/transition-group@1.0.2(solid-js@1.7.6):
+    resolution: {integrity: sha512-+o3J7TnU0/Sok+LKA0z0wvhim88dpd2eFBk8/05adE6wVypVlME8sKqTMO+xRv8HoT4Kq3sczmvwV07FKg2n+g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@solid-primitives/transition-group/-/transition-group-1.0.2.tgz}
+    id: registry.npmmirror.com/@solid-primitives/transition-group/1.0.2
+    name: '@solid-primitives/transition-group'
+    version: 1.0.2
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
       solid-js: registry.npmmirror.com/solid-js@1.7.6
     dev: false
 
@@ -7701,6 +7727,19 @@ packages:
       - '@vue/composition-api'
       - supports-color
       - vue
+
+  registry.npmmirror.com/solid-transition-group@0.2.2(solid-js@1.7.6):
+    resolution: {integrity: sha512-6nB90UM2PB6VsIo/UCkmZmlIJb9mnmP7QPGrePqQJWtpUiRs5PbhkB8fvdyv9g/RPHWYpdJhQgxL6n++WmTt5A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/solid-transition-group/-/solid-transition-group-0.2.2.tgz}
+    id: registry.npmmirror.com/solid-transition-group/0.2.2
+    name: solid-transition-group
+    version: 0.2.2
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
+      '@solid-primitives/refs': registry.npmmirror.com/@solid-primitives/refs@1.0.4(solid-js@1.7.6)
+      '@solid-primitives/transition-group': registry.npmmirror.com/@solid-primitives/transition-group@1.0.2(solid-js@1.7.6)
+      solid-js: registry.npmmirror.com/solid-js@1.7.6
+    dev: false
 
   registry.npmmirror.com/source-map-js@1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/source-map-js/-/source-map-js-1.0.2.tgz}
