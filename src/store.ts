@@ -168,7 +168,7 @@ function Store() {
     countTokensInWorker(content).then(res => {
       setStore("currentMessageToken", res)
     })
-  }, 100)
+  }, 50)
 
   createEffect(() => {
     throttleCountCurrentAssistantMessage(store.currentAssistantMessage)

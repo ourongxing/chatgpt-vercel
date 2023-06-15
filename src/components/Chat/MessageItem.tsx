@@ -95,7 +95,7 @@ export default function MessageItem(props: Props) {
     renderMarkdownInWorker(content).then(html => {
       setRenderedMarkdown(html)
     })
-  }, 100)
+  }, 50)
 
   createEffect(() => {
     if (props.message.type === "temporary") {

@@ -55,6 +55,7 @@ export default function () {
       batch(() => {
         setStore("messageList", k => k.type === "temporary", "type", "default")
         setStore("currentAssistantMessage", "")
+        setStore("currentMessageToken", 0)
         setStore("loading", false)
       })
       controller = undefined
