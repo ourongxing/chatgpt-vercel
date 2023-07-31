@@ -1,15 +1,10 @@
-import {
-  type Accessor,
-  For,
-  Show,
-  createEffect,
-  createSignal,
-  createMemo
-} from "solid-js"
+import { type Accessor, For, Show, createEffect, createMemo } from "solid-js"
 import { RootStore, defaultMessage } from "~/store"
 import { scrollToBottom } from "~/utils"
 import MessageItem from "./MessageItem"
 import { defaultInputBoxHeight } from "./InputBox"
+import { TransitionGroup } from "solid-transition-group"
+import "~/styles/transition.css"
 
 export default function ({
   sendMessage,
@@ -45,6 +40,11 @@ export default function ({
     return true
   })
 
+  const shownTokens = (token: number) => {
+    if (token > 1000) return (token / 1000).toFixed(1) + "k"
+    else return token
+  }
+
   return (
     <div
       class="px-1em"
@@ -57,26 +57,18 @@ export default function ({
         <Show when={!store.messageList.length}>
           <MessageItem hiddenAction={true} message={defaultMessage} />
         </Show>
-        <For each={store.messageList}>
-          {(message, index) => (
-            <MessageItem
-              message={message}
-              hiddenAction={store.loading}
-              index={index()}
-              sendMessage={sendMessage}
-            />
-          )}
-        </For>
-        <Show when={store.currentAssistantMessage}>
-          <MessageItem
-            hiddenAction={true}
-            message={{
-              role: "assistant",
-              content: store.currentAssistantMessage,
-              type: "temporary"
-            }}
-          />
-        </Show>
+        <TransitionGroup name="transition-group">
+          <For each={store.messageList}>
+            {(message, index) => (
+              <MessageItem
+                message={message}
+                hiddenAction={store.loading || message.type === "temporary"}
+                index={index()}
+                sendMessage={sendMessage}
+              />
+            )}
+          </For>
+        </TransitionGroup>
       </div>
       <Show
         when={!store.loading && (store.contextToken || store.inputContentToken)}
@@ -87,22 +79,22 @@ export default function ({
             when={store.inputContentToken}
             fallback={
               <span class="mx-1 text-slate/40">
-                {`有效上下文 Tokens : ${
+                {`有效上下文 Tokens : ${shownTokens(
                   store.contextToken
-                }/$${store.contextToken$.toFixed(4)}`}
+                )}/$${store.contextToken$.toFixed(4)}`}
               </span>
             }
           >
             <span class="mx-1 text-slate/40">
-              {`有效上下文+提问 Tokens : ${
+              {`有效上下文+提问 Tokens : ${shownTokens(
                 store.contextToken + store.inputContentToken
-              }(`}
+              )}(`}
               <span
                 classList={{
                   "text-red-500": store.remainingToken < 0
                 }}
               >
-                {store.remainingToken}
+                {shownTokens(store.remainingToken)}
               </span>
               {`)/$${(store.contextToken$ + store.inputContentToken$).toFixed(
                 4

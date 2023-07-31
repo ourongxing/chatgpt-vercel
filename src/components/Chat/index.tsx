@@ -24,9 +24,9 @@ export default function () {
     createResizeObserver(containerRef, ({ width }, el) => {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
-    setTimeout(() => {
+    window.setTimeout(() => {
       document.querySelector("#root")?.classList.remove("before")
-    })
+    }, 100)
     document.querySelector("#root")?.classList.add("after")
     loadSession(store.sessionId)
     if (q) sendMessage(q)
@@ -53,14 +53,9 @@ export default function () {
   function archiveCurrentMessage() {
     if (store.currentAssistantMessage) {
       batch(() => {
-        setStore("messageList", k => [
-          ...k,
-          {
-            role: "assistant",
-            content: store.currentAssistantMessage.trim()
-          }
-        ])
+        setStore("messageList", k => k.type === "temporary", "type", "default")
         setStore("currentAssistantMessage", "")
+        setStore("currentMessageToken", 0)
         setStore("loading", false)
       })
       controller = undefined
@@ -128,7 +123,7 @@ export default function () {
           throw new Error(
             store.sessionSettings.continuousDialogue
               ? "本次对话过长，请清除之前部分对话或者缩短当前提问。"
-              : "提问太长了，请缩短。"
+              : "当前提问太长了，请缩短。"
           )
         }
         setStore("loading", true)
@@ -170,7 +165,7 @@ export default function () {
         key: store.globalSettings.APIKey || undefined,
         temperature: store.sessionSettings.APITemperature,
         password: store.globalSettings.password,
-        model: store.sessionSettings.APIModel
+        model: store.currentModel
       }),
       signal: controller?.signal
     })
@@ -194,7 +189,26 @@ export default function () {
           continue
         }
         if (char) {
-          setStore("currentAssistantMessage", k => k + char)
+          batch(() => {
+            if (store.currentAssistantMessage) {
+              setStore(
+                "messageList",
+                k => k.type === "temporary",
+                "content",
+                k => k + char
+              )
+            } else {
+              setStore("messageList", k => [
+                ...k,
+                {
+                  role: "assistant",
+                  content: char,
+                  type: "temporary"
+                }
+              ])
+            }
+            setStore("currentAssistantMessage", k => k + char)
+          })
         }
       }
       done = readerDone

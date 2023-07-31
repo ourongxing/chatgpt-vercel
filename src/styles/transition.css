@@ -1,0 +1,9 @@
+.transition-group-enter {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.transition-group-exit-to {
+  opacity: 0;
+  transform: translateX(30px);
+}

@@ -1,6 +1,4 @@
-import { makeEventListener } from "@solid-primitives/event-listener"
 import { Fzf } from "fzf"
-import throttle from "just-throttle"
 import {
   type Accessor,
   type Setter,
@@ -12,10 +10,11 @@ import {
 } from "solid-js"
 import { FZFData, RootStore, loadSession } from "~/store"
 import type { Option } from "~/types"
-import { parsePrompts, scrollToBottom } from "~/utils"
+import { scrollToBottom } from "~/utils"
 import SettingAction, { actionState, type FakeRoleUnion } from "./SettingAction"
 import SlashSelector from "./SlashSelector"
 import { useNavigate } from "solid-start"
+import { throttle } from "@solid-primitives/scheduled"
 
 // 3em
 export const defaultInputBoxHeight = 48
@@ -37,41 +36,23 @@ export default function ({
   const navgiate = useNavigate()
   const { store, setStore } = RootStore
   onMount(() => {
-    setTimeout(() => {
+    import("~/utils/parse").then(({ parsePrompts }) => {
       FZFData.promptOptions = parsePrompts().map(
         k => ({ title: k.desc, desc: k.detail } as Option)
       )
       FZFData.fzfPrompts = new Fzf(FZFData.promptOptions, {
         selector: k => `${k.title}\n${k.desc}`
       })
-    }, 500)
-    if (store.inputRef) {
-      makeEventListener(
-        store.inputRef,
-        "compositionend",
-        () => {
-          setCompositionend(true)
-          handleInput()
-        },
-        { passive: true }
-      )
-      makeEventListener(
-        store.inputRef,
-        "compositionstart",
-        () => {
-          setCompositionend(false)
-        },
-        { passive: true }
-      )
-    }
+    })
+    store.inputRef?.focus()
   })
 
   function setSuitableheight() {
     const scrollHeight = store.inputRef?.scrollHeight
     if (scrollHeight)
       setHeight(
-        scrollHeight > window.innerHeight - 80
-          ? window.innerHeight - 80
+        scrollHeight > window.innerHeight / 2
+          ? window.innerHeight / 2
           : scrollHeight
       )
   }
@@ -95,51 +76,46 @@ export default function ({
     batch(() => {
       if (option) {
         if (option.extra?.id) {
-          navgiate(`/session/${option.extra.id}`)
-          loadSession(option.extra.id)
-          setStore("inputContent", "")
+          if (option.extra?.id === "index") window.location.href = "/"
+          else {
+            navgiate(`/session/${option.extra.id}`)
+            loadSession(option.extra.id)
+            setStore("inputContent", "")
+          }
         } else setStore("inputContent", option.desc)
       }
       setCandidateOptions([])
       setSuitableheight()
     })
-    store.inputRef?.focus()
   }
 
-  const searchOptions = throttle(
-    (value: string) => {
-      if (/^\s{2,}$|^\/{2,}$/.test(value))
-        return setCandidateOptions(FZFData.sessionOptions)
-      if (value === "/" || value === " ")
-        return setCandidateOptions(FZFData.promptOptions)
+  const searchOptions = throttle((value: string) => {
+    if (/^\s{2,}$|^\/{2,}$/.test(value))
+      return setCandidateOptions(FZFData.sessionOptions)
+    if (value === "/" || value === " ")
+      return setCandidateOptions(FZFData.promptOptions)
 
-      const sessionQuery = value.replace(
-        /^\s{2,}(.*)\s*$|^\/{2,}(.*)\s*$/,
-        "$1$2"
+    const sessionQuery = value.replace(
+      /^\s{2,}(.*)\s*$|^\/{2,}(.*)\s*$/,
+      "$1$2"
+    )
+    const promptQuery = value.replace(/^\s(.*)\s*$|^\/(.*)\s*$/, "$1$2")
+    if (sessionQuery !== value) {
+      setCandidateOptions(
+        FZFData.fzfSessions!.find(sessionQuery).map(k => ({
+          ...k.item,
+          positions: k.positions
+        }))
       )
-      const promptQuery = value.replace(/^\s(.*)\s*$|^\/(.*)\s*$/, "$1$2")
-      if (sessionQuery !== value) {
-        setCandidateOptions(
-          FZFData.fzfSessions!.find(sessionQuery).map(k => ({
-            ...k.item,
-            positions: k.positions
-          }))
-        )
-      } else if (promptQuery !== value) {
-        setCandidateOptions(
-          FZFData.fzfPrompts!.find(promptQuery).map(k => ({
-            ...k.item,
-            positions: k.positions
-          }))
-        )
-      }
-    },
-    100,
-    {
-      trailing: false,
-      leading: true
+    } else if (promptQuery !== value) {
+      setCandidateOptions(
+        FZFData.fzfPrompts!.find(promptQuery).map(k => ({
+          ...k.item,
+          positions: k.positions
+        }))
+      )
     }
-  )
+  }, 100)
 
   async function handleInput() {
     // 重新设置高度，让输入框可以自适应高度，-1 是为了标记不是初始状态
@@ -156,6 +132,11 @@ export default function ({
         setCandidateOptions([])
       }
     })
+  }
+
+  const shownTokens = (token: number) => {
+    if (token > 1000) return (token / 1000).toFixed(1) + "k"
+    else return token
   }
 
   return (
@@ -183,7 +164,7 @@ export default function ({
               onClick={stopStreamFetch}
             >
               <span class="dark:text-slate text-slate-7">
-                AI 正在思考 / {store.currentMessageToken} / $
+                AI 正在思考 / {shownTokens(store.currentMessageToken)} / $
                 {store.currentMessageToken$.toFixed(4)}
               </span>
             </div>
@@ -229,6 +210,13 @@ export default function ({
                 }
               }}
               onInput={handleInput}
+              onCompositionStart={() => {
+                setCompositionend(false)
+              }}
+              onCompositionEnd={() => {
+                setCompositionend(true)
+                handleInput()
+              }}
               style={{
                 height: height() + "px"
               }}

@@ -1,4 +1,3 @@
-import type { Model } from "~/types"
 import GPT3Tokenizer from "./tokenizer"
 
 export default class GPT3NodeTokenizer extends GPT3Tokenizer {
@@ -24,19 +23,4 @@ export default class GPT3NodeTokenizer extends GPT3Tokenizer {
 export function countTokens(text: string) {
   const tokenizer = new GPT3NodeTokenizer({ type: "gpt3" })
   return tokenizer.encode(text).bpe.length
-}
-
-export function countTokensDollar(
-  tokens: number,
-  model: Model,
-  completion: boolean
-) {
-  switch (model) {
-    case "gpt-3.5-turbo":
-      return (tokens / 1000) * 0.002
-    case "gpt-4":
-      return completion ? (tokens / 1000) * 0.03 : (tokens / 1000) * 0.06
-    case "gpt-4-32k":
-      return completion ? (tokens / 1000) * 0.06 : (tokens / 1000) * 0.12
-  }
 }
