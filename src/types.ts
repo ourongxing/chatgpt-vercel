@@ -13,8 +13,12 @@ export interface ChatMessage {
 }
 
 export type Role = "system" | "user" | "assistant" | "error"
-export type SimpleModel = "gpt-3.5" | "gpt-4"
-export type Model = "gpt-3.5-turbo-1106" | "gpt-4-1106-preview"
+export type SimpleModel = "gpt-3.5" | "gpt-4" | "gpt-4-preivew"
+export type Model =
+  | "gpt-3.5-turbo-1106"
+  | "gpt-4-1106-preview"
+  | "gpt-4"
+  | "gpt-4-32k"
 
 export interface Prompt {
   desc: string

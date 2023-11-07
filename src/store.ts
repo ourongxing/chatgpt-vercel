@@ -61,6 +61,10 @@ const models = {
     "16k": "gpt-3.5-turbo-1106"
   },
   "gpt-4": {
+    "8k": "gpt-4",
+    "32k": "gpt-4-32k"
+  },
+  "gpt-4-preivew": {
     "128k": "gpt-4-1106-preview"
   }
 } satisfies {
@@ -77,6 +81,14 @@ const modelFee = {
   "gpt-4-1106-preview": {
     input: 0.01,
     output: 0.03
+  },
+  "gpt-4": {
+    input: 0.03,
+    output: 0.06
+  },
+  "gpt-4-32k": {
+    input: 0.06,
+    output: 0.12
   }
 } satisfies {
   [key in Model]: {
@@ -175,10 +187,14 @@ function Store() {
 
   const currentModel = createMemo(() => {
     const model = store.sessionSettings.model
-    if (model === "gpt-3.5") {
-      return models["gpt-3.5"]["16k"]
-    } else {
-      return models["gpt-4"]["128k"]
+    const tk = (store.inputContentToken + store.contextToken) / 1000
+    switch (model) {
+      case "gpt-3.5":
+        return models["gpt-3.5"]["16k"]
+      case "gpt-4":
+        return models["gpt-4"][tk < 7 ? "8k" : "32k"]
+      default:
+        return models["gpt-4-preivew"]["128k"]
     }
   })
 

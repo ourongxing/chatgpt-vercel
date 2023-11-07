@@ -148,6 +148,10 @@ export default function SettingAction() {
                   {
                     value: "gpt-4",
                     label: "gpt-4(auto)"
+                  },
+                  {
+                    value: "gpt-4-preview",
+                    label: "gpt-4(preivew)"
                   }
                 ]}
               />
