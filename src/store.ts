@@ -58,12 +58,10 @@ export const defaultMessage: ChatMessage = {
 
 const models = {
   "gpt-3.5": {
-    "4k": "gpt-3.5-turbo-0613",
-    "16k": "gpt-3.5-turbo-16k-0613"
+    "16k": "gpt-3.5-turbo-1106"
   },
   "gpt-4": {
-    "8k": "gpt-4-0613",
-    "32k": "gpt-4-32k-0613"
+    "128k": "gpt-4-1106-preview"
   }
 } satisfies {
   [k in SimpleModel]: {
@@ -72,21 +70,13 @@ const models = {
 }
 
 const modelFee = {
-  "gpt-3.5-turbo-0613": {
-    input: 0.0015,
+  "gpt-3.5-turbo-1106": {
+    input: 0.001,
     output: 0.002
   },
-  "gpt-3.5-turbo-16k-0613": {
-    input: 0.003,
-    output: 0.004
-  },
-  "gpt-4-0613": {
-    input: 0.03,
-    output: 0.06
-  },
-  "gpt-4-32k-0613": {
-    input: 0.06,
-    output: 0.12
+  "gpt-4-1106-preview": {
+    input: 0.01,
+    output: 0.03
   }
 } satisfies {
   [key in Model]: {
@@ -185,11 +175,10 @@ function Store() {
 
   const currentModel = createMemo(() => {
     const model = store.sessionSettings.model
-    const tk = (store.inputContentToken + store.contextToken) / 1000
     if (model === "gpt-3.5") {
-      return models["gpt-3.5"][tk < 3.5 ? "4k" : "16k"]
+      return models["gpt-3.5"]["16k"]
     } else {
-      return models["gpt-4"][tk < 7 ? "8k" : "32k"]
+      return models["gpt-4"]["128k"]
     }
   })
 
