@@ -64,7 +64,7 @@ const models = {
     "8k": "gpt-4",
     "32k": "gpt-4-32k"
   },
-  "gpt-4-preivew": {
+  "gpt-4-preview": {
     "128k": "gpt-4-1106-preview"
   }
 } satisfies {
@@ -194,7 +194,7 @@ function Store() {
       case "gpt-4":
         return models["gpt-4"][tk < 7 ? "8k" : "32k"]
       default:
-        return models["gpt-4-preivew"]["128k"]
+        return models["gpt-4-preview"]["128k"]
     }
   })
 
