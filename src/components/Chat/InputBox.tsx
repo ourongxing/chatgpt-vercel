@@ -180,8 +180,12 @@ export default function ({
               id="input"
               placeholder="与 ta 对话吧"
               autocomplete="off"
+              autocapitalize="off"
+              autofocus={false}
+              wrap="hard"
+              spellcheck={false}
               value={store.inputContent}
-              autofocus
+              // autofocus
               onClick={scrollToBottom}
               onKeyDown={e => {
                 if (e.isComposing) return
