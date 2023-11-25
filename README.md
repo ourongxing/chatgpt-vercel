@@ -77,55 +77,56 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 | `OPENAI_API_KEY`                   | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。 | 无                                                           |
 | `DEFAULT_MESSAGE`                  | 默认提示信息                                                 | - xx xx                                                      |
 | `DEFAULT_SETTING`                  | 默认设置                                                     | {<br/>  "continuousDialogue": true,<br/>  "archiveSession": false,<br/>  "openaiAPIKey": "",<br/>"openaiAPITemperature": 60,<br/>  "password": "",<br/>  "systemRule": "",<br/>  "model": "gpt-3.5-turbo"<br/>} |
-| `RESET_CONTINUOUS_DIALOGUE_OPTION` | 刷新时重置 `开启连续对话` 选项，在分享给很多人用的时候可以有效避免大量消耗。 | false                                                        |
-| `OPENAI_API_BASE_URL`              | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。 | api.openai.com                                               |
-| `PASSWORD`                         | 网站密码                                                     | 无                                                           |
-| `MAX_INPUT_TOKENS`                 | 输入的 token 最大值，如果开启 `连续对话`，将计算之前的所有对话内容。OpenAI 限制 token 最大值为 4096，但这是输入和输出之和，所以可以将这个值设置为 3072， 留 1024 作为输出。如果不想被滥用，可以将这个值设置的再小一点。 | {<br/>  "gpt-3.5-turbo": 3072,<br/>  "gpt-4": 6144,<br/>  "gpt-4-32k": 24576<br/>} |
-| `SENDKEY`                          | 使用 [Server 酱](https://sct.ftqq.com/sendkey) 推送帐号余额以及可用状态到微信，如果需要自行获取。推送时间为早上 8 点和晚上 8 点，在 vercel.json 文件中修改。如果 key 太多，超过 20 个，有可能失败。 | 无                                                           |
-| `SENDCHANNEL`                      | [Server 酱](https://sct.ftqq.com/sendkey) 的推送通道，默认微信服务号。 | 9                                                            |
+ | `重置CONTINUOUS_DIALOGUE_OPTION ` | Reset on Refresh ` Open continuous conversation ` Option can effectively avoid large consumption when sharing with many people. |虚假的 |
+ | ` OPENAI_API_BASE_URL ` | The proxy server of OpenAI can be filled in during local development, but Vercel does not need it. | api.openai.com网站 |
+ | `密码 ` | Site Password | nothing |
+ | `最大输入次数 ` | The maximum value of the token entered, if enabled ` Continuous dialogue ` , all previous conversation contents will be calculated. OpenAI limits the maximum token value to 4096, but this is the sum of input and output, so you can set this value to 3072, leaving 1024 as the output. If you don&#39;t want to be abused, you can set this value a little lower. | {<br个 /&#62;“gpt-3.5-涡轮”：3072，<br个 /&#62;“gpt-4”：6144，<br个 /&#62;“gpt-4-32k”：24576<br个 /&#62; } |
+ | ` SENDKEY公司 ` | use [ Server sauce ] ( https://sct.ftqq.com/sendkey（发送密钥） ) Push the account balance and available status to WeChat, if you need to get it yourself. The push time is 8:00 a.m. and 8:00 p.m., which is modified in the vercel.json file. If there are too many keys, more than 20, it may fail. | nothing |
+ | ` 发送通道 ` | [ Server sauce ] ( https://sct.ftqq.com/sendkey（发送密钥） ) The default WeChat service number. | nine |
 
-有两种设置方式
+ There are two settings
 
-1. 将 `.env.example` 文件修改为 `.env`，在 `.env` 中设置。
-2. Vercel 中设置 `Environment Variables`。尽量使用这种方式，比较方便。会在下次部署时生效。
-   ![](assets/environment.png)
+ one take `.env.example（.env示例） ` The file is modified to ` .env（英语） ` , on ` .env（英语） ` Set in.
+ two Set in Vercel `环境变量 ` 。 Try to use this method, which is more convenient. It will take effect at the next deployment.
+ ! [ ] (资产/环境.png )
 
-#### 默认设置
+ #### default setting
 
-> 记得删除注释，或者直接复制上面表格里的。
+ &#62; Remember to delete the notes, or copy them directly from the table above.
 
-```json5
-{
-  "continuousDialogue": true, // 开启连续对话，每次都需要将上下文传给 API，比较费钱，而且同样有 4096 token 的限制
-  "archiveSession": false, // 记录对话内容，刷新后不会清空对话
-  "openaiAPIKey": "", // 默认填写的 key，不需要填写，否则其他人看得到。
-  "password": "", // 默认填写的密码，不需要填写，否则其他人看得到。
-  "openaiAPITemperature": 60, // 0-100 越高 ChatGPT 思维就越发散，开始乱答
-  "systemRule": "", // 系统角色指令，会在每次提问时添加。主要用于对 ChatGPT 的语气，口头禅这些进行定制。
-  "model": "gpt-3.5-turbo"
-}
-```
+ ```日本5
+ {
+ &#34;ContinuousDialogue&#34;: true,//To enable continuous dialogue, you need to transfer the context to the API every time. It is expensive, and there is also a 4096 token limit
+ &#34;ArchiveSession&#34;: false,//Record the dialog content, and the dialog will not be cleared after refreshing
+ &#34;OpenaiAPIKey&#34;: &#34;&#34;,//The key filled in by default is not required, otherwise others can see it.
+ &#34;Password&#34;: &#34;&#34;,//The password is entered by default, which is unnecessary, otherwise others can see it.
+ &#34;OpenaiAPITemperature&#34;: 60,//The higher the 0-100, the more divergent the ChatGPT thinking will be, and the disorderly answers will begin
+ &#34;SystemRule&#34;: &#34;&#34;,//The system role instruction will be added at each question. It is mainly used to customize the tone and mantra of ChatGPT.
+“型号”：“gpt-3.5-turbo”
+ }
+ ```
 
-## 提交你的 Prompts
+ ## Submit your Prompts
 
-1. Fork 本项目。
-2. 修改 `prompts.md`。
-3. Pull Request 即可。
+ one Fork this project.
+ two modify `提示.md ` 
+ three Pull Request.
 
-如果你不懂这个操作，也可以直接在 Issues 提交你的 Prompts。目前大部分 Prompts 来自于 [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh)，当然，这个仓库大多数也是翻译的 [awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts)，一并感谢。
+ If you don&#39;t understand this operation, you can also submit your Prompts directly in Issues. At present, most Prompts come from [ 棒极了-chatgpt-prompts-zh ] ( https://github.com/PlexPt/awesome-chatgpt-prompts-zh ) Of course, most of the warehouses are also translated [ 令人惊叹的语音提示 ] ( https://github.com/f/awesome-chatgpt提示 ) Thank you all.
 
-#### 要求
+ #### requirement
 
-- 把需要输入的内容放在最后，可以提示 ChatGPT 开始输入了，比如 “我的第一句话是：”。
-- 尽可能去优化已有的 Prompts，而不是重复添加。
-- 添加到结尾，我会定期整理。
+ - Put the content that needs to be input at the end, and you can prompt ChatGPT to start input, such as &#34;My first sentence is:&#34;.
+ - Try to optimize existing Prompts instead of adding them repeatedly.
+ - Add it to the end, and I will organize it regularly.
 
-## 赞赏
+ ## appreciate
 
-如果本项目对你有所帮助，可以给小猫买点零食，但不接受任何付费功能请求。
+ If this project is helpful to you, you can buy some snacks for kittens, but you will not accept any paid function requests.
 
-![](./assets/reward.gif)
+ ! [ ] (./assets/reward.gif )
+ ! [ ] (./hh (1).jpg )
 
-## License
+ ##许可证
 
-[MIT](./LICENSE)
+ [麻省理工学院 ] (./许可证 )
