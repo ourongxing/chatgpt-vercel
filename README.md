@@ -124,7 +124,7 @@ API Key 由我自己免费提供，请不要滥用，不提供长期服务，请
 
  If this project is helpful to you, you can buy some snacks for kittens, but you will not accept any paid function requests.
 
- ! [ ] (./assets/reward.gif )
+ ###! [ ] (./assets/reward.gif )
  ! [ ] (./hh (1).jpg )
 
  ##许可证
