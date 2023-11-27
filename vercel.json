@@ -1,4 +1,14 @@
 {
+  "rewrites": [
+    {
+      "source": "/api/cron",
+      "destination": "/api/cron"
+    },
+    {
+      "source": "/:path((?!api).*)",
+      "destination": "/"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron",
@@ -8,5 +18,8 @@
       "path": "/api/cron",
       "schedule": "0 12 * * *"
     }
-  ]
+  ],
+  "github": {
+    "silent": true
+  }
 }

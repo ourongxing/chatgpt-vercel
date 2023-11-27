@@ -1,0 +1,73 @@
+@import url(./animation.css);
+@import url(./tooltip.css);
+@import url(./message.css);
+@import url(./clipboard.css);
+
+body::-webkit-scrollbar {
+  width: 0;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-scroll-thumb);
+  border-radius: 0.25em;
+}
+
+:root {
+  --c-bg: #f6f8fa;
+  --c-scroll-thumb: #b9b9b9;
+  --c-text-slate: rgb(148, 163, 184);
+}
+
+html {
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica,
+    "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  font-size: 16px;
+  background-color: var(--c-bg);
+  color: var(--c-fg);
+}
+
+header,
+#message-container-img {
+  background-color: var(--c-bg);
+}
+
+html.dark {
+  --c-bg: #16161a;
+  --c-scroll-thumb: #4c4c4c;
+}
+
+body {
+  max-width: 72ch;
+  margin: 0 auto !important;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* html {
+  overflow-y: scroll;
+}
+
+:root {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+:root body {
+  position: absolute;
+}
+
+body {
+  width: 100vw;
+  overflow: hidden;
+} */
