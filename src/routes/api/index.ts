@@ -51,6 +51,20 @@ const timeout = isNaN(+process.env.TIMEOUT!)
 const passwordSet = process.env.PASSWORD || defaultEnv.PASSWORD
 
 export async function POST({ request }: APIEvent) {
+
+   // 设置 CORS 相关的头
+    const headers = new Headers({
+      "Access-Control-Allow-Origin": "*", // 允许所有域
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS", // 允许的 HTTP 方法
+      "Access-Control-Allow-Headers": "Content-Type, Authorization", // 允许的 HTTP 头
+      "Content-Type": "application/json"
+    });
+
+    // 预检请求的处理
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers });
+    }
+  
   try {
     const body: {
       messages?: ChatMessage[]
@@ -74,7 +88,7 @@ export async function POST({ request }: APIEvent) {
           const billings = await Promise.all(
             splitKeys(key).map(k => fetchBilling(k))
           )
-          return new Response(await genBillingsTable(billings))
+          return new Response(await genBillingsTable(billings), { headers })
         } else {
           throw new Error("没有填写 OpenAI API key，不会查询内置的 Key。")
         }
@@ -82,7 +96,7 @@ export async function POST({ request }: APIEvent) {
         const billings = await Promise.all(
           splitKeys(content).map(k => fetchBilling(k))
         )
-        return new Response(await genBillingsTable(billings))
+        return new Response(await genBillingsTable(billings), { headers })
       }
     }
 
@@ -116,14 +130,15 @@ export async function POST({ request }: APIEvent) {
             message: err.message
           }
         }),
-        { status: 500 }
+        { status: 500 ,  headers }
       )
     })
 
     if (!rawRes.ok) {
       return new Response(rawRes.body, {
         status: rawRes.status,
-        statusText: rawRes.statusText
+        statusText: rawRes.statusText,
+        headers
       })
     }
 
@@ -153,7 +168,7 @@ export async function POST({ request }: APIEvent) {
       }
     })
 
-    return new Response(stream)
+    return new Response(stream,{ headers})
   } catch (err: any) {
     return new Response(
       JSON.stringify({
@@ -161,7 +176,7 @@ export async function POST({ request }: APIEvent) {
           message: err.message
         }
       }),
-      { status: 400 }
+      { status: 400,  headers }
     )
   }
 }
