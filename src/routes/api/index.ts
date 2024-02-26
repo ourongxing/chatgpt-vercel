@@ -102,7 +102,7 @@ export async function POST({ request }: APIEvent) {
 
     const apiKey = randomKey(splitKeys(key))
 
-    if (!apiKey) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
+    if (model) throw new Error(`模型指定错误：${model}`);
 
     const encoder = new TextEncoder()
     const decoder = new TextDecoder()
@@ -133,7 +133,7 @@ export async function POST({ request }: APIEvent) {
         { status: 500 ,  headers }
       )
     })
-
+    if (model) throw new Error("没有填写 OpenAI API key，或者 key 填写错误。")
     if (!rawRes.ok) {
       return new Response(rawRes.body, {
         status: rawRes.status,
