@@ -3,7 +3,7 @@ name: Cloudflare
 on:
   push:
     branches:
-      - main
+      - _main
 
 jobs:
   ci:
