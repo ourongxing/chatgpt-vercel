@@ -1,7 +1,0 @@
-[build.environment]
-  NETLIFY_USE_PNPM = "true"
-  NODE_VERSION = "20"
-
-[build]
-  command = "solid-start build"
-  publish = "netlify"

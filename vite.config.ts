@@ -1,10 +1,7 @@
 import solid from "solid-start/vite"
 // @ts-ignore
-import netlify from "solid-start-netlify"
-// @ts-ignore
 import node from "solid-start-node"
 import vercel from "solid-start-vercel"
-import cloudflare from "solid-start-cloudflare-workers"
 import { defineConfig } from "vite"
 import unocss from "unocss/vite"
 import {
@@ -19,10 +16,6 @@ import { VitePWA } from "vite-plugin-pwa"
 const adapter = () => {
   if (process.env.VERCEL) {
     return vercel({ edge: true })
-  } else if (process.env.NETLIFY) {
-    return netlify({ edge: true })
-  } else if (process.env.CF_WORKER) {
-    return cloudflare({})
   } else {
     return node()
   }

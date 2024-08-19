@@ -9,8 +9,6 @@
     "build": "tsx scripts/genEnv.ts && solid-start build",
     "build:vps": "NODE_OPTIONS=\"--max-old-space-size=3072\" pnpm build",
     "start": "solid-start start",
-    "lint:fix": "eslint . --fix --ext .ts",
-    "lint": "eslint . --ext .ts",
     "prettier": "prettier --write ."
   },
   "simple-git-hooks": {
@@ -62,8 +60,6 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "simple-git-hooks": "^2.10.0",
-    "solid-start-cloudflare-workers": "^0.3.10",
-    "solid-start-netlify": "^0.3.10",
     "solid-start-node": "^0.3.10",
     "solid-start-vercel": "^0.3.10",
     "tsx": "^3.14.0",
