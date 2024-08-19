@@ -57,15 +57,11 @@ export const defaultMessage: ChatMessage = {
 }
 
 const models = {
-  "gpt-3.5": {
-    "16k": "gpt-3.5-turbo-0125"
+  "gpt-4o": {
+    "128k": "gpt-4o-2024-08-06"
   },
-  "gpt-4": {
-    "8k": "gpt-4",
-    "32k": "gpt-4-32k"
-  },
-  "gpt-4-preview": {
-    "128k": "gpt-4-0125-preview"
+  "gpt-4o-mini": {
+    "128k": "gpt-4o-mini"
   }
 } satisfies {
   [k in SimpleModel]: {
@@ -74,21 +70,13 @@ const models = {
 }
 
 const modelFee = {
-  "gpt-3.5-turbo-0125": {
-    input: 0.0005,
-    output: 0.0015
+  "gpt-4o-mini": {
+    input: 0.00015,
+    output: 0.0006
   },
-  "gpt-4-0125-preview": {
-    input: 0.01,
-    output: 0.03
-  },
-  "gpt-4": {
-    input: 0.03,
-    output: 0.06
-  },
-  "gpt-4-32k": {
-    input: 0.06,
-    output: 0.12
+  "gpt-4o-2024-08-06": {
+    input: 0.0025,
+    output: 0.01
   }
 } satisfies {
   [key in Model]: {
@@ -187,14 +175,11 @@ function Store() {
 
   const currentModel = createMemo(() => {
     const model = store.sessionSettings.model
-    const tk = (store.inputContentToken + store.contextToken) / 1000
     switch (model) {
-      case "gpt-3.5":
-        return models["gpt-3.5"]["16k"]
-      case "gpt-4":
-        return models["gpt-4"][tk < 7 ? "8k" : "32k"]
+      case "gpt-4o":
+        return models["gpt-4o"]["128k"]
       default:
-        return models["gpt-4-preview"]["128k"]
+        return models["gpt-4o-mini"]["128k"]
     }
   })
 
@@ -232,18 +217,30 @@ export function loadSession(id: string) {
       const session = getSession(id)
       if (globalSettings) {
         const parsed = JSON.parse(globalSettings)
-        setStore("globalSettings", t => ({
-          ...t,
-          ...parsed
-        }))
+        setStore("globalSettings", t => {
+          const s = {
+            ...t,
+            ...parsed
+          }
+          if (s.model !== "gpt-4o" && s.model !== "gpt-4o-mini") {
+            s.model = "gpt-4o-mini"
+          }
+          return s
+        })
       }
       if (session) {
         const { settings, messages } = session
         if (settings) {
-          setStore("sessionSettings", t => ({
-            ...t,
-            ...settings
-          }))
+          setStore("sessionSettings", t => {
+            const s = {
+              ...t,
+              ...session
+            }
+            if (s.model !== "gpt-4o" && s.model !== "gpt-4o-mini") {
+              s.model = "gpt-4o-mini"
+            }
+            return s
+          })
         }
         if (messages) {
           if (store.sessionSettings.saveSession) {

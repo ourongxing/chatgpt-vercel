@@ -8,7 +8,6 @@ interface ImportMetaEnv {
   TIMEOUT?: string
   PASSWORD?: string
   SEND_KEY?: string
-  SEND_CHANNEL?: string
   NO_GFW?: string
 }
 

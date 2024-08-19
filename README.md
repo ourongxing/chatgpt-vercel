@@ -14,12 +14,10 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 在线预览:
 
 1. [vercel.app](https://vercel-chatgpt-github.vercel.app) 被墙。
-2. ~~[aitoolgpt.com](https://www.aitoolgpt.com)，由 [@AUDI_GUZZ](https://m.okjike.com/users/4af3cfb4-1291-4a8b-b210-f515c86934a9) 免费提供~~。（2023.03.22 壮烈牺牲，提醒大家不要分享自己的站点，请小范围内使用）。
 
 ## 特点
 
 1. UI 优雅简洁的同时功能尽可能强大，细节满满，等你发现。同时满足小白和大佬使用。
-2. 快速部署到国外平台，支持 Vercel，Netlify，Railway，免翻墙使用，方便分享给朋友。
 3. 支持 PWA。
 4. 支持 Prompts 预设，使用 <kbd>空格</kbd> 或者 <kbd>/</kbd> 搜索，可以模糊匹配，突出显示匹配的文字。
 5. 支持多个对话（聊天），并且每个对话都可以单独设置，自由设置角色，不同对话可以通过 URL 直达。使用 <kbd>空格</kbd><kbd>空格</kbd> 或者 <kbd>/</kbd><kbd>/</kbd> 搜索，可以模糊匹配，搜索历史消息。
@@ -32,7 +30,6 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 - 有效上下文：剔除报错的部分对话。如果关闭连续对话，将只统计锁定了的部分对话。这个概念很关键。
 - 锁定对话：点击每条消息前面的头像，就可以锁定了。锁定有什么好处？清空对话时，锁定了的不会删除。关闭连续对话时，始终会发送锁定了的对话，相当于角色设定。关闭 `记录对话内容` 后，始终会记录锁定了的对话，下次刷新仍然存在。
-
 - Open AI Key 要怎么获得：注册 OpenAI 的帐号，然后 [生成 Key](https://platform.openai.com/account/api-keys) 就行了。现在注册就送 5 美元，可以用一两个月。嫌注册麻烦，可以直接去买号，自行搜索。注意不要被骗，一般 5 元以下可以入手，看到有 120 美元的 key，这种属于是绑了虚拟信用卡，可以透支 120 美元，只能用一个月，而且容易封号。现在没绑卡的账号限制比较多，并且容易封号。绑了卡也会优先扣除赠送的余额。
 - 输入框
   - <kbd>Enter</kbd>发送（可关闭），<kbd>Shift</kbd>+<kbd>Enter</kbd>换行。
@@ -49,7 +46,6 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
     - 重新回答
     - 删除：只删除回答。
 - 点击顶部标题滚动到顶部，点击输入框滚动到底部。
-- 发送 sk- 开头的 key，可以直接查询余额。可以换行查询多个。也可以发送 `查询填写的 Key 的余额` 来直接查询你填的 key 的余额，这个 Prompt 预设第一个就是，直接用。作为站长，你可以通过设置环境变量来定时查询所有内置 key 的余额，并发送到微信上。
 - url 里使用 `url?q=你好啊` 这种方式可以打开网页直接回答 `你好啊`，当作搜索引擎使用。所有的对话中都可以使用。
 
 ### 设置与动作
@@ -119,21 +115,19 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 ### 环境变量
 
-> v1.0.0 版本环境变量变化比较大，需要重新设置。以 `CLIENT_` 开头的变量会暴露给前端，请不要填写敏感信息。
+> 以 `CLIENT_` 开头的变量会暴露给前端，请不要填写敏感信息。
 
-| 环境变量                  | 说明                                                                                                                                                                                                | 默认值                                                                                           |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `OPENAI_API_KEY`          | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。                                                    | 无                                                                                               |
-| `OPENAI_API_BASE_URL`     | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。并且不建议生产阶段使用。                                                                                                                | api.openai.com                                                                                   |
-| `NO_GFW`                  | 表示可以服务器可以直连，不需要`OPENAI_API_BASE_URL`，就算设置了也不使用。                                                                                                                           | false                                                                                            |
-| `TIMEOUT`                 | OpenAI API 超时。单位为毫秒，Vercel Edge Function 最大超时为 30000。                                                                                                                                | 30000                                                                                            |
-| `PASSWORD`                | 网站密码                                                                                                                                                                                            | 无                                                                                               |
-| `CLIENT_DEFAULT_MESSAGE`  | 默认提示信息                                                                                                                                                                                        | - xx xx                                                                                          |
-| `CLIENT_GLOBAL_SETTINGS`  | 默认全局设置                                                                                                                                                                                        | {"APIKey":"","password":"","enterToSend":true}                                                   |
-| `CLIENT_SESSION_SETTINGS` | 默认对话设置，对话设置在每个对话中都是独立的。                                                                                                                                                      | {"title":"","saveSession":true,"APITemperature":0.6,"continuousDialogue":true,"model":"gpt-3.5"} |
-| `CLIENT_MAX_INPUT_TOKENS` | 有效上下文+输入的 token 数。OpenAI 不同模型的最大 token 不一样，价格也不同，可以分别设置。并且 OpenAI 会统计输入+输出之和，但我们这里只限制输入。                                                   | {"gpt-3.5":16000,"gpt-4":32000}                                                                  |
-| `SEND_KEY`                | 使用 [Server 酱](https://sct.ftqq.com/sendkey) 推送帐号余额以及可用状态到微信，如果需要自行获取。推送时间为早上 8 点和晚上 8 点，在 vercel.json 文件中修改。如果 key 太多，超过 20 个，有可能失败。 | 无                                                                                               |
-| `SEND_CHANNEL`            | [Server 酱](https://sct.ftqq.com/sendkey) 的推送通道，默认微信服务号。                                                                                                                              | 9                                                                                                |
+| 环境变量                  | 说明                                                         | 默认值                                                       |
+| ------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `OPENAI_API_KEY`          | OpenAI API Key，可以填写多个，用 \| 或者 换行 隔开，随机调用。最好是多填几个，API 有并发上的限制。如果用户不填自己的 key，那么就会使用你的 key。 | 无                                                           |
+| `OPENAI_API_BASE_URL`     | 本地开发时可以填写 OpenAI 的代理服务器，但是 Vercel 不需要。并且不建议生产阶段使用。 | api.openai.com                                               |
+| `NO_GFW`                  | 表示可以服务器可以直连，不需要`OPENAI_API_BASE_URL`，就算设置了也不使用。 | false                                                        |
+| `TIMEOUT`                 | OpenAI API 超时。单位为毫秒，Vercel Edge Function 最大超时为 30000。 | 30000                                                        |
+| `PASSWORD`                | 网站密码                                                     | 无                                                           |
+| `CLIENT_DEFAULT_MESSAGE`  | 默认提示信息                                                 | - xx xx                                                      |
+| `CLIENT_GLOBAL_SETTINGS`  | 默认全局设置                                                 | {"APIKey":"","password":"","enterToSend":true}               |
+| `CLIENT_SESSION_SETTINGS` | 默认对话设置，对话设置在每个对话中都是独立的。               | {"title":"","saveSession":true,"APITemperature":0.6,"continuousDialogue":true,"model":"gpt-3.5"} |
+| `CLIENT_MAX_INPUT_TOKENS` | 有效上下文+输入的 token 数。OpenAI 不同模型的最大 token 不一样，价格也不同，可以分别设置。并且 OpenAI 会统计输入+输出之和，但我们这里只限制输入。 | {"gpt-3.5":16000,"gpt-4":32000}                              |
 
 有两种设置方式
 
@@ -164,7 +158,7 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
   "saveSession": true, // 记录当前对话内容，刷新不会丢失。关闭后仍然会记录锁定的对话。
   "APITemperature": 0.6, // 0-2，思维发散程度，越高 ChatGPT 思维就越发散，开始乱答，甚至会乱码，建议小于 1 。
   "continuousDialogue": true, // 开启连续对话，每次都需要将上下文传给 API。
-  "model": "gpt-3.5" // 模型，gpt-3.5、gpt-4。会自动根据 tokens 大小选择合适的模型。
+  "model": "gpt-4o-mini" // 模型
 }
 ```
 
