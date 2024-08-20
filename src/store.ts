@@ -234,7 +234,7 @@ export function loadSession(id: string) {
           setStore("sessionSettings", t => {
             const s = {
               ...t,
-              ...session
+              ...settings
             }
             if (s.model !== "gpt-4o" && s.model !== "gpt-4o-mini") {
               s.model = "gpt-4o-mini"

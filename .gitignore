@@ -11,3 +11,4 @@ dev-dist/
 .eslintcache
 .solid/
 netlify/
+.vercel
