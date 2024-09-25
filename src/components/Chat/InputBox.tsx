@@ -33,7 +33,7 @@ export default function ({
 }) {
   const [candidateOptions, setCandidateOptions] = createSignal<Option[]>([])
   const [compositionend, setCompositionend] = createSignal(true)
-  const navgiate = useNavigate()
+  const navigate = useNavigate()
   const { store, setStore } = RootStore
   onMount(() => {
     import("~/utils/parse").then(({ parsePrompts }) => {
@@ -76,9 +76,12 @@ export default function ({
     batch(() => {
       if (option) {
         if (option.extra?.id) {
-          if (option.extra?.id === "index") window.location.href = "/"
+          if (option.extra?.id === "index") {
+            navigate("/", { replace: true })
+            loadSession("index")
+          }
           else {
-            navgiate(`/session/${option.extra.id}`)
+            navigate(`/session/${option.extra.id}`)
             loadSession(option.extra.id)
             setStore("inputContent", "")
           }

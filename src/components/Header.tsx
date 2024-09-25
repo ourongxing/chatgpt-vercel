@@ -37,8 +37,10 @@ export default function Header() {
         id="logo"
         class="pl-1em cursor-pointer inline-block"
         onClick={() => {
-          navigate("/", { replace: true })
-          loadSession("index")
+          if (store.sessionId && store.sessionId !== "index") {
+            navigate("/", { replace: true })
+            loadSession("index")
+          }
         }}
       >
         <Show

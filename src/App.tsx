@@ -1,5 +1,4 @@
 import PrefixTitle from "~/components/PrefixTitle"
-import Header from "~/components/Header"
 import { LocalStorageKey } from "~/types"
 import "@unocss/reset/tailwind.css"
 import "~/styles/main.css"
@@ -8,7 +7,6 @@ import "highlight.js/styles/atom-one-dark.css"
 import { MetaProvider } from "@solidjs/meta"
 import { ParentProps } from "solid-js"
 import "uno.css"
-import Main from "./layout/Main"
 
 const e = localStorage.getItem(LocalStorageKey.THEME) || ""
 const a = window.matchMedia("(prefers-color-scheme: dark)").matches
