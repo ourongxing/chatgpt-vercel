@@ -10,13 +10,9 @@ import {
 import solidPlugin from "vite-plugin-solid"
 import tsconfigPaths from "vite-tsconfig-paths"
 import nitro from "vite-plugin-with-nitro"
-// import nitro from "@analogjs/vite-plugin-nitro"
 
 export default defineConfig({
   envPrefix: "CLIENT_",
-  build: {
-    outDir: "dist"
-  },
   plugins: [
     unocss({
       mergeSelectors: false,
@@ -39,14 +35,13 @@ export default defineConfig({
     }),
     solidPlugin(),
     tsconfigPaths(),
-    // @ts-ignore
     nitro(
       {
         ssr: false
       },
       {
         srcDir: "server",
-        // preset: process.env.VERCEL ? "vercel-edge" : "node-server"
+        preset: process.env.VERCEL ? "vercel" : "node-server"
       }
     )
   ],
