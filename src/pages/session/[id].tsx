@@ -4,6 +4,7 @@ import { Show } from "solid-js"
 import { RootStore } from "~/store"
 import PrefixTitle from "~/components/PrefixTitle"
 import { getSession } from "~/utils"
+import Main from "~/layout/Main"
 
 export default function () {
   const { store, setStore } = RootStore
@@ -13,9 +14,11 @@ export default function () {
   if (redirect()) useNavigate()("/", { replace: true })
   else setStore("sessionId", params.id ?? "index")
   return (
-    <Show when={!redirect()}>
+    <Show when={!redirect() && store.sessionId}>
       <PrefixTitle>{store.sessionSettings.title}</PrefixTitle>
-      <Chat />
+      <Main>
+        <Chat />
+      </Main>
     </Show>
   )
 }

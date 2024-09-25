@@ -1,5 +1,10 @@
 import Chat from "~/components/Chat"
+import Main from "~/layout/Main"
 
 export default function () {
-  return  <Chat />
+  return (
+    <Main>
+      <Chat />
+    </Main>
+  )
 }

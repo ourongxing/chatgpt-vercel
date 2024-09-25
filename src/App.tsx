@@ -8,6 +8,7 @@ import "highlight.js/styles/atom-one-dark.css"
 import { MetaProvider } from "@solidjs/meta"
 import { ParentProps } from "solid-js"
 import "uno.css"
+import Main from "./layout/Main"
 
 const e = localStorage.getItem(LocalStorageKey.THEME) || ""
 const a = window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -28,10 +29,7 @@ export default function (props: ParentProps) {
   return (
     <MetaProvider>
       <PrefixTitle />
-      <div id="app" class="sm:pt-8em py-2em before">
-        <Header />
-        {props.children}
-      </div>
+      {props.children}
     </MetaProvider>
   )
 }
