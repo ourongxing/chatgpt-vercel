@@ -1,6 +1,6 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { batch, createEffect, createSignal, onMount } from "solid-js"
-import { useSearchParams } from "solid-start"
+import { useSearchParams } from "@solidjs/router"
 import { RootStore, loadSession } from "~/store"
 import { LocalStorageKey, type ChatMessage } from "~/types"
 import { setSession, isMobile } from "~/utils"
@@ -25,9 +25,9 @@ export default function () {
       if (el === containerRef) setContainerWidth(`${width}px`)
     })
     window.setTimeout(() => {
-      document.querySelector("#root")?.classList.remove("before")
+      document.querySelector("#app")?.classList.remove("before")
     }, 100)
-    document.querySelector("#root")?.classList.add("after")
+    document.querySelector("#app")?.classList.add("after")
     loadSession(store.sessionId)
     if (q) sendMessage(q)
   })

@@ -4,10 +4,10 @@ import { RootStore } from "~/store"
 import type { ChatMessage } from "~/types"
 import { copyToClipboard } from "~/utils"
 import MessageAction from "./MessageAction"
-import openai from "/assets/openai.svg?raw"
-import vercel from "/assets/vercel.svg?raw"
+import openai from "~/icons/openai.svg?raw"
+import vercel from "~/icons/vercel.svg?raw"
 import type { FakeRoleUnion } from "./SettingAction"
-import { renderMarkdownInWorker } from "~/wokers"
+import { renderMarkdownInWorker } from "~/workers"
 import { throttle } from "@solid-primitives/scheduled"
 
 interface Props {

@@ -1,4 +1,4 @@
-import { defaultEnv } from "~/env"
+import { defaultEnv } from "../shared/env"
 import fs from "node:fs/promises"
 const env = Object.entries(defaultEnv).reduce((acc, [key, value]) => {
   let v = String(value)

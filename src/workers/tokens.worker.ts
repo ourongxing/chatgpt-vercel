@@ -1,4 +1,4 @@
-import { countTokens } from "~/utils/tokens"
+import { countTokens } from "../utils/tokens"
 
 const sw = self as unknown as ServiceWorkerGlobalScope & typeof globalThis
 

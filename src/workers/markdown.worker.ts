@@ -1,4 +1,4 @@
-import { md } from "~/markdown-it"
+import { md } from "../markdown-it"
 
 const sw = self as unknown as ServiceWorkerGlobalScope & typeof globalThis
 

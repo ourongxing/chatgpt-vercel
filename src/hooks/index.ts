@@ -3,7 +3,7 @@ import { type Accessor, onCleanup, onMount } from "solid-js"
 import { copyToClipboard } from "~/utils"
 
 export function useCopyCode() {
-  const timeoutIdMap: Map<HTMLElement, NodeJS.Timeout> = new Map()
+  const timeoutIdMap: Map<HTMLElement, any> = new Map()
   onMount(() => {
     makeEventListener(window, "click", e => {
       const el = e.target as HTMLElement

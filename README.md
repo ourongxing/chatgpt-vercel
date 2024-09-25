@@ -1,7 +1,7 @@
 # ChatGPT-Vercel
 
-![](assets/preview-light.png#gh-light-mode-only)
-![](assets/preview-dark.png#gh-dark-mode-only)
+![](md-assets/preview-light.png#gh-light-mode-only)
+![](md-assets/preview-dark.png#gh-dark-mode-only)
 
 
 
@@ -81,8 +81,6 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 ## 部署一个你自己的 ChatGPT 网站（免费，国内直连）
 
-[![](assets/powered-by-vercel.svg)](http://vercel.com/?utm_source=busiyi&utm_campaign=oss)
-
 > **Warning**
 >
 > vercel.app 域名已经被墙，但 vercel 本身没有被墙，所以你绑定自己的域名就可以了。如果广泛分享，域名有被墙的风险。如果是国内购买的域名，有请去喝茶的风险，所以要么小范围加密码使用，要么在国外购买域名。更推荐小范围内使用。
@@ -135,7 +133,7 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 2. Vercel 中设置 `Environment Variables`。尽量使用这种方式，比较方便。会在下次部署时生效。
 
-   ![](assets/environment.png)
+   ![](md-assets/environment.png)
 
 ### 默认全局设置
 
@@ -180,7 +178,7 @@ https://user-images.githubusercontent.com/48356807/232432194-46ba797f-ad9d-476a-
 
 如果本项目对你有所帮助，可以给小猫买点零食，但不接受任何付费功能请求。
 
-![](./assets/reward.gif)
+![](md-assets/reward.gif)
 
 ## License
 

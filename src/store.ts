@@ -1,11 +1,11 @@
 import { createStore } from "solid-js/store"
-import { defaultEnv } from "./env"
-import { type ChatMessage, LocalStorageKey } from "./types"
+import { defaultEnv } from "../shared/env"
+import { type ChatMessage, LocalStorageKey } from "../shared/types"
 import { batch, createEffect, createMemo, createRoot } from "solid-js"
 import { fetchAllSessions, getSession } from "./utils"
 import { Fzf } from "fzf"
 import type { Model, Option, SimpleModel } from "~/types"
-import { countTokensInWorker } from "~/wokers"
+import { countTokensInWorker } from "~/workers"
 import { throttle } from "@solid-primitives/scheduled"
 
 let globalSettings = { ...defaultEnv.CLIENT_GLOBAL_SETTINGS }
@@ -277,7 +277,7 @@ export function loadSession(id: string) {
             seesions
               .find(k => k.id === "index")
               ?.messages.map(k => k.content)
-              .join("\n") ?? "",
+              .join("\n"),
         extra: {
           id: "index"
         }

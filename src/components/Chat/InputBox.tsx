@@ -13,7 +13,7 @@ import type { Option } from "~/types"
 import { scrollToBottom } from "~/utils"
 import SettingAction, { actionState, type FakeRoleUnion } from "./SettingAction"
 import SlashSelector from "./SlashSelector"
-import { useNavigate } from "solid-start"
+import { useNavigate } from "@solidjs/router"
 import { throttle } from "@solid-primitives/scheduled"
 
 // 3em

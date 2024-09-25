@@ -1,24 +1,7 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "jsxImportSource": "solid-js",
-    "jsx": "preserve",
-    "strict": true,
-    "allowJs": true,
-    "types": [
-      "node",
-      "solid-start/env",
-      "vite/client",
-      "vite-plugin-pwa/client"
-    ],
-    "baseUrl": "./",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
-  },
-  "include": ["src/**/*", "*.d.ts", "scripts/**/*"]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }

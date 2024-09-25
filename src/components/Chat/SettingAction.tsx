@@ -15,7 +15,7 @@ import {
   setSession
 } from "~/utils"
 import { Selector, Switch as SwitchButton } from "../Common"
-import { useNavigate } from "solid-start"
+import { useNavigate } from "@solidjs/router"
 
 export const [actionState, setActionState] = createStore({
   showSetting: "none" as "none" | "global" | "session",
@@ -401,7 +401,6 @@ async function exportJpg() {
     const messageContainer = document.querySelector(
       "#message-container-img"
     ) as HTMLElement
-    const header = document.querySelector("header") as HTMLElement
     async function downloadIMG() {
       const url = await toJpeg(messageContainer)
       const a = document.createElement("a")
