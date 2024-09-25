@@ -158,7 +158,7 @@ export default function () {
   }
 
   async function fetchGPT(messages: ChatMessage[]) {
-    const response = await fetch("/api", {
+    const response = await fetch("/api/ai", {
       method: "POST",
       body: JSON.stringify({
         messages,
