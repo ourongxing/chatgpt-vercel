@@ -46,7 +46,7 @@
     "unocss": "^0.62.4",
     "vite": "^5.4.8",
     "vite-plugin-solid": "^2.10.2",
-    "vite-plugin-with-nitro": "0.0.1",
+    "vite-plugin-with-nitro": "0.0.2",
     "vite-tsconfig-paths": "^5.0.1"
   },
   "packageManager": "pnpm@9.11.0",

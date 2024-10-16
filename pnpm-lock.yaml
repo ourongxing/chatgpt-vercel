@@ -106,8 +106,8 @@ importers:
         specifier: ^2.10.2
         version: 2.10.2(solid-js@1.8.23)(vite@5.4.8(@types/node@20.16.6)(terser@5.24.0))
       vite-plugin-with-nitro:
-        specifier: 0.0.1
-        version: 0.0.1(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.6)(terser@5.24.0))
+        specifier: 0.0.2
+        version: 0.0.2(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.6)(terser@5.24.0))
       vite-tsconfig-paths:
         specifier: ^5.0.1
         version: 5.0.1(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.6)(terser@5.24.0))
@@ -2696,8 +2696,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  nitro-go@0.0.0-beta.2:
-    resolution: {integrity: sha512-Irs1b5+R14+crDBhrGlXdqwnaNw3K3GEJU82SzKlClWtEP0DXezNO87qnsdrGau9xAEEmVw8tmUe7P1bGnLNOw==}
+  nitro-go@0.0.1:
+    resolution: {integrity: sha512-oquSOY4P3WixYHMlDF782CgTiDabE0wi6LkcEVXNGzfCrp1m84WKydpARgwxqHJZorIq+mJHZbhkObaxHqhXeg==}
     engines: {node: ^16.11.0 || >=17.0.0}
     hasBin: true
     peerDependencies:
@@ -3406,8 +3406,8 @@ packages:
       '@testing-library/jest-dom':
         optional: true
 
-  vite-plugin-with-nitro@0.0.1:
-    resolution: {integrity: sha512-ki9dZ2BdTPpeeGLBHzV3Swy8KVF9uT4Z4g4hH5FWH3NkrCw4pnmH3PFrRM2pstj53lIehNOU63WaxWpm0qh/Qw==}
+  vite-plugin-with-nitro@0.0.2:
+    resolution: {integrity: sha512-hVnOw4qrr3r+KP+6dwUZSjnJ72c+WB74z0gcTPZtCA6UT5MQAttYy3OYHh9iUj4mx0tm0pkgFXqkxyaFvE+Gzg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       vite: ^5
@@ -5972,7 +5972,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  nitro-go@0.0.0-beta.2(typescript@5.6.2):
+  nitro-go@0.0.1(typescript@5.6.2):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@netlify/functions': 2.8.2
@@ -6793,12 +6793,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-with-nitro@0.0.1(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.6)(terser@5.24.0)):
+  vite-plugin-with-nitro@0.0.2(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.6)(terser@5.24.0)):
     dependencies:
       consola: 3.2.3
       defu: 6.1.4
       h3: h3-nightly@1.13.1-20241013-011028-3bf8af0
-      nitropack: nitro-go@0.0.0-beta.2(typescript@5.6.2)
+      nitropack: nitro-go@0.0.1(typescript@5.6.2)
       vite: 5.4.8(@types/node@20.16.6)(terser@5.24.0)
     transitivePeerDependencies:
       - '@azure/app-configuration'
