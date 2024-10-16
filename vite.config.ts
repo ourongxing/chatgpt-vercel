@@ -35,14 +35,8 @@ export default defineConfig({
     }),
     solidPlugin(),
     tsconfigPaths(),
-    nitro(
-      {
-        ssr: false
-      },
-      {
-        srcDir: "server",
-        preset: process.env.VERCEL ? "vercel" : "node-server"
-      }
-    )
+    nitro({
+      preset: process.env.VERCEL ? "vercel-edge" : "node-server",
+    })
   ],
 })

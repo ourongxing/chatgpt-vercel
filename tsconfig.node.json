@@ -19,5 +19,5 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "./",
   },
-  "include": ["vite.config.ts", "server", "shared", "scripts", "env.node.d.ts"]
+  "include": ["vite.config.ts", "server", "shared", "scripts", "env.node.d.ts", "dist/.nitro/types"]
 }

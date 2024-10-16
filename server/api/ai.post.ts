@@ -3,7 +3,6 @@ import { createParser } from "eventsource-parser"
 import type { ChatMessage, Model } from "../../shared/types"
 import { defaultEnv } from "../../shared/env"
 import { randomKey, splitKeys, fetchWithTimeout } from "../utils"
-import { defineEventHandler, readBody } from "h3"
 
 export const config = {
   runtime: "edge",
